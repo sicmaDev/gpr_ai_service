@@ -7,3 +7,4 @@ scikit-learn
 pandas
 ollama
 textblob
+python-dotenv

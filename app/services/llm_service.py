@@ -1,17 +1,30 @@
-import ollama
+import os
+import re
+import json
 import logging
+from dotenv import load_dotenv
+from ollama import Client
+
+load_dotenv()
 
 # Configuration du logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Modèle Ollama à utiliser par défaut (ex: llama3, mistral, ou phi3 pour plus de légèreté)
-# Assurez-vous d'avoir téléchargé le modèle localement avec : ollama run llama3.2:1b
-DEFAULT_MODEL = "llama3.2:1b"
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://127.0.0.1:11434")
+LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+DEFAULT_MODEL = os.getenv("LLM_MODEL_NAME", "llama3.2:1b")
+
+headers = {}
+if LLM_API_KEY:
+    headers["Authorization"] = f"Bearer {LLM_API_KEY}"
+
+# Création du client Ollama (Local ou Cloud)
+ollama_client = Client(host=LLM_BASE_URL, headers=headers)
 
 def generate_solution_from_history(current_complaint_text: str, similar_historic_solutions: list) -> str:
     """
-    Génère une proposition de solution unique et formatée en se basant sur la plainte actuelle
+    Génère 3 propositions de solutions formatées en se basant sur la plainte actuelle
     et un échantillon des meilleures solutions passées.
     """
     if not similar_historic_solutions:
@@ -23,14 +36,16 @@ def generate_solution_from_history(current_complaint_text: str, similar_historic
     # 2. Construction du Prompt Système (Les instructions strictes pour l'IA)
     system_prompt = """
     Tu es un assistant expert pour le service client de GPR (Gestion des Réclamations).
-    Ton rôle est d'analyser une plainte d'un client actuel, de regarder comment des problèmes similaires ont été résolus dans le passé, 
-    et de rédiger UNE SEULE proposition de réponse/solution claire, professionnelle et prête à être envoyée au client.
+    Ton rôle est d'analyser une plainte actuelle et les solutions historiques fournies.
+    Tu dois rédiger EXACTEMENT 3 propositions distinctes, numérotées 1, 2 et 3.
+    Chaque proposition doit être composée d'une SOLUTION (ce qu'on fait) et d'un COMMENTAIRE court (justification pour l'agent), séparés par le caractère '|'.
     
     Règles strictes :
+    - Propose 3 options variées basées sur les données fournies.
+    - Format par ligne : "N. [Solution] | [Commentaire]"
     - Reste courtois et professionnel (vouvoiement).
-    - Ne copie pas textuellement les historiques, inspire-t-en pour créer une réponse sur-mesure.
-    - Ne mentionne pas que tu es une IA ni que tu t'inspires d'historiques.
-    - Va droit au but. Propose des solutions concrètes (ex: annulation de frais, vérification technique en cours, etc.) basées sur le contexte.
+    - Ne mentionne pas que tu es une IA.
+    - Exemple : "1. Rembourser les frais | Le client a été débité deux fois par erreur."
     """
 
     # 3. Construction de la requête utilisateur (La tâche)
@@ -41,13 +56,13 @@ def generate_solution_from_history(current_complaint_text: str, similar_historic
     Voici comment des plaintes similaires ont été résolues par nos agents par le passé :
     {context_text}
 
-    Rédige maintenant la solution idéale à proposer pour cette plainte actuelle.
+    Rédige maintenant les 3 propositions (Solution | Commentaire) idéales pour cette plainte.
     """
 
     try:
         logger.info(f"Appel au modèle LLM local '{DEFAULT_MODEL}' via Ollama...")
         
-        response = ollama.chat(model=DEFAULT_MODEL, messages=[
+        response = ollama_client.chat(model=DEFAULT_MODEL, messages=[
             {
                 'role': 'system',
                 'content': system_prompt
@@ -56,7 +71,7 @@ def generate_solution_from_history(current_complaint_text: str, similar_historic
                 'role': 'user',
                 'content': user_prompt
             }
-        ])
+        ], options={'temperature': 0})
         
         generated_text = response['message']['content']
         logger.info("Génération LLM réussie.")
@@ -66,3 +81,354 @@ def generate_solution_from_history(current_complaint_text: str, similar_historic
         logger.error(f"Erreur lors de l'appel à Ollama : {e}")
         return "Erreur : Impossible de générer une solution. Veuillez vérifier que Ollama est bien lancé en arrière-plan."
 
+def _build_tree_text(categories_motifs: dict) -> str:
+    if not categories_motifs:
+        return ""
+    tree_text = ""
+    for cat_name, cat_data in categories_motifs.items():
+        cat_desc = ""
+        motifs = []
+        if hasattr(cat_data, "description"):
+            cat_desc = cat_data.description
+            motifs = cat_data.motifs
+        elif isinstance(cat_data, dict):
+            cat_desc = cat_data.get("description", "")
+            motifs = cat_data.get("motifs", [])
+            
+        desc_text = f" (Description: {cat_desc})" if cat_desc else ""
+        tree_text += f"- Catégorie '{cat_name}'{desc_text} contient les motifs suivants :\n"
+        
+        for motif in motifs:
+            m_libelle = ""
+            m_desc = ""
+            m_gravite = ""
+            if hasattr(motif, "libelle"):
+                m_libelle = motif.libelle
+                m_desc = motif.description
+                m_gravite = motif.gravite
+            elif isinstance(motif, dict):
+                m_libelle = motif.get("libelle", "")
+                m_desc = motif.get("description", "")
+                m_gravite = motif.get("gravite", "")
+                
+            details = []
+            if m_desc: details.append(f"Description: {m_desc}")
+            if m_gravite: details.append(f"Gravité: {m_gravite}")
+            
+            details_text = f" -> {', '.join(details)}" if details else ""
+            tree_text += f"    * Motif: '{m_libelle}'{details_text}\n"
+    return tree_text
+
+def check_urgency_with_llm(text: str, categories_motifs: dict = None) -> str:
+    """
+    Demande rapidement à Llama si la plainte nécessite un traitement urgent (GRAVE, MOYEN ou MINEUR).
+    """
+    system_prompt = """
+    Tu es un assistant expert pour le service client d'une institution financière.
+    Ton rôle est d'analyser la plainte d'un client et d'évaluer son niveau d'urgence afin d'aider l'agent à prioriser le traitement.
+    
+    Règles :
+    - Répond UNIQUEMENT avec un objet JSON valide.
+    - L'urgence doit être EXACTEMENT : GRAVE, MOYEN ou MINEUR.
+    - Pour comprendre ce que l'institution considère comme GRAVE, MOYEN ou MINEUR, réfère-toi aux descriptions et aux niveaux de gravité des catégories/motifs fournis dans le contexte.
+    - Rédige d'abord une courte 'analyse_du_probleme' (1 phrase) expliquant ton choix avant de donner l'urgence.
+    """
+    
+    tree_text = _build_tree_text(categories_motifs) if categories_motifs else ""
+    
+    user_prompt = f"""
+    Plainte du client : '{text}'
+    
+    Contexte de l'institution (Catégories, Motifs et Gravité) :
+    {tree_text}
+    
+    Format de réponse attendu : {{"analyse_du_probleme": "...", "urgence": "..."}}
+    """
+    
+    try:
+        logger.info("\n--- SYSTEM PROMPT (Urgence) ---")
+        logger.info(system_prompt.strip())
+        logger.info("--- USER PROMPT (Urgence) ---")
+        logger.info(user_prompt.strip())
+        
+        response = ollama_client.chat(
+            model=DEFAULT_MODEL, 
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt}
+            ],
+            format='json',
+            options={'temperature': 0}
+        )
+        raw_content = response['message']['content']
+        result_json = json.loads(raw_content)
+        
+        urgence = result_json.get("urgence", "MINEUR").strip().upper()
+        raisonnement = result_json.get("analyse_du_probleme", "Aucune explication")
+        
+        logger.info(f"Urgence LLM : {urgence} | Raisonnement : {raisonnement}")
+        
+        if "GRAVE" in urgence: return "GRAVE"
+        if "MOYEN" in urgence: return "MOYEN"
+        return "MINEUR"
+    except Exception as e:
+        logger.error(f"Erreur urgence LLM : {e}")
+        return "MINEUR"
+
+def classify_with_llm(text: str, categories_motifs: dict) -> dict:
+    """
+    Classification stricte via LLM avec température 0 et hiérarchie conservée.
+    """
+    system_prompt = """
+    Tu es un assistant expert pour le service client d'une institution financière.
+    Ton rôle est d'analyser la plainte d'un client et de la classifier automatiquement pour aider l'agent.
+    Tu dois choisir la CATÉGORIE principale et le MOTIF spécifique le plus approprié à la situation.
+    Attention : Un MOTIF appartient toujours à une CATÉGORIE précise. Tu dois respecter cette hiérarchie.
+    
+    Règles Strictes :
+    - Tu dois lire et comparer la plainte avec TOUS les motifs disponibles (leurs descriptions et leur niveau de gravité) avant de faire ton choix.
+    - Si la plainte ne correspond à aucune des catégories et motifs listés dans le contexte, ou s'il s'agit d'une demande hors sujet, tu dois impérativement renvoyer "AUTRE" pour la category et "AUTRE" pour le motif.
+    - Répond UNIQUEMENT avec un objet JSON valide.
+    - Rédige d'abord une courte 'analyse_du_probleme' (1 ou 2 phrases expliquant pourquoi tu choisis ce motif plutôt qu'un autre, ou pourquoi la plainte est classée en AUTRE si aucun motif ne correspond) avant de donner ton choix final.
+    """
+    
+    tree_text = _build_tree_text(categories_motifs)
+        
+    user_prompt = f"""
+    Plainte du client : "{text}"
+    
+    Hiérarchie des Catégories et Motifs disponibles :
+    {tree_text}
+    
+    Format de réponse attendu : {{"analyse_du_probleme": "...", "category": "...", "motif": "..."}}
+    """
+    
+    try:
+        logger.info("\n--- SYSTEM PROMPT (Classification) ---")
+        logger.info(system_prompt.strip())
+        logger.info("--- USER PROMPT (Classification) ---")
+        logger.info(user_prompt.strip())
+        
+        response = ollama_client.chat(
+            model=DEFAULT_MODEL, 
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt}
+            ], 
+            format='json',
+            options={'temperature': 0}
+        )
+        
+        raw_content = response['message']['content']
+        result = json.loads(raw_content)
+        # On renomme 'analyse_du_probleme' en 'raisonnement' pour rester compatible avec la suite
+        result['raisonnement'] = result.pop('analyse_du_probleme', 'Aucune explication')
+        logger.info(f"Classification LLM : {result.get('category')} > {result.get('motif')} | Raisonnement : {result.get('raisonnement', 'Aucune explication')}")
+        return result
+    except Exception as e:
+        logger.error(f"Erreur classification LLM : {e}")
+        return {"category": "AUTRE", "motif": "AUTRE"}
+
+def classify_with_llm_stream(text: str, categories_motifs: dict):
+    """
+    Classification via LLM en mode streaming pour renvoyer le raisonnement au fur et à mesure.
+    """
+    system_prompt = """
+    Tu es un assistant expert pour le service client d'une institution financière.
+    Ton rôle est d'analyser la plainte d'un client et de la classifier automatiquement pour aider l'agent.
+    Tu dois choisir la CATÉGORIE principale et le MOTIF spécifique le plus approprié à la situation.
+    Attention : Un MOTIF appartient toujours à une CATÉGORIE précise. Tu dois respecter cette hiérarchie.
+    
+    Règles Strictes :
+    - Tu dois lire et comparer la plainte avec TOUS les motifs disponibles (leurs descriptions et leur niveau de gravité) avant de faire ton choix.
+    - Si la plainte ne correspond à aucune des catégories et motifs listés dans le contexte, ou s'il s'agit d'une demande hors sujet, tu dois impérativement renvoyer "AUTRE" pour la category et "AUTRE" pour le motif.
+    - Répond UNIQUEMENT avec un objet JSON valide.
+    - Rédige d'abord une courte 'analyse_du_probleme' (1 ou 2 phrases expliquant pourquoi tu choisis ce motif plutôt qu'un autre, ou pourquoi la plainte est classée en AUTRE si aucun motif ne correspond) avant de donner ton choix final.
+    """
+    
+    tree_text = _build_tree_text(categories_motifs)
+        
+    user_prompt = f"""
+    Plainte du client : "{text}"
+    
+    Hiérarchie des Catégories et Motifs disponibles :
+    {tree_text}
+    
+    Format de réponse attendu : {{"analyse_du_probleme": "...", "category": "...", "motif": "..."}}
+    """
+    
+    try:
+        logger.info("\n--- SYSTEM PROMPT (Classification Stream) ---")
+        logger.info(system_prompt.strip())
+        logger.info("--- USER PROMPT (Classification Stream) ---")
+        logger.info(user_prompt.strip())
+        
+        response = ollama_client.chat(
+            model=DEFAULT_MODEL, 
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt}
+            ], 
+            format='json',
+            options={'temperature': 0},
+            stream=True
+        )
+        
+        buffer = ""
+        state = 0 # 0: waiting for start of raisonnement, 1: inside raisonnement, 2: after raisonnement
+        last_yielded_len = 0
+        
+        for chunk in response:
+            content = chunk['message']['content']
+            buffer += content
+            
+            if state == 0:
+                match = re.search(r'"analyse_du_probleme"\s*:\s*"', buffer)
+                if match:
+                    state = 1
+                    start_idx = match.end()
+                    val_str = buffer[start_idx:]
+                    end_match = re.search(r'(?<!\\)"', val_str)
+                    if end_match:
+                        clean_text = val_str[:end_match.start()]
+                        if clean_text:
+                            yield {"type": "raisonnement_chunk", "content": clean_text}
+                        last_yielded_len = len(clean_text)
+                        state = 2
+                    else:
+                        if val_str:
+                            yield {"type": "raisonnement_chunk", "content": val_str}
+                        last_yielded_len = len(val_str)
+            elif state == 1:
+                match = re.search(r'"analyse_du_probleme"\s*:\s*"', buffer)
+                start_idx = match.end()
+                val_str = buffer[start_idx:]
+                end_match = re.search(r'(?<!\\)"', val_str)
+                if end_match:
+                    clean_text = val_str[:end_match.start()]
+                    new_part = clean_text[last_yielded_len:]
+                    if new_part:
+                        yield {"type": "raisonnement_chunk", "content": new_part}
+                    state = 2
+                else:
+                    new_part = val_str[last_yielded_len:]
+                    if new_part:
+                        yield {"type": "raisonnement_chunk", "content": new_part}
+                        last_yielded_len = len(val_str)
+            elif state == 2:
+                pass
+                
+        try:
+            result = json.loads(buffer)
+            result['raisonnement'] = result.pop('analyse_du_probleme', 'Aucune explication')
+            yield {"type": "final", "result": result}
+        except Exception as e:
+            logger.error(f"Erreur parsing JSON final stream : {e}")
+            yield {"type": "final", "result": {"category": "AUTRE", "motif": "AUTRE", "raisonnement": "Erreur de flux"}}
+            
+    except Exception as e:
+        logger.error(f"Erreur classification LLM Stream : {e}")
+        yield {"type": "final", "result": {"category": "AUTRE", "motif": "AUTRE", "raisonnement": "Erreur LLM"}}
+
+def check_urgency_with_llm_stream(text: str, categories_motifs: dict):
+    """
+    Calcul d'urgence via LLM en mode streaming pour renvoyer le raisonnement au fur et à mesure.
+    """
+    system_prompt = """
+    Tu es un assistant expert pour le service client d'une institution financière.
+    Ton rôle est d'analyser la plainte d'un client et d'évaluer son niveau d'urgence afin d'aider l'agent à prioriser le traitement.
+    
+    Règles :
+    - Répond UNIQUEMENT avec un objet JSON valide.
+    - L'urgence doit être EXACTEMENT : GRAVE, MOYEN ou MINEUR.
+    - Pour comprendre ce que l'institution considère comme GRAVE, MOYEN ou MINEUR, réfère-toi aux descriptions et aux niveaux de gravité des catégories/motifs fournis dans le contexte.
+    - Rédige d'abord une courte 'analyse_du_probleme' (1 phrase) expliquant ton choix avant de donner l'urgence.
+    """
+    
+    tree_text = _build_tree_text(categories_motifs) if categories_motifs else ""
+    
+    user_prompt = f"""
+    Plainte du client : '{text}'
+    
+    Contexte de l'institution (Catégories, Motifs et Gravité) :
+    {tree_text}
+    
+    Format de réponse attendu : {{"analyse_du_probleme": "...", "urgence": "..."}}
+    """
+    
+    try:
+        logger.info("\n--- SYSTEM PROMPT (Urgence Stream) ---")
+        logger.info(system_prompt.strip())
+        logger.info("--- USER PROMPT (Urgence Stream) ---")
+        logger.info(user_prompt.strip())
+        
+        response = ollama_client.chat(
+            model=DEFAULT_MODEL, 
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_prompt}
+            ],
+            format='json',
+            options={'temperature': 0},
+            stream=True
+        )
+        
+        buffer = ""
+        state = 0
+        last_yielded_len = 0
+        
+        for chunk in response:
+            content = chunk['message']['content']
+            buffer += content
+            
+            if state == 0:
+                match = re.search(r'"analyse_du_probleme"\s*:\s*"', buffer)
+                if match:
+                    state = 1
+                    start_idx = match.end()
+                    val_str = buffer[start_idx:]
+                    end_match = re.search(r'(?<!\\)"', val_str)
+                    if end_match:
+                        clean_text = val_str[:end_match.start()]
+                        if clean_text:
+                            yield {"type": "raisonnement_urgence_chunk", "content": clean_text}
+                        last_yielded_len = len(clean_text)
+                        state = 2
+                    else:
+                        if val_str:
+                            yield {"type": "raisonnement_urgence_chunk", "content": val_str}
+                        last_yielded_len = len(val_str)
+            elif state == 1:
+                match = re.search(r'"analyse_du_probleme"\s*:\s*"', buffer)
+                start_idx = match.end()
+                val_str = buffer[start_idx:]
+                end_match = re.search(r'(?<!\\)"', val_str)
+                if end_match:
+                    clean_text = val_str[:end_match.start()]
+                    new_part = clean_text[last_yielded_len:]
+                    if new_part:
+                        yield {"type": "raisonnement_urgence_chunk", "content": new_part}
+                    state = 2
+                else:
+                    new_part = val_str[last_yielded_len:]
+                    if new_part:
+                        yield {"type": "raisonnement_urgence_chunk", "content": new_part}
+                        last_yielded_len = len(val_str)
+            elif state == 2:
+                pass
+                
+        try:
+            result_json = json.loads(buffer)
+            urgence = result_json.get("urgence", "MINEUR").strip().upper()
+            raisonnement = result_json.get("analyse_du_probleme", "Aucune explication")
+            if "GRAVE" in urgence: urgence_final = "GRAVE"
+            elif "MOYEN" in urgence: urgence_final = "MOYEN"
+            else: urgence_final = "MINEUR"
+            yield {"type": "urgence_final", "urgence": urgence_final, "raisonnement": raisonnement}
+        except Exception as e:
+            logger.error(f"Erreur parsing JSON final urgence stream : {e}")
+            yield {"type": "urgence_final", "urgence": "MINEUR", "raisonnement": "Erreur de flux urgence"}
+            
+    except Exception as e:
+        logger.error(f"Erreur urgence LLM Stream : {e}")
+        yield {"type": "urgence_final", "urgence": "MINEUR", "raisonnement": "Erreur LLM urgence"}
