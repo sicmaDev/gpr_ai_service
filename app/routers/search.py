@@ -1,8 +1,10 @@
 from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional, List
+import json
 from app.services.vector_service import vector_db
-from app.services.llm_service import generate_solution_from_history
+from app.services.llm_service import generate_solution_from_history, generate_solution_from_history_stream
 
 router = APIRouter(prefix="/search", tags=["RAG Search"])
 
@@ -35,3 +37,32 @@ def search_similar(request: SearchRequest):
         "resultats_trouves": len(results),
         "similar_claims": results      # Sources historiques pour la Section B du Front-end
     }
+
+@router.post("/stream")
+async def search_similar_stream(request: SearchRequest):
+    # 1. Recherche Sémantique Faiss (Rapide)
+    results = vector_db.search_similar(
+        query=request.texte_actuel,
+        top_k=3,
+        category_filter=request.categorie
+    )
+    
+    historic_solutions_text = [res["solution_suggeree"] for res in results]
+    
+    def event_generator():
+        # Envoyer d'abord les sources trouvées
+        yield f"data: {json.dumps({'type': 'sources', 'similar_claims': results})}\n\n"
+        
+        if not historic_solutions_text:
+            yield f"data: {json.dumps({'type': 'chunk', 'content': 'Aucune similarité trouvée dans l\'historique.'})}\n\n"
+            yield f"data: {json.dumps({'type': 'final', 'content': 'Aucune similarité trouvée.'})}\n\n"
+            return
+            
+        full_text = ""
+        for chunk in generate_solution_from_history_stream(request.texte_actuel, historic_solutions_text):
+            full_text += chunk
+            yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
+            
+        yield f"data: {json.dumps({'type': 'final', 'content': full_text})}\n\n"
+        
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

@@ -81,6 +81,58 @@ def generate_solution_from_history(current_complaint_text: str, similar_historic
         logger.error(f"Erreur lors de l'appel à Ollama : {e}")
         return "Erreur : Impossible de générer une solution. Veuillez vérifier que Ollama est bien lancé en arrière-plan."
 
+def generate_solution_from_history_stream(current_complaint_text: str, similar_historic_solutions: list):
+    """
+    Génère 3 propositions de solutions en stream.
+    Yields chunks de texte.
+    """
+    if not similar_historic_solutions:
+        yield "Aucune solution historique trouvée pour formuler une recommandation."
+        return
+
+    context_text = "\n".join([f"- Historique {i+1} : {sol}" for i, sol in enumerate(similar_historic_solutions)])
+
+    system_prompt = """
+    Tu es un assistant expert pour le service client de GPR (Gestion des Réclamations).
+    Ton rôle est d'analyser une plainte actuelle et les solutions historiques fournies.
+    Tu dois rédiger EXACTEMENT 3 propositions distinctes, numérotées 1, 2 et 3.
+    Chaque proposition doit être composée d'une SOLUTION (ce qu'on fait) et d'un COMMENTAIRE court (justification pour l'agent), séparés par le caractère '|'.
+    
+    Règles strictes :
+    - Propose 3 options variées basées sur les données fournies.
+    - Format par ligne : "N. [Solution] | [Commentaire]"
+    - Reste courtois et professionnel (vouvoiement).
+    - Ne mentionne pas que tu es une IA.
+    - Exemple : "1. Rembourser les frais | Le client a été débité deux fois par erreur."
+    """
+
+    user_prompt = f"""
+    Plainte actuelle du client :
+    "{current_complaint_text}"
+
+    Voici comment des plaintes similaires ont été résolues par nos agents par le passé :
+    {context_text}
+
+    Rédige maintenant les 3 propositions (Solution | Commentaire) idéales pour cette plainte.
+    """
+
+    try:
+        logger.info(f"Appel au modèle LLM local '{DEFAULT_MODEL}' via Ollama en STREAM...")
+        
+        response_stream = ollama_client.chat(model=DEFAULT_MODEL, messages=[
+            {'role': 'system', 'content': system_prompt},
+            {'role': 'user', 'content': user_prompt}
+        ], options={'temperature': 0}, stream=True)
+        
+        for chunk in response_stream:
+            content = chunk['message'].get('content', '')
+            if content:
+                yield content
+
+    except Exception as e:
+        logger.error(f"Erreur lors de l'appel à Ollama stream : {e}")
+        yield f"Erreur de génération : {e}"
+
 def _build_tree_text(categories_motifs: dict) -> str:
     if not categories_motifs:
         return ""
