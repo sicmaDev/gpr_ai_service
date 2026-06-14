@@ -1,9 +1,12 @@
 fastapi
 uvicorn[standard]
 pydantic
+python-multipart
 Sentence-Transformers
 faiss-cpu
 scikit-learn
 pandas
 ollama
 textblob
+python-dotenv
+openai-whisper

@@ -1,8 +1,10 @@
 from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional, List
+import json
 from app.services.vector_service import vector_db
-from app.services.llm_service import generate_solution_from_history
+from app.services.llm_service import generate_solution_from_history, generate_solution_from_history_stream
 
 router = APIRouter(prefix="/search", tags=["RAG Search"])
 
@@ -19,11 +21,11 @@ def search_similar(request: SearchRequest):
         top_k=3,
         category_filter=request.categorie
     )
-    
+
     # 2. Génération de solution via LLM (Ollama)
     # Extraire uniquement les textes des solutions de l'historique pour le prompt
     historic_solutions_text = [res["solution_suggeree"] for res in results]
-    
+
     # Si des résultats existent, on demande à Llama de rédiger une réponse
     generated_solution = "Aucune similarité trouvée."
     if historic_solutions_text:
@@ -35,3 +37,37 @@ def search_similar(request: SearchRequest):
         "resultats_trouves": len(results),
         "similar_claims": results      # Sources historiques pour la Section B du Front-end
     }
+
+@router.post("/stream")
+async def search_similar_stream(request: SearchRequest):
+    # 1. Recherche Sémantique Faiss (Rapide)
+    results = vector_db.search_similar(
+        query=request.texte_actuel,
+        top_k=3,
+        category_filter=request.categorie
+    )
+
+    historic_solutions_text = [res["solution_suggeree"] for res in results]
+
+    def event_generator():
+        # Envoyer d'abord les sources trouvées
+        payload = {'type': 'sources', 'similar_claims': results}
+        yield "data: " + json.dumps(payload) + "\n\n"
+
+        if not historic_solutions_text:
+            payload = {'type': 'chunk', 'content': "Aucune similarité trouvée dans l'histoire."}
+            yield "data: " + json.dumps(payload) + "\n\n"
+            payload = {'type': 'final', 'content': 'Aucune similarité trouvée.'}
+            yield "data: " + json.dumps(payload) + "\n\n"
+            return
+
+        full_text = ""
+        for chunk in generate_solution_from_history_stream(request.texte_actuel, historic_solutions_text):
+            full_text += chunk
+            payload = {'type': 'chunk', 'content': chunk}
+            yield "data: " + json.dumps(payload) + "\n\n"
+
+        payload = {'type': 'final', 'content': full_text}
+        yield "data: " + json.dumps(payload) + "\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
