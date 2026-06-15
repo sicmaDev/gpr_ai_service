@@ -2,11 +2,16 @@
   {
     "id": 1001,
     "date_creation": "2024-01-15T10:30:00Z",
-    "objet_categorie": "Frais bancaires",
+    "objet_categorie": "COMPTE",
     "texte_plainte": "Bonjour, je viens de voir sur mon relevé de compte que vous m'avez prélevé 15 euros de frais de tenue de compte alors que mon conseiller m'avait assuré que la première année était gratuite. Je trouve ça inacceptable. Merci de me rembourser au plus vite.",
     "texte_solution": "Bonjour M. [Nom], Après vérification, votre compte bénéficie effectivement d'une exonération de frais pour la première année. Une erreur informatique a généré ce prélèvement. Nous avons recrédité la somme de 15 euros sur votre compte ce jour. Veuillez nous excuser pour ce désagrément.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Frais excessifs",
+    "produit_service": "Carte Visa Premium",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Support Technique App"
   },
   {
     "id": 1002,
@@ -15,7 +20,12 @@
     "texte_plainte": "C'EST UNE HONTE !!! Ma carte a été piratée et des achats ont été faits en ligne pour plus de 800 euros ! J'ai appelé le service client 3 fois et personne ne fait rien. Si je ne suis pas remboursé d'ici 48h je contacte mon avocat et je porte plainte contre la banque !",
     "texte_solution": "Madame, Monsieur, Nous prenons votre signalement très au sérieux. Votre carte a été bloquée préventivement. Suite à l'analyse de notre service Fraude, les transactions contestées ont été identifiées comme illégitimes. Une procédure de remboursement de 800 euros a été déclenchée en urgence et sera visible sur votre compte sous 2 à 3 jours ouvrés. Une nouvelle carte vous a été expédiée gratuitement.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Email",
+    "motif_reclamation": "Comportement du personnel",
+    "produit_service": "Compte Courant",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1003,
@@ -24,7 +34,12 @@
     "texte_plainte": "J'ai déclaré un dégât des eaux il y a plus de 3 semaines (référence DDE-892) et je n'ai toujours aucune nouvelle de l'expert. Mon plafond continue de moisir, je ne peux pas rester dans cette situation. Merci de faire avancer mon dossier rapidement.",
     "texte_solution": "Bonjour, Nous comprenons votre impatience. Suite à une surcharge exceptionnelle de notre partenaire d'expertise dans votre région, les délais ont été allongés. Nous avons relancé notre prestataire ce matin en lui signifiant le caractère urgent de votre dossier. L'expert prendra contact avec vous d'ici 48 heures maximum pour fixer un rendez-vous.",
     "statut_final": "TREAT",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Téléphone",
+    "motif_reclamation": "Comportement du personnel",
+    "produit_service": "Prêt Auto",
+    "point_service": "Agence Paris Centre",
+    "point_service_indexe": "Service Client Téléphonique"
   },
   {
     "id": 1004,
@@ -33,7 +48,12 @@
     "texte_plainte": "Depuis la dernière mise à jour de l'application, je n'arrive plus à me connecter avec FaceID sur mon iPhone. Ça me demande mon mot de passe à chaque fois et je l'ai oublié. C'est très pénible de ne plus avoir un accès rapide à ses comptes.",
     "texte_solution": "Bonjour M. [Nom], Un correctif a été déployé la semaine dernière concernant les soucis biométriques (FaceID/TouchID). Veuillez vous assurer que vous avez la version 4.2.1 de l'application. Pour votre mot de passe oublié, un lien de réinitialisation vous a été envoyé par SMS. Une fois reconnecté avec le nouveau mot de passe, vous pourrez réactiver FaceID dans les paramètres Réglages > Sécurité de l'application.",
     "statut_final": "UNSATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Email",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Livret A",
+    "point_service": "Service Client Téléphonique",
+    "point_service_indexe": "Agence Lyon Nord"
   },
   {
     "id": 1005,
@@ -42,7 +62,12 @@
     "texte_plainte": "J'attends toujours mon tableau d'amortissement définitif suite à la renégociation de mon prêt le mois dernier. J'en ai besoin de toute urgence pour mon notaire. Sans ce document la vente risque d'être annulée ! Faite le nécessaire s'il vous plaît.",
     "texte_solution": "Madame, Monsieur, Suite à votre alerte, nous avons traité la génération de votre tableau d'amortissement en priorité. Le document a été généré ce jour et vous a été envoyé sur votre espace sécurisé en ligne, ainsi que par courrier électronique pour transmission immédiate à votre notaire.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Retard de traitement",
+    "produit_service": "Prêt Auto",
+    "point_service": "Automate de retrait",
+    "point_service_indexe": "Agence Lyon Nord"
   },
   {
     "id": 1006,
@@ -51,7 +76,12 @@
     "texte_plainte": "Je conteste les agios prélevés le 25 février sur mon compte courant. Mon salaire ayant été versé avec 1 jour de retard par mon employeur, le découvert était exceptionnel. Je demande la remise gracieuse de ces 28 euros.",
     "texte_solution": "Bonjour, À titre de geste commercial et compte tenu de votre ancienneté sans incident de paiement, nous acceptons de vous rétrocéder la somme de 28 euros correspondants aux agios du mois de février. La somme sera créditée ce jour.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Téléphone",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Compte Courant",
+    "point_service": "Agence Paris Centre",
+    "point_service_indexe": "Agence Paris Centre"
   },
   {
     "id": 1007,
@@ -60,7 +90,12 @@
     "texte_plainte": "Je suis passé à l'agence de Centre-Ville ce matin et l'accueil a été déplorable. Le conseiller ne m'a même pas regardé et m'a expédié en 2 minutes en me disant d'aller sur l'application. Ce n'est pas une façon de traiter ses clients ! Je songe à clôturer mes comptes.",
     "texte_solution": "Bonjour Madame, Nous vous prions d'accepter nos excuses pour ce comportement qui ne reflète pas nos standards de qualité. Le directeur d'agence a été informé de votre retour for un rappel à l'ordre de ses équipes. Nous vous invitons à nous contacter directement au numéro direct de l'agence pour convenir d'un rendez-vous privilégié.",
     "statut_final": "PARTIAL_SATISFIED",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Téléphone",
+    "motif_reclamation": "Retard de traitement",
+    "produit_service": "Assurance Habitation",
+    "point_service": "Site Web",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1008,
@@ -69,7 +104,12 @@
     "texte_plainte": "Le distributeur automatique de votre agence Nord a avalé ma carte hier soir alors que mon code était bon. L'agence était fermée. Comment je fais pour récupérer ma carte et payer mes courses aujourd'hui ?",
     "texte_solution": "Bonjour M. [Nom], Un problème technique a effectivement été détecté sur ce distributeur. Votre carte a pu être récupérée en toute sécurité ce matin par nos équipes. Elle est disponible au guichet de l'agence Nord sur présentation d'une pièce d'identité.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Livret A",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Agence Paris Centre"
   },
   {
     "id": 1009,
@@ -78,7 +118,12 @@
     "texte_plainte": "On m'a volé mon téléphone et ma carte bleue hier dans les transports. J'ai fait opposition via l'application avant qu'on ne me vole aussi le téléphone, mais je vois des opérations de paiement sans contact ce matin ! Il faut tout rembourser, j'ai porté plainte à la police !",
     "texte_solution": "Bonjour, Nous prenons en charge votre demande en urgence. Votre carte est bien enregistrée en opposition depuis hier 18h30. Les opérations sans contact apparues ce matin ont dû être forcées avant la mise en opposition ou par fraude. Merci de nous transmettre le dépôt de plainte de la police via l'application. Dès réception de ce document, nous vous recréditerons immédiatement l'ensemble des sommes contestées.",
     "statut_final": "TREAT",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Application Mobile",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Livret A",
+    "point_service": "Site Web",
+    "point_service_indexe": "Service Client Téléphonique"
   },
   {
     "id": 1010,
@@ -87,7 +132,12 @@
     "texte_plainte": "L'application crash sans arrêt quand j'essaie de faire un virement depuis la dernière mise à jour iOS. Impossible de payer mon loyer !",
     "texte_solution": "Bonjour, Nous sommes conscients du problème technique lié à la dernière version iOS. Nos équipes techniques travaillent sur un patch qui sera déployé d'ici 24h. En attendant, nous vous invitons à effectuer votre virement via votre espace client sur le site web (ordinateur). Merci de votre compréhension.",
     "statut_final": "PARTIAL_SATISFIED",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Email",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Crédit Immobilier",
+    "point_service": "Service Client Téléphonique",
+    "point_service_indexe": "Agence Paris Centre"
   },
   {
     "id": 1011,
@@ -96,7 +146,12 @@
     "texte_plainte": "Vous refusez de prendre en charge le vol de mon vélo sous prétexte que ce n'était pas dans un local fermé, mais c'était indiqué comme tel par mon propriétaire ! Votre assurance ne sert à rien, c'est de l'escroquerie pure et simple ! Je vais saisir le médiateur.",
     "texte_solution": "Madame, Monsieur, Après réétude de votre dossier et analyse de l'attestation de votre propriétaire confirmant la présence d'une serrure sécurisée, nous acceptons exceptionnellement de revoir notre position. La garantie vol est actionnée et l'indemnisation de 500 euros sera versée sur votre compte sous 5 jours.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Téléphone",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Crédit Immobilier",
+    "point_service": "Service Client Téléphonique",
+    "point_service_indexe": "Agence Paris Centre"
   },
   {
     "id": 1012,
@@ -105,7 +160,12 @@
     "texte_plainte": "Prélèvement inconnu de 45 euros au nom de 'Assurance SecurPlus' que je n'ai jamais souscrite. Exige remboursement immédiat.",
     "texte_solution": "Bonjour, Il s'agit de la cotisation annuelle de l'assurance des moyens de paiement souscrite à l'ouverture de votre compte. Cependant, comme vous ne souhaitez pas la conserver, nous avons procédé à la résiliation de cette option avec effet immédiat et au remboursement de la cotisation de 45 euros.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Courrier",
+    "motif_reclamation": "Retard de traitement",
+    "produit_service": "Compte Courant",
+    "point_service": "Service Client Téléphonique",
+    "point_service_indexe": "Agence Lyon Nord"
   },
   {
     "id": 1013,
@@ -114,7 +174,12 @@
     "texte_plainte": "J'attends un retour de mon conseiller depuis une semaine pour valider mon dossier de prêt auto. J'ai appelé 5 fois, on me dit toujours 'il vous rappelle', mais jamais rien. Le concessionnaire ne va pas bloquer la voiture éternellement.",
     "texte_solution": "Bonjour M. [Nom], Nous tenons à nous excuser pour ce retard. Votre conseiller était absent pour des raisons de santé. Son remplaçant a repris votre dossier en urgence aujourd'hui. L'offre de prêt vient d'être éditée et est disponible dans votre espace client pour signature électronique.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Prêt Auto",
+    "point_service": "Automate de retrait",
+    "point_service_indexe": "Service Client Téléphonique"
   },
   {
     "id": 1014,
@@ -123,7 +188,12 @@
     "texte_plainte": "Je suis actuellement à l'étranger (Espagne) et ma carte de paiement est bloquée au péage !! Il me faut du carburant pour rentrer en France, débloquez la tout de suite !",
     "texte_solution": "Bonjour, Rassurez-vous. Notre système de sécurité a bloqué la carte suite à plusieurs transactions rapprochées à l'étranger par précaution. Nous venons de débloquer immédiatement la carte après vérification avec vous par SMS. Vous pouvez à nouveau l'utiliser.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Application Mobile",
+    "motif_reclamation": "Comportement du personnel",
+    "produit_service": "Prêt Auto",
+    "point_service": "Automate de retrait",
+    "point_service_indexe": "Support Technique App"
   },
   {
     "id": 1015,
@@ -132,7 +202,12 @@
     "texte_plainte": "Impossible de télécharger mon RIB depuis l'application ce matin. Ça charge dans le vide.",
     "texte_solution": "Bonjour, Le problème de génération de RIB a été identifié et corrigé ce midi. Vous pouvez de nouveau éditer votre RIB depuis l'application. Si le problème persiste, nous vous invitons à redémarrer (forcer l'arrêt) de l'application.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Compte Courant",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Support Technique App"
   },
   {
     "id": 1016,
@@ -141,7 +216,12 @@
     "texte_plainte": "Mon dossier de prêt est 'en validation' depuis 15 jours. La date limite de la clause suspensive est dans 3 jours ! Si vous ne débloquez pas la situation, je m'adresse au tribunal pour préjudice financier.",
     "texte_solution": "Madame, Monsieur, Nous avons bien pris la mesure de l'urgence de votre situation. Votre dossier a été remonté au niveau de la direction commerciale pour validation express. L'accord de principe a été acté il y a 10 minutes. L'offre de prêt définitive sera générée et transmise à votre notaire ce soir.",
     "statut_final": "TREAT",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Livret A",
+    "point_service": "Agence Marseille Sud",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1017,
@@ -150,7 +230,12 @@
     "texte_plainte": "Suite à la tempête, mon toit est endommagé. J'ai envoyé les photos il y a 3 jours et l'interface m'indique toujours 'En attente de traitement'. Il va pleuvoir cette nuit, j'ai besoin d'une intervention en urgence.",
     "texte_solution": "Bonjour, La tempête a généré un volume exceptionnel de dossiers. Néanmoins, au vu du risque d'infiltration imminent, nous avons validé ce matin la mise en place d'une procédure de bâchage d'urgence via notre réseau de partenaires. Une entreprise vous contactera d'ici la fin de journée.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Prêt Auto",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Agence Lyon Nord"
   },
   {
     "id": 1018,
@@ -159,7 +244,12 @@
     "texte_plainte": "Des 'Frais de recherche d'adresse' de 35 euros m'ont été facturés alors que je n'ai jamais déménagé !",
     "texte_solution": "Bonjour M. [Nom], Il s'agit d'une anomalie informatique consécutive à un retour de courrier d'une campagne publicitaire. Nous vous présentons nos excuses pour cette erreur de facturation. Les 35 euros ont été annulés et recrédités sur votre compte.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Email",
+    "motif_reclamation": "Erreur de facturation",
+    "produit_service": "Prêt Auto",
+    "point_service": "Agence Paris Centre",
+    "point_service_indexe": "Agence Lyon Nord"
   },
   {
     "id": 1019,
@@ -168,7 +258,12 @@
     "texte_plainte": "J'ai demandé un chéquier il y a deux semaines et je n'ai toujours rien reçu...",
     "texte_solution": "Bonjour, Votre chéquier a été édité il y a 10 jours et est actuellement disponible à l'accueil de votre agence. Vous pouvez passer le récupérer aux horaires d'ouverture habituels sur présentation d'une pièce d'identité.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Email",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Carte Visa Premium",
+    "point_service": "Site Web",
+    "point_service_indexe": "Agence Paris Centre"
   },
   {
     "id": 1020,
@@ -177,7 +272,12 @@
     "texte_plainte": "J'ai reçu un email alarmant de votre service sécurité me demandant de cliquer sur un lien pour vérifier mon compte. C'est bizarre car l'adresse email n'a pas l'air très officielle. Est-ce bien vous ?",
     "texte_solution": "ATTENTION : Il s'agit d'une tentative de fraude (Phishing). Ne cliquez sur aucun lien et ne fournissez aucune information. Nous ne vous demanderons jamais votre mot de passe ni vos codes de carte par email ou SMS. Merci de supprimer le message. Nos services de sécurité ont été avertis.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Email",
+    "motif_reclamation": "Comportement du personnel",
+    "produit_service": "Prêt Auto",
+    "point_service": "Service Client Téléphonique",
+    "point_service_indexe": "Service Client Téléphonique"
   },
   {
     "id": 1021,
@@ -186,7 +286,12 @@
     "texte_plainte": "Impossible de joindre mon conseiller depuis 3 semaines. Il est toujours en réunion ou en ligne.",
     "texte_solution": "Bonjour M. [Nom], Votre conseiller habituel a récemment changé d'affectation au sein du réseau. Votre nouveau conseiller, Mme Dupont, a repris votre portefeuille en charge ce lundi. Elle tentera de vous joindre dans l'après-midi pour se présenter.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Courrier",
+    "motif_reclamation": "Erreur de facturation",
+    "produit_service": "Assurance Habitation",
+    "point_service": "Automate de retrait",
+    "point_service_indexe": "Service Client Téléphonique"
   },
   {
     "id": 1022,
@@ -195,7 +300,12 @@
     "texte_plainte": "Paiement Paylib impossible depuis la dernière maj. Ca mouline à l'infini.",
     "texte_solution": "Bonjour, L'incident est connu et en cours de résolution par les équipes en charge de Paylib. La situation devrait revenir à la normale d'ici la fin de journée. Veuillez privilégier d'autres moyens de paiements d'ici là.",
     "statut_final": "TREAT",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Crédit Immobilier",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Agence Lyon Nord"
   },
   {
     "id": 1023,
@@ -204,7 +314,12 @@
     "texte_plainte": "Le montant de l'indemnisation pour mon véhicule après l'accident est ridicule. 3000 euros alors que la cote argus est à 4500 ! Si vous ne revoyez pas votre proposition, je bloque les futurs prélèvements.",
     "texte_solution": "Madame, Monsieur, L'offre initiale de l'expert se basait sur la valeur de remplacement à dire d'expert (VRADE). Après entretien avec votre conseiller et pour conserver une bonne relation commerciale, nous avons pu obtenir une réévaluation tenant compte des factures d'entretien fournies. L'offre est revalorisée au montant maximum de 4200 euros. Un avenant vous sera transmis ce jour.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Retard de traitement",
+    "produit_service": "Prêt Auto",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Support Technique App"
   },
   {
     "id": 1024,
@@ -213,7 +328,12 @@
     "texte_plainte": "Facturation de 'Frais de prélèvement rejeté'. J'avais pourtant fait le virement la veille pour approvisionner le compte !!",
     "texte_solution": "Bonjour, Effectivement, le virement est arrivé avec 24h de décalage mais nous confirmons votre bonne foi. Nous procédons donc exceptionnellement à l'annulation des frais de rejet pour solde insuffisant (soit 20 euros).",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Courrier",
+    "motif_reclamation": "Retard de traitement",
+    "produit_service": "Livret A",
+    "point_service": "Site Web",
+    "point_service_indexe": "Agence Lyon Nord"
   },
   {
     "id": 1025,
@@ -222,7 +342,12 @@
     "texte_plainte": "J'ai voulu faire un retrait important au guichet pour l'achat d'un véhicule, on m'a refusé en me disant que le délai n'était pas respecté !! C'est inadmissible, c'est mon argent !!!",
     "texte_solution": "Monsieur, Pour des raisons de sécurité, les agences ne détiennent plus de fonds importants sans commande préalable (délai de 48h). Cependant, le directeur d'agence a pu trouver une solution alternative ce matin en émettant un chèque de banque certifié qui vous attend à l'agence sans frais supplémentaires.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Téléphone",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Prêt Auto",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1026,
@@ -231,7 +356,12 @@
     "texte_plainte": "Les prélèvements de mon prêt ont commencé alors que les fonds de l'acquisition n'ont même pas été appelés par le constructeur !! C'est grave et illégal.",
     "texte_solution": "Bonjour, Vous avez tout à fait raison. Il s'agit d'une erreur technique au moment du montage du dossier (le prêt a été basculé en amortissement immédiat au lieu de différé partiel). L'anomalie a été corrigée ce matin, la ligne de prêt remise à plat, et les sommes indûment prélevées seront rétro-cédées d'ici 5 jours ouvrés. Nous nous excusons platement.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Courrier",
+    "motif_reclamation": "Retard de traitement",
+    "produit_service": "Crédit Immobilier",
+    "point_service": "Agence Marseille Sud",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1027,
@@ -240,7 +370,12 @@
     "texte_plainte": "J'ai bloqué mon accès à l'espace en ligne après trop d'essais erronés. Votre plateforme téléphonique me fait tourner en bourrique depuis 40 minutes !!",
     "texte_solution": "Bonjour M. [Nom], Un de nos téléconseillers premium vient de prendre la main sur la file d'attente. Votre espace client a été débloqué et vos accès réinitialisés. Vous allez recevoir un SMS avec un code à usage unique dans les prochaines minutes.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Erreur de facturation",
+    "produit_service": "Assurance Habitation",
+    "point_service": "Agence Paris Centre",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1028,
@@ -249,7 +384,12 @@
     "texte_plainte": "Des virements SEPA frauduleux vers la Lituanie ont été initiés depuis mon compte !! Arrêtez tout de suite, c'est pas moi !!",
     "texte_solution": "Alerte de niveau critique prise en compte. Tous les virements sortants SEPA sont gelés préventivement. Nos équipes techniques analysent les logs de connexion à votre espace personnel. Nous reprenons contact avec vous dans l'heure avec le service des Fraudes pour sécuriser l'ensemble de vos avoirs.",
     "statut_final": "TREAT",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Courrier",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Livret A",
+    "point_service": "Agence Marseille Sud",
+    "point_service_indexe": "Agence Paris Centre"
   },
   {
     "id": 1029,
@@ -258,7 +398,12 @@
     "texte_plainte": "J'ai un prélèvement 'Assurance Habitation' en doublon ce mois-ci.",
     "texte_solution": "Bonjour M. [Nom], Une erreur de consolidation informatique a effectivement généré des doublons de prélèvement sur les échéances du mois d'Août. Un process général d'annulation a été lancé cette nuit, le compte sera recrédité sans que vous n'ayez aucune action à faire.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Courrier",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Crédit Immobilier",
+    "point_service": "Agence Paris Centre",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1030,
@@ -267,7 +412,12 @@
     "texte_plainte": "Le mécanicien mandaté par l'assurance fait n'importe quoi sur ma voiture (peinture ne correspondant pas). L'expert est injoignable.",
     "texte_solution": "Bonjour, Suite à vos remarques argumentées, nous changeons de prestataire. Nous arrêtons les réparations chez ce garagiste et avons mandaté un garage de la marque constructeur pour reprendre en charge le véhicule dès la semaine prochaine sans avancement de frais.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Retard de traitement",
+    "produit_service": "Livret A",
+    "point_service": "Service Client Téléphonique",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1031,
@@ -276,7 +426,12 @@
     "texte_plainte": "On m'a promis un taux à 3.10% hier par oral, je reçois l'offre aujourd'hui elle est à 3.25% !!!",
     "texte_solution": "Bonjour, Nous vous confirmons que l'offre au taux de 3.10% était la bonne, l'édition de cette matinée ne tenait pas compte de la réduction commerciale accordée par la direction le jour de l'entretien. Une nouvelle offre corrigée est éditée ce jour et vous parviendra dans votre espace sécurisé ce soir.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MOYEN"
+    "niveau_urgence": "MOYEN",
+    "modalite_depot": "Courrier",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Compte Courant",
+    "point_service": "Agence Lyon Nord",
+    "point_service_indexe": "Agence Lyon Nord"
   },
   {
     "id": 1032,
@@ -285,7 +440,12 @@
     "texte_plainte": "Pourquoi ma nouvelle carte bloque au dessus de 1000 euros alors que mon plafond était à 2000 euros avant son renouvellement ??",
     "texte_solution": "Bonjour, Le plafond de votre ancienne carte a été ajusté automatiquement sur la base d'une utilisation standard suite au renouvellement automatique. Vous avez désormais la main pour remonter ce plafond à 2000 euros gratuitement depuis l'application mobile en allant dans 'Cartes > Gérer les plafonds'.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Téléphone",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Prêt Auto",
+    "point_service": "Site Web",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1033,
@@ -294,7 +454,12 @@
     "texte_plainte": "Le module de Bourse de l'application est en panne, je ne peux pas clôturer ma position sur mes actions. C'est l'enfer !!",
     "texte_solution": "Bonjour, Un problème de latence avec la place de marché a fortement impacté l'application de bourse ce matin. Si vous souhaitez clôturer urgemment une position avec le cours de 11h, veuillez contacter notre cellule trading au [Numéro] qui pourra le faire manuellement par dérogation pour vous.",
     "statut_final": "PARTIAL_SATISFIED",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Application Mobile",
+    "motif_reclamation": "Problème technique",
+    "produit_service": "Carte Visa Premium",
+    "point_service": "Site Web",
+    "point_service_indexe": "Agence Marseille Sud"
   },
   {
     "id": 1034,
@@ -303,7 +468,12 @@
     "texte_plainte": "Les horaires de mon agence ont changé sans prévenir (fermée l'après-midi). Difficile pour quelqu'un qui travaille tout les jours !",
     "texte_solution": "Bonjour M. [Nom], Les horaires d'été ont effectivement réduit les créneaux d'ouverture l'après-midi pour certaines agences. Sachez que vous pouvez planifier un rendez-vous (téléphonique ou en visio) avec un conseiller jusqu'à 20h via l'application. Pour toute opération courante, les distributeurs restent accessibles 24h/24.",
     "statut_final": "UNSATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Email",
+    "motif_reclamation": "Insatisfaction du service",
+    "produit_service": "Carte Visa Premium",
+    "point_service": "Automate de retrait",
+    "point_service_indexe": "Agence Paris Centre"
   },
   {
     "id": 1035,
@@ -312,7 +482,12 @@
     "texte_plainte": "Suite clôture de compte, on m'a facturé des frais de 'conservation de compte inactif'. Inacceptable !",
     "texte_solution": "Bonjour, Les frais ont été appliqués automatiquement par notre logiciel suite à l'absence de mouvements sur le compte pendant l'année précédent la demande de clôture. Compte tenu du bon fonctionnement global de la gestion de vos autres comptes, une rétrocession gracieuse de 30 euros a été appliquée en chèque adressé à votre nouveau domicile.",
     "statut_final": "SATISFIED",
-    "niveau_urgence": "MINEUR"
+    "niveau_urgence": "MINEUR",
+    "modalite_depot": "Agence",
+    "motif_reclamation": "Comportement du personnel",
+    "produit_service": "Assurance Habitation",
+    "point_service": "Automate de retrait",
+    "point_service_indexe": "Agence Paris Centre"
   },
   {
     "id": 1036,
@@ -321,6 +496,11 @@
     "texte_plainte": "J'attends toujours le remboursement de ma fraude de 1500 euros il y a plus d'un mois !! Le dossier 145/BD a soi-disant été perdu, les conseillers s'en moquent ! Je saisis le CIMA !!",
     "texte_solution": "Madame, Monsieur, L'examen de votre dossier indique un blocage de conformité inopportun dû à un justificatif de dépôt de plainte illisible. Nous prenons personnellement la responsabilité de valider le remboursement immédiat à titre transitoire dès aujourd'hui avant l'envoi d'un duplicata de dépôt de plainte de votre part.",
     "statut_final": "TREAT",
-    "niveau_urgence": "GRAVE"
+    "niveau_urgence": "GRAVE",
+    "modalite_depot": "Email",
+    "motif_reclamation": "Erreur de facturation",
+    "produit_service": "Prêt Auto",
+    "point_service": "Site Web",
+    "point_service_indexe": "Agence Lyon Nord"
   }
 ]

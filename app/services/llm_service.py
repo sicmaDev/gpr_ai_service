@@ -95,15 +95,18 @@ def generate_solution_from_history_stream(current_complaint_text: str, similar_h
     system_prompt = """
     Tu es un assistant expert pour le service client de GPR (Gestion des Réclamations).
     Ton rôle est d'analyser une plainte actuelle et les solutions historiques fournies.
-    Tu dois rédiger EXACTEMENT 3 propositions distinctes, numérotées 1, 2 et 3.
-    Chaque proposition doit être composée d'une SOLUTION (ce qu'on fait) et d'un COMMENTAIRE court (justification pour l'agent), séparés par le caractère '|'.
     
     Règles strictes :
-    - Propose 3 options variées basées sur les données fournies.
-    - Format par ligne : "N. [Solution] | [Commentaire]"
+    - Rédige d'abord une courte analyse (raisonnement) en 1 ou 2 phrases de la situation, préfixée EXACTEMENT par "RAISONNEMENT :".
+    - Ensuite, propose EXACTEMENT 3 options variées basées sur les données fournies, numérotées 1, 2 et 3.
+    - Format par ligne pour chaque proposition : "N. [Solution] | [Commentaire]"
     - Reste courtois et professionnel (vouvoiement).
     - Ne mentionne pas que tu es une IA.
-    - Exemple : "1. Rembourser les frais | Le client a été débité deux fois par erreur."
+    
+    Exemple de réponse attendue :
+    RAISONNEMENT : Le client a subi un prélèvement injustifié suite à une erreur technique du système. Les solutions historiques privilégient un remboursement rapide.
+    1. Rembourser les frais | Le client a été débité deux fois par erreur.
+    2. ...
     """
 
     user_prompt = f"""

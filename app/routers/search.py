@@ -11,6 +11,7 @@ router = APIRouter(prefix="/search", tags=["RAG Search"])
 class SearchRequest(BaseModel):
     texte_actuel: str
     categorie: Optional[str] = None
+    motif: Optional[str] = None
     gravite_max: Optional[str] = None
 
 @router.post("/")
@@ -19,7 +20,8 @@ def search_similar(request: SearchRequest):
     results = vector_db.search_similar(
         query=request.texte_actuel,
         top_k=3,
-        category_filter=request.categorie
+        category_filter=request.categorie,
+        motif_filter=request.motif
     )
     
     # 2. Génération de solution via LLM (Ollama)
@@ -40,11 +42,17 @@ def search_similar(request: SearchRequest):
 
 @router.post("/stream")
 async def search_similar_stream(request: SearchRequest):
+    print("=== REQUÊTE SEARCH REÇUE ===")
+    print(f"Texte: {request.texte_actuel}")
+    print(f"Categorie: {request.categorie}")
+    print(f"Motif: {request.motif}")
+    print("============================")
     # 1. Recherche Sémantique Faiss (Rapide)
     results = vector_db.search_similar(
         query=request.texte_actuel,
         top_k=3,
-        category_filter=request.categorie
+        category_filter=request.categorie,
+        motif_filter=request.motif
     )
     
     historic_solutions_text = [res["solution_suggeree"] for res in results]
