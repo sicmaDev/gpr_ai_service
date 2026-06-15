@@ -18,3 +18,8 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Bases de données Vectorielles et Index
+chroma_db/
+faiss_index.bin
+app/data/metadata.json
