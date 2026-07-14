@@ -20,12 +20,17 @@ class VectorSearchService:
         self.chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
         self.collection = self.chroma_client.get_or_create_collection(name="claims")
         
+        # Collection pour le RAG des catégories et motifs (classification LLM)
+        self.categories_collection = self.chroma_client.get_or_create_collection(name="categories_motifs")
+        
         # Si la collection est vide, charger les données fictives
         if self.collection.count() == 0:
             print("Collection ChromaDB vide. Chargement des données fictives par défaut...")
             self._load_and_index_mock_data()
         else:
-            print(f"Collection ChromaDB chargée avec {self.collection.count()} vecteurs.")
+            print(f"Collection ChromaDB (claims) chargée avec {self.collection.count()} vecteurs.")
+            
+        print(f"Collection ChromaDB (categories) chargée avec {self.categories_collection.count()} vecteurs.")
 
     def build_index_from_data(self, data: list):
         """Met à jour (Upsert) l'index complet à partir d'une liste de dictionnaires (venant de l'API)."""
@@ -69,7 +74,8 @@ class VectorSearchService:
                 "motif_reclamation": str(mot).lower(), # Minuscule pour filtrage strict
                 "produit_service": str(row.get('produit_service', '')),
                 "point_service_indexe": str(row.get('point_service_indexe', '')),
-                "date_creation": str(row.get('date_creation', ''))
+                "date_creation": str(row.get('date_creation', '')),
+                "claim_type": str(row.get('claimType', ''))
             }
             # Les listes medias et audios sont converties en chaine JSON car ChromaDB ne gère que les types simples
             meta["medias"] = json.dumps(row.get('medias', []))
@@ -101,13 +107,13 @@ class VectorSearchService:
             if not raw_data:
                 return
                 
-            data = [item for item in raw_data if item.get('statut_final') == 'SATISFIED']
+            data = [item for item in raw_data if item.get('statut_final') == 'SATISFIED' or item.get('claimType') in ['DENONCIATION', 'DENUNCIACION']]
             self.build_index_from_data(data)
             
         except Exception as e:
             print(f"Erreur lors de l'initialisation depuis le mock data: {e}")
 
-    def search_similar(self, query: str, top_k: int = 3, category_filter: str = None, motif_filter: str = None) -> list[dict]:
+    def search_similar(self, query: str, top_k: int = 3, category_filter: str = None, motif_filter: str = None, claim_type_filter: str = None) -> list[dict]:
         """
         Recherche les plaintes les plus sémantiquement proches de la requête.
         Utilise le filtrage natif de ChromaDB.
@@ -124,18 +130,19 @@ class VectorSearchService:
         query_vector = self.model.encode([combined_query], convert_to_numpy=True).tolist()
         
         # 3. Construction du filtre (where clause de ChromaDB)
+        filters = []
+        if category_filter:
+            filters.append({"categorie": category_filter.lower()})
+        if motif_filter:
+            filters.append({"motif_reclamation": motif_filter.lower()})
+        if claim_type_filter:
+            filters.append({"claim_type": claim_type_filter})
+
         where_filter = {}
-        if category_filter and motif_filter:
-            where_filter = {
-                "$and": [
-                    {"categorie": category_filter.lower()},
-                    {"motif_reclamation": motif_filter.lower()}
-                ]
-            }
-        elif category_filter:
-            where_filter = {"categorie": category_filter.lower()}
-        elif motif_filter:
-            where_filter = {"motif_reclamation": motif_filter.lower()}
+        if len(filters) > 1:
+            where_filter = {"$and": filters}
+        elif len(filters) == 1:
+            where_filter = filters[0]
 
         # 4. Requête à ChromaDB (c'est instantané et filtré nativement !)
         # On ne passe le where que s'il n'est pas vide
@@ -190,6 +197,113 @@ class VectorSearchService:
             })
             
         return formatted_results
+
+    def index_categories_motifs(self, categories_motifs: dict):
+        """
+        Indexe dynamiquement l'arbre des catégories et motifs dans ChromaDB.
+        Chaque catégorie ET chaque motif deviennent des documents vectorisés pour le RAG.
+        """
+        if not categories_motifs:
+            return
+
+        documents = []
+        metadatas = []
+        ids = []
+
+        for cat_name, cat_data in categories_motifs.items():
+            cat_desc = cat_data.get('description', '')
+            
+            # 1. Indexer la catégorie elle-même
+            cat_text = f"Catégorie: {cat_name}. Description: {cat_desc}"
+            documents.append(cat_text)
+            ids.append(f"CAT::{cat_name}")
+            metadatas.append({
+                "categorie": cat_name,
+                "type": "categorie"
+            })
+            
+            # 2. Indexer chaque motif
+            for motif in cat_data.get('motifs', []):
+                mot_name = motif.get('libelle', '')
+                mot_desc = motif.get('description', '')
+                mot_gravite = motif.get('gravite', '')
+
+                # Construction du texte complet
+                combined_text = f"Catégorie: {cat_name}. Motif: {mot_name}. Description: {mot_desc}. Gravité: {mot_gravite}"
+                
+                doc_id = f"MOT::{cat_name}::{mot_name}"
+                
+                documents.append(combined_text)
+                ids.append(doc_id)
+                metadatas.append({
+                    "categorie": cat_name,
+                    "type": "motif"
+                })
+
+        if not documents:
+            return
+
+        print(f"Indexation de {len(documents)} éléments (catégories et motifs) dans ChromaDB pour le RAG...")
+        
+        # 1. Vider l'ancienne collection pour éviter les doublons fantômes des tests précédents
+        existing_ids = self.categories_collection.get()['ids']
+        if existing_ids:
+            self.categories_collection.delete(ids=existing_ids)
+            
+        # 2. Calculer les embeddings (en les normalisant pour avoir une vraie distance Cosinus entre 0 et 2)
+        embeds = self.model.encode(documents, convert_to_numpy=True, normalize_embeddings=True).tolist()
+        
+        # 3. Insérer les nouveaux vecteurs propres
+        self.categories_collection.upsert(
+            ids=ids,
+            embeddings=embeds,
+            metadatas=metadatas,
+            documents=documents
+        )
+        print(f"Indexation catégories terminée. Total vecteurs: {self.categories_collection.count()}")
+
+    def search_relevant_motifs(self, query: str, original_categories: dict, top_k: int = 15) -> dict:
+        """
+        Recherche sémantiquement les éléments les plus pertinents et retourne
+        l'arbre COMPLET des catégories retenues (avec TOUS leurs motifs)
+        afin que l'IA ne rate aucun motif d'une catégorie pertinente.
+        """
+        if self.categories_collection.count() == 0:
+            return {}, []
+
+        # Il faut aussi normaliser la requête pour que la distance cosinus ait du sens
+        query_vector = self.model.encode([query], convert_to_numpy=True, normalize_embeddings=True).tolist()
+        
+        results = self.categories_collection.query(
+            query_embeddings=query_vector,
+            n_results=min(top_k, self.categories_collection.count()),
+            include=["metadatas", "distances", "documents"]
+        )
+        
+        retained_category_names = set()
+        top_matches = []
+        
+        if not results['ids'] or not results['ids'][0]:
+            return {}, []
+            
+        print("\n=== TOP RAG MATCHES (CHROMADB) ===")
+        for i in range(len(results['ids'][0])):
+            meta = results['metadatas'][0][i]
+            doc_id = results['ids'][0][i]
+            dist = results['distances'][0][i]
+            cat_name = meta['categorie']
+            retained_category_names.add(cat_name)
+            top_matches.append({"id": doc_id, "distance": dist, "categorie": cat_name})
+            print(f"{i+1}. [Distance: {dist:.4f}] {doc_id} (Catégorie: {cat_name})")
+        print("==================================\n", flush=True)
+            
+        # Reconstruire le dictionnaire avec toutes les catégories retenues et TOUS leurs motifs
+        filtered_categories_motifs = {}
+        for cat_name in retained_category_names:
+            if cat_name in original_categories:
+                filtered_categories_motifs[cat_name] = original_categories[cat_name]
+                
+        return filtered_categories_motifs, top_matches
 
 # Singleton: Chargé une seule fois
 vector_db = VectorSearchService()

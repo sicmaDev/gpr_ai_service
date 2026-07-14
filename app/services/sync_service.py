@@ -1,7 +1,7 @@
 import requests
 from app.services.vector_service import vector_db
 
-JAVA_API_URL = "http://localhost:8080/api/v1/ai/export-claims"
+JAVA_API_URL = "http://localhost:8082/api/v1/ai/export-claims"
 
 def perform_sync():
     print(f"Début de la synchronisation avec l'API Java : {JAVA_API_URL}")

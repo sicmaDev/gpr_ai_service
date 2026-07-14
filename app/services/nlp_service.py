@@ -22,7 +22,7 @@ MAPPING_CATEGORIES = {
     "RELATIONNEL": ["accueil", "gentil", "attente", "reçu", "bonjour", "agent", "chef", "politesse"]
 }
 
-def analyze_sentiment_and_urgency(text: str, categories_motifs: dict = None) -> tuple[str, str, list[str], str, str, str]:
+def analyze_sentiment_and_urgency(text: str, categories_motifs: dict = None, nature_dossier: str = "RECLAMATION", definition_nature: str = "") -> tuple[str, str, list[str], str, str, str]:
     """
     Analyse le texte pour déterminer le niveau de gravité,
     une tonalité globale, les mots sensibles et la catégorie suggérée.
@@ -54,7 +54,7 @@ def analyze_sentiment_and_urgency(text: str, categories_motifs: dict = None) -> 
     gravity = "MINEUR"
     
     if len(text.split()) > 4:
-        gravity = check_urgency_with_llm(text, categories_motifs)
+        gravity = check_urgency_with_llm(text, categories_motifs, nature_dossier, definition_nature)
     else:
         # Fallback basique par mots-clés si le texte est très court
         mots_critiques = ["fraude", "vol", "police", "avocat", "tribunal", "bceao", "bloquer", "bloqué", "perte", "piratage"]
@@ -74,7 +74,7 @@ def analyze_sentiment_and_urgency(text: str, categories_motifs: dict = None) -> 
     
     if categories_motifs:
         logger.info(f"Début de la classification LLM ({len(categories_motifs)} catégories fournies avec leurs motifs)")
-        llm_result = classify_with_llm(text, categories_motifs)
+        llm_result = classify_with_llm(text, categories_motifs, nature_dossier, definition_nature)
         suggested_cat = llm_result.get("category", "AUTRE")
         suggested_motif = llm_result.get("motif", "AUTRE")
         raisonnement_classification = llm_result.get("raisonnement", "Aucune explication")
@@ -97,7 +97,7 @@ def generate_short_summary(text: str) -> str:
         return f"{sentences[0].strip()}. [...] {sentences[-2].strip()}."
     return text[:200] + ("..." if len(text)>200 else "")
 
-def analyze_sentiment_and_urgency_stream(text: str, categories_motifs: dict = None):
+def analyze_sentiment_and_urgency_stream(text: str, categories_motifs: dict = None, nature_dossier: str = "RECLAMATION", definition_nature: str = ""):
     text_lower = text.lower()
     
     # 1. Détection des mots-clés
@@ -125,20 +125,20 @@ def analyze_sentiment_and_urgency_stream(text: str, categories_motifs: dict = No
     logger.info("Début du calcul d'urgence LLM Stream")
     gravity = "MINEUR"
     if categories_motifs:
-        for event in check_urgency_with_llm_stream(text, categories_motifs):
+        for event in check_urgency_with_llm_stream(text, categories_motifs, nature_dossier, definition_nature):
             if event["type"] == "urgence_final":
                 gravity = event["urgence"]
                 yield {"type": "init_urgence", "urgence": gravity, "raisonnement_urgence": event["raisonnement"]}
             else:
                 yield event
     else:
-        gravity = check_urgency_with_llm(text, categories_motifs)
+        gravity = check_urgency_with_llm(text, categories_motifs, nature_dossier, definition_nature)
         yield {"type": "init_urgence", "urgence": gravity, "raisonnement_urgence": "Calcul d'urgence par défaut"}
     
     # 5. Streaming du raisonnement et de la classification finale
     if categories_motifs:
         logger.info(f"Début de la classification LLM Stream ({len(categories_motifs)} catégories fournies)")
-        for event in classify_with_llm_stream(text, categories_motifs):
+        for event in classify_with_llm_stream(text, categories_motifs, nature_dossier, definition_nature):
             yield event
     else:
         logger.warning("Aucune liste de catégories ou motifs fournie pour la classification LLM Stream")

@@ -13,6 +13,7 @@ class SearchRequest(BaseModel):
     categorie: Optional[str] = None
     motif: Optional[str] = None
     gravite_max: Optional[str] = None
+    claimType: Optional[str] = None
 
 @router.post("/")
 def search_similar(request: SearchRequest):
@@ -21,7 +22,8 @@ def search_similar(request: SearchRequest):
         query=request.texte_actuel,
         top_k=3,
         category_filter=request.categorie,
-        motif_filter=request.motif
+        motif_filter=request.motif,
+        claim_type_filter=request.claimType
     )
     
     # 2. Génération de solution via LLM (Ollama)
@@ -52,7 +54,8 @@ async def search_similar_stream(request: SearchRequest):
         query=request.texte_actuel,
         top_k=3,
         category_filter=request.categorie,
-        motif_filter=request.motif
+        motif_filter=request.motif,
+        claim_type_filter=request.claimType
     )
     
     historic_solutions_text = [res["solution_suggeree"] for res in results]
