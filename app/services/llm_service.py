@@ -4,6 +4,7 @@ import json
 import logging
 from dotenv import load_dotenv
 from ollama import Client
+from app.services.vector_service import vector_db
 
 load_dotenv()
 
@@ -95,15 +96,18 @@ def generate_solution_from_history_stream(current_complaint_text: str, similar_h
     system_prompt = """
     Tu es un assistant expert pour le service client de GPR (Gestion des Réclamations).
     Ton rôle est d'analyser une plainte actuelle et les solutions historiques fournies.
-    Tu dois rédiger EXACTEMENT 3 propositions distinctes, numérotées 1, 2 et 3.
-    Chaque proposition doit être composée d'une SOLUTION (ce qu'on fait) et d'un COMMENTAIRE court (justification pour l'agent), séparés par le caractère '|'.
     
     Règles strictes :
-    - Propose 3 options variées basées sur les données fournies.
-    - Format par ligne : "N. [Solution] | [Commentaire]"
+    - Rédige d'abord une courte analyse (raisonnement) en 1 ou 2 phrases de la situation, préfixée EXACTEMENT par "RAISONNEMENT :".
+    - Ensuite, propose EXACTEMENT 3 options variées basées sur les données fournies, numérotées 1, 2 et 3.
+    - Format par ligne pour chaque proposition : "N. [Solution] | [Commentaire]"
     - Reste courtois et professionnel (vouvoiement).
     - Ne mentionne pas que tu es une IA.
-    - Exemple : "1. Rembourser les frais | Le client a été débité deux fois par erreur."
+    
+    Exemple de réponse attendue :
+    RAISONNEMENT : Le client a subi un prélèvement injustifié suite à une erreur technique du système. Les solutions historiques privilégient un remboursement rapide.
+    1. Rembourser les frais | Le client a été débité deux fois par erreur.
+    2. ...
     """
 
     user_prompt = f"""
@@ -171,7 +175,7 @@ def _build_tree_text(categories_motifs: dict) -> str:
             tree_text += f"    * Motif: '{m_libelle}'{details_text}\n"
     return tree_text
 
-def check_urgency_with_llm(text: str, categories_motifs: dict = None) -> str:
+def check_urgency_with_llm(text: str, categories_motifs: dict = None, nature_dossier: str = 'RECLAMATION', definition_nature: str = '') -> str:
     """
     Demande rapidement à Llama si la plainte nécessite un traitement urgent (GRAVE, MOYEN ou MINEUR).
     """
@@ -189,7 +193,9 @@ def check_urgency_with_llm(text: str, categories_motifs: dict = None) -> str:
     tree_text = _build_tree_text(categories_motifs) if categories_motifs else ""
     
     user_prompt = f"""
-    Plainte du client : '{text}'
+    Nature du dossier : '{nature_dossier}'
+    Définition de cette nature : '{definition_nature}'
+    Texte soumis : '{text}'
     
     Contexte de l'institution (Catégories, Motifs et Gravité) :
     {tree_text}
@@ -227,7 +233,7 @@ def check_urgency_with_llm(text: str, categories_motifs: dict = None) -> str:
         logger.error(f"Erreur urgence LLM : {e}")
         return "MINEUR"
 
-def classify_with_llm(text: str, categories_motifs: dict) -> dict:
+def classify_with_llm(text: str, categories_motifs: dict, nature_dossier: str = 'RECLAMATION', definition_nature: str = '') -> dict:
     """
     Classification stricte via LLM avec température 0 et hiérarchie conservée.
     """
@@ -247,7 +253,9 @@ def classify_with_llm(text: str, categories_motifs: dict) -> dict:
     tree_text = _build_tree_text(categories_motifs)
         
     user_prompt = f"""
-    Plainte du client : "{text}"
+    Nature du dossier : '{nature_dossier}'
+    Définition de cette nature : '{definition_nature}'
+    Texte soumis : "{text}"
     
     Hiérarchie des Catégories et Motifs disponibles :
     {tree_text}
@@ -272,16 +280,20 @@ def classify_with_llm(text: str, categories_motifs: dict) -> dict:
         )
         
         raw_content = response['message']['content']
-        result = json.loads(raw_content)
-        # On renomme 'analyse_du_probleme' en 'raisonnement' pour rester compatible avec la suite
-        result['raisonnement'] = result.pop('analyse_du_probleme', 'Aucune explication')
+        raw_json = json.loads(raw_content)
+        
+        cat = raw_json.get('category') or raw_json.get('Category') or raw_json.get('catégorie') or raw_json.get('Categorie') or 'AUTRE'
+        mot = raw_json.get('motif') or raw_json.get('Motif') or 'AUTRE'
+        raison = raw_json.get('analyse_du_probleme') or raw_json.get('analyse') or raw_json.get('raisonnement') or 'Aucune explication'
+        
+        result = {"category": cat, "motif": mot, "raisonnement": raison}
         logger.info(f"Classification LLM : {result.get('category')} > {result.get('motif')} | Raisonnement : {result.get('raisonnement', 'Aucune explication')}")
         return result
     except Exception as e:
         logger.error(f"Erreur classification LLM : {e}")
         return {"category": "AUTRE", "motif": "AUTRE"}
 
-def classify_with_llm_stream(text: str, categories_motifs: dict):
+def classify_with_llm_stream(text: str, categories_motifs: dict, nature_dossier: str = 'RECLAMATION', definition_nature: str = ''):
     """
     Classification via LLM en mode streaming pour renvoyer le raisonnement au fur et à mesure.
     """
@@ -298,10 +310,21 @@ def classify_with_llm_stream(text: str, categories_motifs: dict):
     - Rédige d'abord une courte 'analyse_du_probleme' (1 ou 2 phrases expliquant pourquoi tu choisis ce motif plutôt qu'un autre, ou pourquoi la plainte est classée en AUTRE si aucun motif ne correspond) avant de donner ton choix final.
     """
     
-    tree_text = _build_tree_text(categories_motifs)
+    # --- RAG : Vectorisation et filtrage sémantique ---
+    # 1. Mise à jour de l'index avec toutes les catégories reçues du frontend
+    vector_db.index_categories_motifs(categories_motifs)
+    # 2. Recherche sémantique du Top 15 des éléments pertinents par rapport au texte de la plainte
+    filtered_categories_motifs, top_matches = vector_db.search_relevant_motifs(text, categories_motifs, top_k=15)
+    # 3. On génère le texte de l'arbre uniquement pour les catégories retenues
+    tree_text = _build_tree_text(filtered_categories_motifs if filtered_categories_motifs else categories_motifs)
+    
+    yield {"type": "rag_matches", "matches": top_matches}
+    yield {"type": "rag_context", "categories": list(filtered_categories_motifs.keys()) if filtered_categories_motifs else list(categories_motifs.keys())}
         
     user_prompt = f"""
-    Plainte du client : "{text}"
+    Nature du dossier : '{nature_dossier}'
+    Définition de cette nature : '{definition_nature}'
+    Texte soumis : "{text}"
     
     Hiérarchie des Catégories et Motifs disponibles :
     {tree_text}
@@ -330,12 +353,15 @@ def classify_with_llm_stream(text: str, categories_motifs: dict):
         state = 0 # 0: waiting for start of raisonnement, 1: inside raisonnement, 2: after raisonnement
         last_yielded_len = 0
         
+        # Regex robuste (insensible à la casse) pour attraper la clé d'analyse
+        regex_start = re.compile(r'"(?:analyse_du_probleme|analyse|raisonnement)"\s*:\s*"', re.IGNORECASE)
+        
         for chunk in response:
-            content = chunk['message']['content']
+            content = chunk['message'].get('content', '')
             buffer += content
             
             if state == 0:
-                match = re.search(r'"analyse_du_probleme"\s*:\s*"', buffer)
+                match = regex_start.search(buffer)
                 if match:
                     state = 1
                     start_idx = match.end()
@@ -352,7 +378,7 @@ def classify_with_llm_stream(text: str, categories_motifs: dict):
                             yield {"type": "raisonnement_chunk", "content": val_str}
                         last_yielded_len = len(val_str)
             elif state == 1:
-                match = re.search(r'"analyse_du_probleme"\s*:\s*"', buffer)
+                match = regex_start.search(buffer)
                 start_idx = match.end()
                 val_str = buffer[start_idx:]
                 end_match = re.search(r'(?<!\\)"', val_str)
@@ -372,8 +398,12 @@ def classify_with_llm_stream(text: str, categories_motifs: dict):
                 
         try:
             result = json.loads(buffer)
-            result['raisonnement'] = result.pop('analyse_du_probleme', 'Aucune explication')
-            yield {"type": "final", "result": result}
+            # Extraction robuste avec fallbacks pour gérer la sensibilité à la casse (LLaMa3 1B)
+            cat = result.get('category') or result.get('Category') or result.get('catégorie') or result.get('Categorie') or 'AUTRE'
+            mot = result.get('motif') or result.get('Motif') or 'AUTRE'
+            raison = result.get('analyse_du_probleme') or result.get('analyse') or result.get('raisonnement') or 'Aucune explication'
+            
+            yield {"type": "final", "result": {"category": cat, "motif": mot, "raisonnement": raison}}
         except Exception as e:
             logger.error(f"Erreur parsing JSON final stream : {e}")
             yield {"type": "final", "result": {"category": "AUTRE", "motif": "AUTRE", "raisonnement": "Erreur de flux"}}
@@ -382,7 +412,7 @@ def classify_with_llm_stream(text: str, categories_motifs: dict):
         logger.error(f"Erreur classification LLM Stream : {e}")
         yield {"type": "final", "result": {"category": "AUTRE", "motif": "AUTRE", "raisonnement": "Erreur LLM"}}
 
-def check_urgency_with_llm_stream(text: str, categories_motifs: dict):
+def check_urgency_with_llm_stream(text: str, categories_motifs: dict, nature_dossier: str = 'RECLAMATION', definition_nature: str = ''):
     """
     Calcul d'urgence via LLM en mode streaming pour renvoyer le raisonnement au fur et à mesure.
     """
@@ -397,10 +427,18 @@ def check_urgency_with_llm_stream(text: str, categories_motifs: dict):
     - Rédige d'abord une courte 'analyse_du_probleme' (1 phrase) expliquant ton choix avant de donner l'urgence.
     """
     
-    tree_text = _build_tree_text(categories_motifs) if categories_motifs else ""
+    # --- RAG : Vectorisation et filtrage sémantique ---
+    if categories_motifs:
+        vector_db.index_categories_motifs(categories_motifs)
+        filtered_categories_motifs, top_matches = vector_db.search_relevant_motifs(text, categories_motifs, top_k=15)
+        tree_text = _build_tree_text(filtered_categories_motifs if filtered_categories_motifs else categories_motifs)
+    else:
+        tree_text = ""
     
     user_prompt = f"""
-    Plainte du client : '{text}'
+    Nature du dossier : '{nature_dossier}'
+    Définition de cette nature : '{definition_nature}'
+    Texte soumis : '{text}'
     
     Contexte de l'institution (Catégories, Motifs et Gravité) :
     {tree_text}
@@ -429,12 +467,14 @@ def check_urgency_with_llm_stream(text: str, categories_motifs: dict):
         state = 0
         last_yielded_len = 0
         
+        regex_start = re.compile(r'"(?:analyse_du_probleme|analyse|raisonnement)"\s*:\s*"', re.IGNORECASE)
+        
         for chunk in response:
             content = chunk['message']['content']
             buffer += content
             
             if state == 0:
-                match = re.search(r'"analyse_du_probleme"\s*:\s*"', buffer)
+                match = regex_start.search(buffer)
                 if match:
                     state = 1
                     start_idx = match.end()
@@ -451,7 +491,7 @@ def check_urgency_with_llm_stream(text: str, categories_motifs: dict):
                             yield {"type": "raisonnement_urgence_chunk", "content": val_str}
                         last_yielded_len = len(val_str)
             elif state == 1:
-                match = re.search(r'"analyse_du_probleme"\s*:\s*"', buffer)
+                match = regex_start.search(buffer)
                 start_idx = match.end()
                 val_str = buffer[start_idx:]
                 end_match = re.search(r'(?<!\\)"', val_str)

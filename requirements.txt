@@ -3,10 +3,11 @@ uvicorn[standard]
 pydantic
 python-multipart
 Sentence-Transformers
-faiss-cpu
+chromadb
 scikit-learn
-pandas
 ollama
 textblob
 python-dotenv
 openai-whisper
+requests
+apscheduler

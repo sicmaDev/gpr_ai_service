@@ -19,6 +19,8 @@ class CategorieData(BaseModel):
 class TextRequest(BaseModel):
     texte: str
     categories_motifs: Optional[Dict[str, CategorieData]] = None
+    nature_dossier: Optional[str] = "RECLAMATION"
+    definition_nature: Optional[str] = ""
 
 import logging
 logger = logging.getLogger(__name__)
@@ -32,7 +34,9 @@ async def analyze_text(request: TextRequest):
     
     result = analyze_sentiment_and_urgency(
         texte, 
-        request.categories_motifs
+        request.categories_motifs,
+        request.nature_dossier,
+        request.definition_nature
     )
     
     # Si le résultat a été mis à jour pour renvoyer le raisonnement ou non
@@ -70,7 +74,7 @@ async def analyze_text_stream(request: TextRequest):
         cat_dict = {k: v.dict() for k, v in request.categories_motifs.items()}
         
     def event_generator():
-        for event in analyze_sentiment_and_urgency_stream(texte, cat_dict):
+        for event in analyze_sentiment_and_urgency_stream(texte, cat_dict, request.nature_dossier, request.definition_nature):
             yield f"data: {json.dumps(event)}\n\n"
             
     return StreamingResponse(event_generator(), media_type="text/event-stream")
