@@ -305,5 +305,21 @@ class VectorSearchService:
                 
         return filtered_categories_motifs, top_matches
 
+    def get_filtered_claims_metadata(self, filters: dict = None, limit: int = None) -> list[dict]:
+        """
+        Récupère les métadonnées des plaintes pour le reporting et l'analyse.
+        """
+        kwargs = {"include": ["metadatas"]}
+        if filters:
+            kwargs["where"] = filters
+        if limit:
+            kwargs["limit"] = limit
+            
+        results = self.collection.get(**kwargs)
+        if not results or not results['metadatas']:
+            return []
+            
+        return results['metadatas']
+
 # Singleton: Chargé une seule fois
 vector_db = VectorSearchService()
