@@ -66,7 +66,7 @@ async def search_similar_stream(request: SearchRequest):
         yield "data: " + json.dumps(payload) + "\n\n"
 
         if not historic_solutions_text:
-            payload = {'type': 'chunk', 'content': "Aucune similarité trouvée dans l'histoire."}
+            payload = {'type': 'chunk', 'content': "Aucune similarité trouvée dans lhistoire."}
             yield "data: " + json.dumps(payload) + "\n\n"
             payload = {'type': 'final', 'content': 'Aucune similarité trouvée.'}
             yield "data: " + json.dumps(payload) + "\n\n"
