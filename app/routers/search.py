@@ -25,11 +25,11 @@ def search_similar(request: SearchRequest):
         motif_filter=request.motif,
         claim_type_filter=request.claimType
     )
-    
+
     # 2. Génération de solution via LLM (Ollama)
     # Extraire uniquement les textes des solutions de l'historique pour le prompt
     historic_solutions_text = [res["solution_suggeree"] for res in results]
-    
+
     # Si des résultats existent, on demande à Llama de rédiger une réponse
     generated_solution = "Aucune similarité trouvée."
     if historic_solutions_text:
@@ -57,23 +57,28 @@ async def search_similar_stream(request: SearchRequest):
         motif_filter=request.motif,
         claim_type_filter=request.claimType
     )
-    
+
     historic_solutions_text = [res["solution_suggeree"] for res in results]
-    
+
     def event_generator():
         # Envoyer d'abord les sources trouvées
-        yield f"data: {json.dumps({'type': 'sources', 'similar_claims': results})}\n\n"
-        
+        payload = {'type': 'sources', 'similar_claims': results}
+        yield "data: " + json.dumps(payload) + "\n\n"
+
         if not historic_solutions_text:
-            yield f"data: {json.dumps({'type': 'chunk', 'content': 'Aucune similarité trouvée dans l\'historique.'})}\n\n"
-            yield f"data: {json.dumps({'type': 'final', 'content': 'Aucune similarité trouvée.'})}\n\n"
+            payload = {'type': 'chunk', 'content': "Aucune similarité trouvée dans lhistoire."}
+            yield "data: " + json.dumps(payload) + "\n\n"
+            payload = {'type': 'final', 'content': 'Aucune similarité trouvée.'}
+            yield "data: " + json.dumps(payload) + "\n\n"
             return
-            
+
         full_text = ""
         for chunk in generate_solution_from_history_stream(request.texte_actuel, historic_solutions_text):
             full_text += chunk
-            yield f"data: {json.dumps({'type': 'chunk', 'content': chunk})}\n\n"
-            
-        yield f"data: {json.dumps({'type': 'final', 'content': full_text})}\n\n"
-        
+            payload = {'type': 'chunk', 'content': chunk}
+            yield "data: " + json.dumps(payload) + "\n\n"
+
+        payload = {'type': 'final', 'content': full_text}
+        yield "data: " + json.dumps(payload) + "\n\n"
+
     return StreamingResponse(event_generator(), media_type="text/event-stream")

@@ -1,11 +1,13 @@
 fastapi
 uvicorn[standard]
 pydantic
+python-multipart
 Sentence-Transformers
 chromadb
 scikit-learn
 ollama
 textblob
 python-dotenv
+openai-whisper
 requests
 apscheduler

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import analyze, search, reporting
+from app.routers import analyze, search, reporting, transcribe
 
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -36,6 +36,7 @@ app.add_middleware(
 app.include_router(analyze.router)
 app.include_router(search.router)
 app.include_router(reporting.router)
+app.include_router(transcribe.router)
 
 @app.get("/")
 def read_root():
