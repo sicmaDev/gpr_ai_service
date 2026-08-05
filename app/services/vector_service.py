@@ -1,5 +1,10 @@
 import json
 import os
+import sys
+import pysqlite3
+
+sys.modules["sqlite3"] = pysqlite3
+
 import chromadb
 from sentence_transformers import SentenceTransformer
 
@@ -73,9 +78,9 @@ class VectorSearchService:
                 "modalite_depot": str(row.get('modalite_depot', '')),
                 "motif_reclamation": str(mot).lower(), # Minuscule pour filtrage strict
                 "produit_service": str(row.get('produit_service', '')),
-                "point_service_indexe": str(row.get('point_service_indexe', '')),
+                "agence": str(row.get('agence', row.get('point_service_indexe', ''))),
                 "date_creation": str(row.get('date_creation', '')),
-                "claim_type": str(row.get('claimType', ''))
+                "type": str(row.get('type', row.get('claimType', '')))
             }
             # Les listes medias et audios sont converties en chaine JSON car ChromaDB ne gère que les types simples
             meta["medias"] = json.dumps(row.get('medias', []))
