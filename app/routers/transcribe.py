@@ -2,7 +2,24 @@ from fastapi import APIRouter, UploadFile, File, Form
 from fastapi.responses import JSONResponse
 import tempfile
 import os
+import re
 from typing import Optional
+
+def clean_transcription(text: str) -> str:
+    if not text:
+        return ""
+    # 1. Supprimer les balises HTML/XML (ex: <tag>...</tag>)
+    text = re.sub(r'<[^>]*>', '', text)
+    # 2. Supprimer les indicateurs Whisper/bruitages entre crochets ou parenthèses
+    text = re.sub(r'\[[^\]]*\]', '', text)
+    text = re.sub(r'\([^)]*\)', '', text)
+    # 3. Remplacer les slashes par un espace
+    text = re.sub(r'[\/\\]', ' ', text)
+    # 4. Supprimer les caractères spéciaux inhabituels
+    text = re.sub(r'[*_~`#@^|+==<>{}|[\]]', '', text)
+    # 5. Normaliser les espaces blancs
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
 router = APIRouter(prefix="/transcribe", tags=["Audio Transcription"])
 
@@ -78,8 +95,10 @@ async def transcribe_audio(
     if texte:
         combined_text = texte + " " + combined_text if combined_text else texte
     
+    cleaned_text = clean_transcription(combined_text)
+    
     return {
-        "texte_transcrit": combined_text.strip(),
-        "transcription": combined_text.strip(),
+        "texte_transcrit": cleaned_text,
+        "transcription": cleaned_text,
         "success": True
     }
