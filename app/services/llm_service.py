@@ -12,9 +12,9 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://127.0.0.1:11434")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "")
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
-DEFAULT_MODEL = os.getenv("LLM_MODEL_NAME", "llama3.2:1b")
+DEFAULT_MODEL = os.getenv("LLM_MODEL_NAME", "")
 
 headers = {}
 if LLM_API_KEY:
