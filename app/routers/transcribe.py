@@ -3,7 +3,9 @@ from fastapi.responses import JSONResponse
 import tempfile
 import os
 import re
+import requests
 from typing import Optional
+from dotenv import load_dotenv
 
 def clean_transcription(text: str) -> str:
     if not text:
@@ -21,21 +23,57 @@ def clean_transcription(text: str) -> str:
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
-router = APIRouter(prefix="/transcribe", tags=["Audio Transcription"])
+def transcribe_with_cloud(file_path: str) -> str:
+    """Envoie le fichier audio à l'API Cloud pour transcription."""
+    load_dotenv(override=True)
+    CLOUD_API_KEY = os.getenv("CLOUD_TRANSCRIPTION_API_KEY", "")
+    CLOUD_API_URL = os.getenv("CLOUD_TRANSCRIPTION_URL", "https://api.groq.com/openai/v1/audio/transcriptions")
+    CLOUD_MODEL_NAME = os.getenv("CLOUD_TRANSCRIPTION_MODEL", "whisper-large-v3-turbo")
 
-# Charger le modèle Whisper une seule fois au démarrage
-whisper_model = None
-
-def get_whisper_model():
-    global whisper_model
-    if whisper_model is None:
+    if not CLOUD_API_KEY or CLOUD_API_KEY == "votre_cle_api_ici":
+        return "Erreur: La clé API Cloud n'est pas configurée dans le fichier .env."
+        
+    headers = {
+        "Authorization": f"Bearer {CLOUD_API_KEY}"
+    }
+    
+    # On spécifie 'fr' pour être sûr de la langue
+    data = {
+        "model": CLOUD_MODEL_NAME,
+        "language": "fr",
+        "response_format": "json"
+    }
+    
+    with open(file_path, "rb") as audio_file:
+        files = {
+            "file": ("audio.webm", audio_file, "audio/webm")
+        }
+        
+        # Désactivation des proxys locaux si nécessaires, comme pour le backend Java
+        proxies = {"http": "", "https": ""}
+        
         try:
-            import whisper
-            print("Chargement du modèle Whisper...")
-            whisper_model = whisper.load_model("base")
-        except ImportError:
-            raise ImportError("openai-whisper n'est pas installé. Veuillez exécuter: pip install openai-whisper")
-    return whisper_model
+            response = requests.post(
+                CLOUD_API_URL, 
+                headers=headers, 
+                data=data, 
+                files=files, 
+                proxies=proxies,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return result.get("text", "")
+            else:
+                print(f"Erreur API Cloud ({response.status_code}): {response.text}")
+                return f"Erreur Cloud: {response.status_code}"
+                
+        except Exception as e:
+            print(f"Exception lors de l'appel Cloud: {str(e)}")
+            return f"Erreur de connexion: {str(e)}"
+
+router = APIRouter(prefix="/transcribe", tags=["Audio Transcription"])
 
 @router.post("/")
 async def transcribe_audio(
@@ -44,7 +82,7 @@ async def transcribe_audio(
     audio_recording: Optional[UploadFile] = File(None)
 ):
     """
-    Transcribe audio files using Whisper.
+    Transcribe audio files using Cloud API (Groq/OpenAI).
     Accepts either audio_upload or audio_recording or both.
     Returns the combined transcription.
     """
@@ -59,9 +97,9 @@ async def transcribe_audio(
                 tmp_path = tmp.name
             
             try:
-                model = get_whisper_model()
-                result = model.transcribe(tmp_path, language="fr", task="transcribe")
-                transcriptions.append(result["text"].strip())
+                # Appel au Cloud au lieu du modèle local Whisper
+                text_result = transcribe_with_cloud(tmp_path)
+                transcriptions.append(text_result.strip())
             finally:
                 if os.path.exists(tmp_path):
                     os.remove(tmp_path)
@@ -78,9 +116,9 @@ async def transcribe_audio(
                 tmp_path = tmp.name
             
             try:
-                model = get_whisper_model()
-                result = model.transcribe(tmp_path, language="fr", task="transcribe")
-                transcriptions.append(result["text"].strip())
+                # Appel au Cloud au lieu du modèle local Whisper
+                text_result = transcribe_with_cloud(tmp_path)
+                transcriptions.append(text_result.strip())
             finally:
                 if os.path.exists(tmp_path):
                     os.remove(tmp_path)

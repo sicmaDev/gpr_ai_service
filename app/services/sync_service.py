@@ -1,11 +1,18 @@
 import requests
 from app.services.vector_service import vector_db
 
-JAVA_API_URL = "http://localhost:8082/api/v1/ai/export-claims"
+JAVA_API_URL = "http://localhost:8020/api/v1/ai/export-claims"
 
 def perform_sync():
     print(f"Début de la synchronisation avec l'API Java : {JAVA_API_URL}")
-    response = requests.get(JAVA_API_URL, timeout=30)
+    
+    # Désactivation explicite du proxy pour éviter l'erreur ProxyError
+    proxies = {
+        "http": "",
+        "https": "",
+    }
+    
+    response = requests.get(JAVA_API_URL, timeout=30, proxies=proxies)
     
     if response.status_code == 200:
         data = response.json()

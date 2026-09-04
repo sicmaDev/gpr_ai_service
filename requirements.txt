@@ -9,7 +9,6 @@ ollama
 textblob
 python-dotenv
 pysqlite3-binary
-openai-whisper
 requests
 apscheduler 
  
