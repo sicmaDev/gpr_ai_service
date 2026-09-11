@@ -1,7 +1,7 @@
 import requests
 from app.services.vector_service import vector_db
 
-JAVA_API_URL = "http://localhost:8020/api/v1/ai/export-claims"
+JAVA_API_URL = "https://api.gprsicma.gprserver.com/api/v1/ai/export-claims" 
 
 def perform_sync():
     print(f"Début de la synchronisation avec l'API Java : {JAVA_API_URL}")
@@ -31,7 +31,7 @@ def perform_sync():
 def run_sync():
     print("Déclenchement de la synchronisation via l'API interne...")
     try:
-        response = requests.get("http://localhost:8001/sync", timeout=120)
+        response = requests.get("https://ai.gprsicma.gprserver.com/sync", timeout=120)
         if response.status_code == 200:
             print("Synchronisation réussie:", response.json().get("message", "OK"))
         else:

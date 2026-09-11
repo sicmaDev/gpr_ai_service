@@ -1,3 +1,8 @@
+import sys 
+import pysqlite3 
+
+sys.modules["sqlite3"] = pysqlite3
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import analyze, search, transcribe
@@ -27,7 +32,7 @@ app = FastAPI(
 # Configuration CORS pour autoriser le backend Java (Spring Boot)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3020"], 
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3020", "https://gpr-formation.gprserver.com"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
