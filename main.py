@@ -1,7 +1,15 @@
-import sys 
-import pysqlite3 
+import os
+import sys
 
-sys.modules["sqlite3"] = pysqlite3
+APP_ENV = os.getenv("APP_ENV", "development").lower()
+IS_DEPLOYMENT = APP_ENV in {"production", "deploy", "deployment"}
+
+if IS_DEPLOYMENT:
+    try:
+        import pysqlite3
+        sys.modules["sqlite3"] = pysqlite3
+    except ImportError:
+        pass
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,15 +21,17 @@ from app.services.sync_service import perform_sync
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Démarrer le planificateur de tâches (Cron)
-    scheduler = BackgroundScheduler()
-    # Configuration pour tourner toutes les nuits à 02:00
-    scheduler.add_job(perform_sync, 'cron', hour=2, minute=0)
-    scheduler.start()
-    print("Planificateur Cron démarré. Synchronisation MySQL prévue tous les jours à 02:00.")
-    yield
-    scheduler.shutdown()
-
+    if IS_DEPLOYMENT:
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(perform_sync, 'cron', hour=2, minute=0)
+        scheduler.start()
+        print("Planificateur Cron démarré. Synchronisation MySQL prévue tous les jours à 02:00.")
+        try:
+            yield
+        finally:
+            scheduler.shutdown()
+    else:
+        yield
 app = FastAPI(
     title="GPR Web IA Service",
     description="Micro-service d'Intelligence Artificielle pour la Gestion des Plaintes et Réclamations.",
@@ -30,9 +40,15 @@ app = FastAPI(
 )
 
 # Configuration CORS pour autoriser le backend Java (Spring Boot)
+allowed_origins = os.getenv(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3020,https://gpr-formation.gprserver.com",
+).split(",")
+allowed_origins = [origin.strip() for origin in allowed_origins if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3020", "https://gpr-formation.gprserver.com"], 
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -57,4 +73,10 @@ def trigger_sync():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True, reload_excludes=["app/data/*", "*.sqlite3", "*.bin", "*.sqlite3-journal"])
+    uvicorn.run(
+        "main:app",
+        host=os.getenv("HOST", "0.0.0.0"),
+        port=int(os.getenv("PORT", "8001")),
+        reload=not IS_DEPLOYMENT,
+        reload_excludes=["app/data/*", "*.sqlite3", "*.bin", "*.sqlite3-journal"],
+    )
