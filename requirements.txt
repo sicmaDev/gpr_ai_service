@@ -10,4 +10,6 @@ python-dotenv
 pysqlite3-binary
 requests
 apscheduler 
+SQLAlchemy>=2.0,<3.0
+PyMySQL>=1.1,<2.0
  
