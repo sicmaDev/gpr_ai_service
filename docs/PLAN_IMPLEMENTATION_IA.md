@@ -579,13 +579,13 @@ Pour chaque modele ou dataset, conserver :
 
 ### Consultation d'un audit
 
-Prevoir un endpoint autorise de consultation :
+L'audit metier des reclamations et des analyses AI est consulte via Spring
+Boot, qui en est le proprietaire et le persiste dans `gpr_sicma_online`.
+Les traces techniques du service AI sont consultees dans le systeme de logs
+ou d'observabilite. Le service AI ne persiste pas d'audit dans
+`gpr_ai_reporting`.
 
-```http
-GET /audit/{correlation_id}
-```
-
-Il doit permettre de reconstituer la chaine suivante :
+La consultation doit permettre de reconstituer la chaine suivante :
 
 ```text
 requete

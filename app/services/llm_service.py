@@ -23,6 +23,17 @@ if LLM_API_KEY:
 # Création du client Ollama (Local ou Cloud)
 ollama_client = Client(host=LLM_BASE_URL, headers=headers)
 
+
+def _institution_context_text(query: str) -> str:
+    matches = vector_db.search_institution_context(query=query, top_k=5)
+    if not matches:
+        return "Aucun document institutionnel pertinent n'a été trouvé."
+    return "\n".join(
+        f"- {match['title']} : {match['content'][:2000]}"
+        for match in matches
+    )
+
+
 def generate_solution_from_history(current_complaint_text: str, similar_historic_solutions: list) -> str:
     """
     Génère 3 propositions de solutions formatées en se basant sur la plainte actuelle
@@ -33,6 +44,7 @@ def generate_solution_from_history(current_complaint_text: str, similar_historic
 
     # 1. Construction du contexte (Les solutions passées)
     context_text = "\n".join([f"- Historique {i+1} : {sol}" for i, sol in enumerate(similar_historic_solutions)])
+    institution_context = _institution_context_text(current_complaint_text)
 
     # 2. Construction du Prompt Système (Les instructions strictes pour l'IA)
     system_prompt = """
@@ -56,6 +68,9 @@ def generate_solution_from_history(current_complaint_text: str, similar_historic
 
     Voici comment des plaintes similaires ont été résolues par nos agents par le passé :
     {context_text}
+
+    Contexte institutionnel et procédures applicables :
+    {institution_context}
 
     Rédige maintenant les 3 propositions (Solution | Commentaire) idéales pour cette plainte.
     """
@@ -92,6 +107,7 @@ def generate_solution_from_history_stream(current_complaint_text: str, similar_h
         return
 
     context_text = "\n".join([f"- Historique {i+1} : {sol}" for i, sol in enumerate(similar_historic_solutions)])
+    institution_context = _institution_context_text(current_complaint_text)
 
     system_prompt = """
     Tu es un assistant expert pour le service client de GPR (Gestion des Réclamations).
@@ -116,6 +132,9 @@ def generate_solution_from_history_stream(current_complaint_text: str, similar_h
 
     Voici comment des plaintes similaires ont été résolues par nos agents par le passé :
     {context_text}
+
+    Contexte institutionnel et procédures applicables :
+    {institution_context}
 
     Rédige maintenant les 3 propositions (Solution | Commentaire) idéales pour cette plainte.
     """
@@ -191,6 +210,7 @@ def check_urgency_with_llm(text: str, categories_motifs: dict = None, nature_dos
     """
     
     tree_text = _build_tree_text(categories_motifs) if categories_motifs else ""
+    institution_context = _institution_context_text(text)
     
     user_prompt = f"""
     Nature du dossier : '{nature_dossier}'
@@ -199,6 +219,9 @@ def check_urgency_with_llm(text: str, categories_motifs: dict = None, nature_dos
     
     Contexte de l'institution (Catégories, Motifs et Gravité) :
     {tree_text}
+
+    Contexte institutionnel et procédures applicables :
+    {institution_context}
     
     Format de réponse attendu : {{"analyse_du_probleme": "...", "urgence": "..."}}
     """
@@ -251,6 +274,7 @@ def classify_with_llm(text: str, categories_motifs: dict, nature_dossier: str = 
     """
     
     tree_text = _build_tree_text(categories_motifs)
+    institution_context = _institution_context_text(text)
         
     user_prompt = f"""
     Nature du dossier : '{nature_dossier}'
@@ -259,6 +283,9 @@ def classify_with_llm(text: str, categories_motifs: dict, nature_dossier: str = 
     
     Hiérarchie des Catégories et Motifs disponibles :
     {tree_text}
+
+    Contexte institutionnel et procédures applicables :
+    {institution_context}
     
     Format de réponse attendu : {{"analyse_du_probleme": "...", "category": "...", "motif": "..."}}
     """
@@ -317,6 +344,7 @@ def classify_with_llm_stream(text: str, categories_motifs: dict, nature_dossier:
     filtered_categories_motifs, top_matches = vector_db.search_relevant_motifs(text, categories_motifs, top_k=15)
     # 3. On génère le texte de l'arbre uniquement pour les catégories retenues
     tree_text = _build_tree_text(filtered_categories_motifs if filtered_categories_motifs else categories_motifs)
+    institution_context = _institution_context_text(text)
     
     yield {"type": "rag_matches", "matches": top_matches}
     yield {"type": "rag_context", "categories": list(filtered_categories_motifs.keys()) if filtered_categories_motifs else list(categories_motifs.keys())}
@@ -328,6 +356,9 @@ def classify_with_llm_stream(text: str, categories_motifs: dict, nature_dossier:
     
     Hiérarchie des Catégories et Motifs disponibles :
     {tree_text}
+
+    Contexte institutionnel et procédures applicables :
+    {institution_context}
     
     Format de réponse attendu : {{"analyse_du_probleme": "...", "category": "...", "motif": "..."}}
     """
@@ -434,6 +465,7 @@ def check_urgency_with_llm_stream(text: str, categories_motifs: dict, nature_dos
         tree_text = _build_tree_text(filtered_categories_motifs if filtered_categories_motifs else categories_motifs)
     else:
         tree_text = ""
+    institution_context = _institution_context_text(text)
     
     user_prompt = f"""
     Nature du dossier : '{nature_dossier}'
@@ -442,6 +474,9 @@ def check_urgency_with_llm_stream(text: str, categories_motifs: dict, nature_dos
     
     Contexte de l'institution (Catégories, Motifs et Gravité) :
     {tree_text}
+
+    Contexte institutionnel et procédures applicables :
+    {institution_context}
     
     Format de réponse attendu : {{"analyse_du_probleme": "...", "urgence": "..."}}
     """

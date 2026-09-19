@@ -79,6 +79,8 @@ Le résultat brut doit toujours être conservé séparément du résultat corrig
 
 ## 4. Phase 1 — Fiabiliser le service actuel
 
+**État : implémentée dans la première tranche du service.**
+
 ### Actions
 
 - vérifier qu'au moins un fichier audio est fourni ;
@@ -97,6 +99,8 @@ Le résultat brut doit toujours être conservé séparément du résultat corrig
 Le service reste compatible avec son utilisation actuelle, mais les erreurs sont explicites et les traitements sont plus faciles à diagnostiquer.
 
 ## 5. Phase 2 — Séparer la transcription brute et corrigée
+
+**État : implémentée.**
 
 ### Principe
 
@@ -123,6 +127,8 @@ La réponse du modèle ne doit jamais être écrasée par le nettoyage ou par un
 - les erreurs doivent être retournées via un statut et un message dédiés.
 
 ## 6. Phase 3 — Ajouter les segments et les timestamps
+
+**État : implémentée.**
 
 ### Actions
 

@@ -1,6 +1,8 @@
 import json
 import os
-import sys
+import hashlib
+import threading
+from datetime import datetime, timezone
 
 
 import chromadb
@@ -9,6 +11,46 @@ from sentence_transformers import SentenceTransformer
 # Définition du chemin absolu vers nos fausses données générées précédemment
 MOCK_DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "plaintes_fictives.json")
 CHROMA_DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "chroma_db")
+
+
+def _canonical_categories(categories_motifs: dict) -> str:
+    """Return a stable representation used to detect catalogue changes."""
+    return json.dumps(
+        categories_motifs,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=lambda value: value.model_dump()
+        if hasattr(value, "model_dump")
+        else value.dict()
+        if hasattr(value, "dict")
+        else str(value),
+    )
+
+
+def categories_hash(categories_motifs: dict) -> str:
+    return hashlib.sha256(
+        _canonical_categories(categories_motifs).encode("utf-8")
+    ).hexdigest()
+
+
+def institution_documents_hash(documents: list[dict]) -> str:
+    return hashlib.sha256(
+        _canonical_categories(documents).encode("utf-8")
+    ).hexdigest()
+
+
+def _to_plain_value(value):
+    if hasattr(value, "model_dump"):
+        return value.model_dump()
+    if hasattr(value, "dict"):
+        return value.dict()
+    if isinstance(value, dict):
+        return {key: _to_plain_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_to_plain_value(item) for item in value]
+    return value
+
 
 class VectorSearchService:
     def __init__(self, model_name: str = 'paraphrase-multilingual-MiniLM-L12-v2'):
@@ -25,6 +67,11 @@ class VectorSearchService:
         
         # Collection pour le RAG des catégories et motifs (classification LLM)
         self.categories_collection = self.chroma_client.get_or_create_collection(name="categories_motifs")
+        self.institution_collection = self.chroma_client.get_or_create_collection(
+            name="institution_context"
+        )
+        self._categories_index_lock = threading.Lock()
+        self._institution_index_lock = threading.Lock()
         
         # Si la collection est vide, charger les données fictives
         if self.collection.count() == 0:
@@ -34,6 +81,10 @@ class VectorSearchService:
             print(f"Collection ChromaDB (claims) chargée avec {self.collection.count()} vecteurs.")
             
         print(f"Collection ChromaDB (categories) chargée avec {self.categories_collection.count()} vecteurs.")
+        print(
+            "Collection ChromaDB (institution_context) chargée avec "
+            f"{self.institution_collection.count()} vecteurs."
+        )
 
     def build_index_from_data(self, data: list):
         """Met à jour (Upsert) l'index complet à partir d'une liste de dictionnaires (venant de l'API)."""
@@ -78,7 +129,7 @@ class VectorSearchService:
                 "produit_service": str(row.get('produit_service', '')),
                 "agence": str(row.get('agence', row.get('point_service_indexe', ''))),
                 "date_creation": str(row.get('date_creation', '')),
-                "type": str(row.get('type', row.get('claimType', '')))
+                "claim_type": str(row.get('claimType', row.get('type', '')))
             }
             # Les listes medias et audios sont converties en chaine JSON car ChromaDB ne gère que les types simples
             meta["medias"] = json.dumps(row.get('medias', []))
@@ -201,69 +252,187 @@ class VectorSearchService:
             
         return formatted_results
 
-    def index_categories_motifs(self, categories_motifs: dict):
+    def index_categories_motifs(self, categories_motifs: dict) -> bool:
         """
         Indexe dynamiquement l'arbre des catégories et motifs dans ChromaDB.
         Chaque catégorie ET chaque motif deviennent des documents vectorisés pour le RAG.
+
+        Returns True when the collection was rebuilt, False when the existing
+        index already represents the same catalogue.
         """
         if not categories_motifs:
-            return
+            return False
 
-        documents = []
-        metadatas = []
-        ids = []
+        categories_motifs = _to_plain_value(categories_motifs)
+        catalog_hash = categories_hash(categories_motifs)
+        with self._categories_index_lock:
+            collection_metadata = self.categories_collection.metadata or {}
+            if collection_metadata.get("catalog_hash") == catalog_hash:
+                return False
 
-        for cat_name, cat_data in categories_motifs.items():
-            cat_desc = cat_data.get('description', '')
-            
-            # 1. Indexer la catégorie elle-même
-            cat_text = f"Catégorie: {cat_name}. Description: {cat_desc}"
-            documents.append(cat_text)
-            ids.append(f"CAT::{cat_name}")
-            metadatas.append({
-                "categorie": cat_name,
-                "type": "categorie"
-            })
-            
-            # 2. Indexer chaque motif
-            for motif in cat_data.get('motifs', []):
-                mot_name = motif.get('libelle', '')
-                mot_desc = motif.get('description', '')
-                mot_gravite = motif.get('gravite', '')
+            documents = []
+            metadatas = []
+            ids = []
 
-                # Construction du texte complet
-                combined_text = f"Catégorie: {cat_name}. Motif: {mot_name}. Description: {mot_desc}. Gravité: {mot_gravite}"
-                
-                doc_id = f"MOT::{cat_name}::{mot_name}"
-                
-                documents.append(combined_text)
-                ids.append(doc_id)
+            for cat_name, cat_data in categories_motifs.items():
+                cat_desc = cat_data.get('description', '')
+
+                # 1. Indexer la catégorie elle-même
+                cat_text = f"Catégorie: {cat_name}. Description: {cat_desc}"
+                documents.append(cat_text)
+                ids.append(f"CAT::{cat_name}")
                 metadatas.append({
                     "categorie": cat_name,
-                    "type": "motif"
+                    "type": "categorie"
                 })
 
-        if not documents:
-            return
+                # 2. Indexer chaque motif
+                for motif in cat_data.get('motifs', []):
+                    mot_name = motif.get('libelle', '')
+                    mot_desc = motif.get('description', '')
+                    mot_gravite = motif.get('gravite', '')
 
-        print(f"Indexation de {len(documents)} éléments (catégories et motifs) dans ChromaDB pour le RAG...")
+                    # Construction du texte complet
+                    combined_text = f"Catégorie: {cat_name}. Motif: {mot_name}. Description: {mot_desc}. Gravité: {mot_gravite}"
+
+                    doc_id = f"MOT::{cat_name}::{mot_name}"
+
+                    documents.append(combined_text)
+                    ids.append(doc_id)
+                    metadatas.append({
+                        "categorie": cat_name,
+                        "type": "motif"
+                    })
+
+            if not documents:
+                return False
+
+            print(f"Indexation de {len(documents)} éléments (catégories et motifs) dans ChromaDB pour le RAG...")
         
         # 1. Vider l'ancienne collection pour éviter les doublons fantômes des tests précédents
-        existing_ids = self.categories_collection.get()['ids']
-        if existing_ids:
-            self.categories_collection.delete(ids=existing_ids)
+            existing_ids = self.categories_collection.get()['ids']
+            if existing_ids:
+                self.categories_collection.delete(ids=existing_ids)
             
         # 2. Calculer les embeddings (en les normalisant pour avoir une vraie distance Cosinus entre 0 et 2)
-        embeds = self.model.encode(documents, convert_to_numpy=True, normalize_embeddings=True).tolist()
+            embeds = self.model.encode(documents, convert_to_numpy=True, normalize_embeddings=True).tolist()
         
         # 3. Insérer les nouveaux vecteurs propres
-        self.categories_collection.upsert(
-            ids=ids,
-            embeddings=embeds,
-            metadatas=metadatas,
-            documents=documents
+            self.categories_collection.upsert(
+                ids=ids,
+                embeddings=embeds,
+                metadatas=metadatas,
+                documents=documents
+            )
+            self.categories_collection.modify(
+                metadata={
+                    "catalog_hash": catalog_hash,
+                    "catalog_count": len(documents),
+                    "catalog_synced_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+            print(f"Indexation catégories terminée. Total vecteurs: {self.categories_collection.count()}")
+            return True
+
+    def index_institution_documents(self, documents: list[dict]) -> bool:
+        """Replace the active institutional knowledge set only when it changes."""
+        normalized_documents = _to_plain_value(documents)
+        if not normalized_documents:
+            return False
+
+        documents_hash = institution_documents_hash(normalized_documents)
+        with self._institution_index_lock:
+            collection_metadata = self.institution_collection.metadata or {}
+            if collection_metadata.get("documents_hash") == documents_hash:
+                return False
+
+            ids = []
+            texts = []
+            metadatas = []
+            for document in normalized_documents:
+                document_id = str(document.get("document_id", "")).strip()
+                content = str(document.get("content", "")).strip()
+                if not document_id or not content:
+                    continue
+
+                ids.append(document_id)
+                texts.append(
+                    f"Titre: {document.get('title', '')}. "
+                    f"Type: {document.get('document_type', '')}. "
+                    f"Contenu: {content}"
+                )
+                metadatas.append(
+                    {
+                        "document_id": document_id,
+                        "title": str(document.get("title", "")),
+                        "document_type": str(document.get("document_type", "")),
+                        "category": str(document.get("category", "")),
+                        "version": str(document.get("version", "")),
+                        "source": str(document.get("source", "INSTITUTIONAL")),
+                        "status": str(document.get("status", "ACTIVE")).upper(),
+                        "validated": bool(document.get("validated", False)),
+                        "effective_from": str(document.get("effective_from", "")),
+                        "effective_until": str(document.get("effective_until", "")),
+                    }
+                )
+
+            if not ids:
+                return False
+
+            embeddings = self.model.encode(
+                texts, convert_to_numpy=True, normalize_embeddings=True
+            ).tolist()
+            existing_ids = self.institution_collection.get()["ids"]
+            if existing_ids:
+                self.institution_collection.delete(ids=existing_ids)
+            self.institution_collection.upsert(
+                ids=ids,
+                embeddings=embeddings,
+                metadatas=metadatas,
+                documents=texts,
+            )
+            self.institution_collection.modify(
+                metadata={
+                    "documents_hash": documents_hash,
+                    "document_count": len(ids),
+                    "documents_synced_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+            return True
+
+    def search_institution_context(
+        self, query: str, top_k: int = 5, category: str | None = None
+    ) -> list[dict]:
+        if self.institution_collection.count() == 0:
+            return []
+
+        query_vector = self.model.encode(
+            [query], convert_to_numpy=True, normalize_embeddings=True
+        ).tolist()
+        where_filters = [{"status": "ACTIVE"}]
+        if category:
+            where_filters.append({"category": category})
+
+        where = where_filters[0] if len(where_filters) == 1 else {"$and": where_filters}
+        results = self.institution_collection.query(
+            query_embeddings=query_vector,
+            n_results=min(top_k, self.institution_collection.count()),
+            where=where,
+            include=["metadatas", "documents", "distances"],
         )
-        print(f"Indexation catégories terminée. Total vecteurs: {self.categories_collection.count()}")
+        if not results["ids"] or not results["ids"][0]:
+            return []
+
+        return [
+            {
+                "document_id": results["metadatas"][0][index]["document_id"],
+                "title": results["metadatas"][0][index]["title"],
+                "content": results["documents"][0][index],
+                "distance": float(results["distances"][0][index]),
+                "metadata": results["metadatas"][0][index],
+            }
+            for index in range(len(results["ids"][0]))
+        ]
 
     def search_relevant_motifs(self, query: str, original_categories: dict, top_k: int = 15) -> dict:
         """

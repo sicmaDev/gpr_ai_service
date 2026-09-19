@@ -13,7 +13,7 @@ if IS_DEPLOYMENT:
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import analyze, search, transcribe
+from app.routers import analyze, knowledge, search, sync, transcribe
 from app.reporting import router as reporting_router
 
 from contextlib import asynccontextmanager
@@ -57,6 +57,8 @@ app.add_middleware(
 
 app.include_router(analyze.router)
 app.include_router(search.router)
+app.include_router(sync.router)
+app.include_router(knowledge.router)
 app.include_router(reporting_router)
 app.include_router(transcribe.router)
 
@@ -65,10 +67,15 @@ def read_root():
     return {"status": "online", "service": "GPR Web IA API", "version": "1.0.0"}
 
 @app.get("/sync")
-def trigger_sync():
+def trigger_sync(full: bool = False):
     try:
-        perform_sync()
-        return {"status": "success", "message": "Synchronisation terminée avec succès."}
+        result = perform_sync(full=full)
+        return {
+            "status": "success",
+            "message": "Synchronisation terminée avec succès.",
+            "full": full,
+            **result,
+        }
     except Exception as e:
         return {"status": "error", "message": str(e)}
 

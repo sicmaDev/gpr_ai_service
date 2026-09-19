@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import Any, Iterable
 
 import requests
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.db.models import ReportingClaim, ReportingSyncState
@@ -19,6 +19,7 @@ JAVA_API_URL = os.getenv(
 SYNC_NAME = "spring_boot_claims"
 PAGE_SIZE = 500
 ENABLE_RAG_SYNC = os.getenv("REPORTING_ENABLE_RAG_SYNC", "false").lower() == "true"
+EXCLUDED_STATUSES = frozenset({"TEMP_SAVED"})
 
 
 def parse_source_datetime(value: Any) -> datetime | None:
@@ -59,6 +60,11 @@ def _risk_level(value: Any) -> str | None:
     }.get(normalized.strip().upper(), normalized.strip().upper())
 
 
+def _is_excluded(row: dict[str, Any]) -> bool:
+    status = _text(row.get("statut_final"))
+    return bool(status and status.strip().upper() in EXCLUDED_STATUSES)
+
+
 def claim_values(row: dict[str, Any], synced_at: datetime) -> dict[str, Any]:
     source_id = row.get("id")
     if source_id is None:
@@ -83,6 +89,8 @@ def claim_values(row: dict[str, Any], synced_at: datetime) -> dict[str, Any]:
         "solution": _text(row.get("texte_solution")),
         "ai_urgency": _risk_level(row.get("aiUrgency")),
         "ai_sentiment": _text(row.get("aiSentiment")),
+        # The risk level is defined by the claim motif in gps_objet. AI urgency
+        # remains only a backward-compatible fallback for older exports.
         "risk_level": _risk_level(row.get("riskLevel") or row.get("aiUrgency")),
         "ai_risk_score": row.get("aiRiskScore"),
         "ai_summary": _text(row.get("aiSummary")),
@@ -100,6 +108,8 @@ def claim_values(row: dict[str, Any], synced_at: datetime) -> dict[str, Any]:
 def upsert_claims(db: Session, rows: Iterable[dict[str, Any]], synced_at: datetime) -> int:
     count = 0
     for row in rows:
+        if _is_excluded(row):
+            continue
         values = claim_values(row, synced_at)
         existing = db.scalar(
             select(ReportingClaim).where(
@@ -183,11 +193,16 @@ def perform_sync(
         if state is None:
             state = ReportingSyncState(sync_name=SYNC_NAME)
             db.add(state)
+        db.execute(
+            delete(ReportingClaim).where(
+                ReportingClaim.status.in_(EXCLUDED_STATUSES)
+            )
+        )
         state.last_successful_sync_at = latest
         state.updated_at = synced_at
         db.commit()
         if ENABLE_RAG_SYNC:
-            sync_claims_to_rag(claims)
+            sync_claims_to_rag(row for row in claims if not _is_excluded(row))
         return {
             "processed": processed,
             "cursor_before": cursor,
