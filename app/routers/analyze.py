@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict
@@ -23,13 +23,15 @@ class TextRequest(BaseModel):
     definition_nature: Optional[str] = ""
 
 import logging
+from uuid import uuid4
 logger = logging.getLogger(__name__)
 
 @router.post("/")
-async def analyze_text(request: TextRequest):
+async def analyze_text(request: TextRequest, x_correlation_id: Optional[str] = Header(default=None)):
     # Appel de la logique du service NLP avec les listes de données réelles
     texte = request.texte
-    logger.info(f"--- NOUVELLE ANALYSE ---")
+    correlation_id = x_correlation_id or str(uuid4())
+    logger.info("--- NOUVELLE ANALYSE correlation_id=%s ---", correlation_id)
     logger.info(f"Texte : {texte[:100]}...")
     
     result = analyze_sentiment_and_urgency(
@@ -57,12 +59,14 @@ async def analyze_text(request: TextRequest):
         "resume": resume,
         "categorie_suggeree": suggested_cat,
         "motif_suggere": suggested_motif,
-        "raisonnement": raisonnement
+        "raisonnement": raisonnement,
+        "correlation_id": correlation_id
     }
 
 @router.post("/stream")
-async def analyze_text_stream(request: TextRequest):
+async def analyze_text_stream(request: TextRequest, x_correlation_id: Optional[str] = Header(default=None)):
     texte = request.texte
+    correlation_id = x_correlation_id or str(uuid4())
     logger.info(f"--- NOUVELLE ANALYSE STREAM ---")
     logger.info(f"Texte : {texte[:100]}...")
     
@@ -74,7 +78,9 @@ async def analyze_text_stream(request: TextRequest):
         cat_dict = {k: v.dict() for k, v in request.categories_motifs.items()}
         
     def event_generator():
+        yield f"data: {json.dumps({'type': 'correlation', 'correlation_id': correlation_id})}\n\n"
         for event in analyze_sentiment_and_urgency_stream(texte, cat_dict, request.nature_dossier, request.definition_nature):
+            event["correlation_id"] = correlation_id
             yield f"data: {json.dumps(event)}\n\n"
             
     return StreamingResponse(event_generator(), media_type="text/event-stream")

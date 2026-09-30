@@ -90,7 +90,7 @@ class VectorSearchService:
         """Met à jour (Upsert) l'index complet à partir d'une liste de dictionnaires (venant de l'API)."""
         if not data:
             print("Aucune donnée fournie pour l'indexation.")
-            return
+            return 0
 
         print(f"Indexation/Mise à jour de {len(data)} réclamations dans ChromaDB...")
         
@@ -100,14 +100,20 @@ class VectorSearchService:
         documents = []
 
         for row in data:
+            feedback_status = str(row.get("aiFeedbackStatus", "")).upper()
+            if feedback_status not in {"VALIDATED", "CORRECTED"}:
+                continue
+            if not row.get("texte_solution") and not row.get("aiRetainedSolution"):
+                continue
             # Sécurité si un code manque, on utilise l'id
             doc_id = str(row.get('id', row.get('code')))
             if not doc_id:
                 continue
                 
-            cat = row.get('objet_categorie', '')
-            mot = row.get('motif_reclamation', '')
+            cat = row.get('aiFinalCategory') or row.get('objet_categorie', '')
+            mot = row.get('aiFinalMotif') or row.get('motif_reclamation', '')
             txt = row.get('texte_plainte', '')
+            solution = row.get('aiRetainedSolution') or row.get('texte_solution', '')
             combined = f"Catégorie: {cat}. Motif: {mot}. Plainte: {txt}"
             
             # Préparation des tableaux pour ChromaDB
@@ -122,8 +128,10 @@ class VectorSearchService:
                 "code_client": str(row.get('codeClient', '')),
                 "categorie": str(cat).lower(), # On stocke en minuscule pour le filtrage
                 "statut": str(row.get('statut_final', '')),
+                "feedback_status": feedback_status,
+                "quality_score": int(row.get("aiQualityScore") or 0),
                 "texte_original": str(txt),
-                "solution_suggeree": str(row.get('texte_solution', '')),
+                "solution_suggeree": str(solution),
                 "modalite_depot": str(row.get('modalite_depot', '')),
                 "motif_reclamation": str(mot).lower(), # Minuscule pour filtrage strict
                 "produit_service": str(row.get('produit_service', '')),
@@ -136,6 +144,10 @@ class VectorSearchService:
             meta["audios"] = json.dumps(row.get('audios', []))
             
             metadatas.append(meta)
+
+        if not documents:
+            print("Aucune reclamation validee eligible pour l'indexation RAG.")
+            return 0
 
         # Calculer tous les embeddings d'un coup
         print("Calcul des embeddings...")
@@ -151,6 +163,7 @@ class VectorSearchService:
         )
         
         print(f"Mise à jour terminée. Total des vecteurs en base: {self.collection.count()}")
+        return len(documents)
 
     def _load_and_index_mock_data(self):
         """Charge les données JSON fictives (utilisé en fallback si rien d'autre)."""

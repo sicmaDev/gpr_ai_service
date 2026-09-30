@@ -43,7 +43,13 @@ app = FastAPI(
 # Configuration CORS pour autoriser le backend Java (Spring Boot)
 allowed_origins = os.getenv(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://127.0.0.1:3020,https://gpr-formation.gprserver.com",
+    (
+        "http://localhost:3000,"
+        "http://127.0.0.1:3000,"
+        "http://localhost:3020,"
+        "http://127.0.0.1:3020,"
+        "https://gpr-formation.gprserver.com"
+    ),
 ).split(",")
 allowed_origins = [origin.strip() for origin in allowed_origins if origin.strip()]
 

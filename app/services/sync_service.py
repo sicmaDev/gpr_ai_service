@@ -106,9 +106,18 @@ def claim_values(row: dict[str, Any], synced_at: datetime) -> dict[str, Any]:
 
 
 def upsert_claims(db: Session, rows: Iterable[dict[str, Any]], synced_at: datetime) -> int:
-    count = 0
+    return upsert_claims_with_metrics(db, rows, synced_at)["processed"]
+
+
+def upsert_claims_with_metrics(
+    db: Session,
+    rows: Iterable[dict[str, Any]],
+    synced_at: datetime,
+) -> dict[str, int]:
+    metrics = {"processed": 0, "inserted": 0, "updated": 0, "ignored": 0}
     for row in rows:
         if _is_excluded(row):
+            metrics["ignored"] += 1
             continue
         values = claim_values(row, synced_at)
         existing = db.scalar(
@@ -118,20 +127,23 @@ def upsert_claims(db: Session, rows: Iterable[dict[str, Any]], synced_at: dateti
         )
         if existing is None:
             db.add(ReportingClaim(**values))
+            metrics["inserted"] += 1
         else:
             for key, value in values.items():
                 setattr(existing, key, value)
-        count += 1
-    return count
+            metrics["updated"] += 1
+        metrics["processed"] += 1
+    return metrics
 
 
-def sync_claims_to_rag(rows: Iterable[dict[str, Any]]) -> None:
+def sync_claims_to_rag(rows: Iterable[dict[str, Any]]) -> int:
     """Index synchronized claims in Chroma only when explicitly enabled."""
     from app.services.vector_service import vector_db
 
     vector_rows = list(rows)
     if vector_rows:
-        vector_db.build_index_from_data(vector_rows)
+        return vector_db.build_index_from_data(vector_rows)
+    return 0
 
 
 def fetch_claim_pages(
@@ -172,6 +184,7 @@ def perform_sync(
     owns_db = db is None
     db = db or SessionLocal()
     http_session = http_session or requests.Session()
+    started_at = datetime.now(timezone.utc).replace(tzinfo=None)
     try:
         state = db.scalar(
             select(ReportingSyncState).where(
@@ -179,9 +192,16 @@ def perform_sync(
             )
         )
         cursor = None if full or state is None else state.last_successful_sync_at
+        if state is None:
+            state = ReportingSyncState(sync_name=SYNC_NAME, updated_at=started_at)
+            db.add(state)
+            db.flush()
+        state.last_started_at = started_at
+        state.last_error = None
+        state.last_error_count = 0
         claims = fetch_claim_pages(http_session, updated_after=cursor)
         synced_at = datetime.now(timezone.utc).replace(tzinfo=None)
-        processed = upsert_claims(db, claims, synced_at)
+        metrics = upsert_claims_with_metrics(db, claims, synced_at)
         updated_dates = [
             parsed
             for parsed in (
@@ -190,26 +210,59 @@ def perform_sync(
             if parsed is not None
         ]
         latest = max(updated_dates, default=cursor)
-        if state is None:
-            state = ReportingSyncState(sync_name=SYNC_NAME)
-            db.add(state)
-        db.execute(
+        deleted_count = db.execute(
             delete(ReportingClaim).where(
                 ReportingClaim.status.in_(EXCLUDED_STATUSES)
             )
-        )
-        state.last_successful_sync_at = latest
-        state.updated_at = synced_at
-        db.commit()
+        ).rowcount or 0
+        indexed_count = 0
         if ENABLE_RAG_SYNC:
-            sync_claims_to_rag(row for row in claims if not _is_excluded(row))
+            indexed_count = sync_claims_to_rag(
+                row for row in claims if not _is_excluded(row)
+            )
+        completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        state.last_successful_sync_at = latest
+        state.updated_at = completed_at
+        state.last_completed_at = completed_at
+        state.last_duration_ms = int(
+            (completed_at - started_at).total_seconds() * 1000
+        )
+        state.last_received_count = len(claims)
+        state.last_inserted_count = metrics["inserted"]
+        state.last_updated_count = metrics["updated"]
+        state.last_ignored_count = metrics["ignored"]
+        state.last_deleted_count = deleted_count
+        state.last_indexed_count = indexed_count
+        db.commit()
         return {
-            "processed": processed,
+            **metrics,
+            "received": len(claims),
+            "deleted": deleted_count,
+            "indexed": indexed_count,
             "cursor_before": cursor,
             "cursor_after": latest,
         }
-    except Exception:
+    except Exception as exc:
         db.rollback()
+        state = db.scalar(
+            select(ReportingSyncState).where(
+                ReportingSyncState.sync_name == SYNC_NAME
+            )
+        )
+        if state is None:
+            state = ReportingSyncState(sync_name=SYNC_NAME, updated_at=started_at)
+            db.add(state)
+        completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        state.last_started_at = started_at
+        state.last_completed_at = completed_at
+        state.last_duration_ms = int(
+            (completed_at - started_at).total_seconds() * 1000
+        )
+        state.last_error_count = 1
+        state.last_error = str(exc)[:4000]
+        state.updated_at = completed_at
+        db.commit()
+        logger.exception("Reporting sync failed")
         raise
     finally:
         if owns_db:

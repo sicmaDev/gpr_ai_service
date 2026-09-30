@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional, List
 import json
+from uuid import uuid4
 from app.services.vector_service import vector_db
 from app.services.llm_service import generate_solution_from_history, generate_solution_from_history_stream
 
@@ -16,7 +17,9 @@ class SearchRequest(BaseModel):
     claimType: Optional[str] = None
 
 @router.post("/")
-def search_similar(request: SearchRequest):
+def search_similar(request: SearchRequest, x_correlation_id: Optional[str] = Header(default=None)):
+    correlation_id = x_correlation_id or str(uuid4())
+
     # 1. Recherche Sémantique Faiss
     results = vector_db.search_similar(
         query=request.texte_actuel,
@@ -39,11 +42,13 @@ def search_similar(request: SearchRequest):
     return {
         "message": generated_solution, # Solution générée pour la Section A du Front-end
         "resultats_trouves": len(results),
-        "similar_claims": results      # Sources historiques pour la Section B du Front-end
+        "similar_claims": results,      # Sources historiques pour la Section B du Front-end
+        "correlation_id": correlation_id
     }
 
 @router.post("/stream")
-async def search_similar_stream(request: SearchRequest):
+async def search_similar_stream(request: SearchRequest, x_correlation_id: Optional[str] = Header(default=None)):
+    correlation_id = x_correlation_id or str(uuid4())
     print("=== REQUÊTE SEARCH REÇUE ===")
     print(f"Texte: {request.texte_actuel}")
     print(f"Categorie: {request.categorie}")
@@ -62,7 +67,7 @@ async def search_similar_stream(request: SearchRequest):
 
     def event_generator():
         # Envoyer d'abord les sources trouvées
-        payload = {'type': 'sources', 'similar_claims': results}
+        payload = {'type': 'sources', 'similar_claims': results, 'correlation_id': correlation_id}
         yield "data: " + json.dumps(payload) + "\n\n"
 
         if not historic_solutions_text:
@@ -75,10 +80,10 @@ async def search_similar_stream(request: SearchRequest):
         full_text = ""
         for chunk in generate_solution_from_history_stream(request.texte_actuel, historic_solutions_text):
             full_text += chunk
-            payload = {'type': 'chunk', 'content': chunk}
+            payload = {'type': 'chunk', 'content': chunk, 'correlation_id': correlation_id}
             yield "data: " + json.dumps(payload) + "\n\n"
 
-        payload = {'type': 'final', 'content': full_text}
+        payload = {'type': 'final', 'content': full_text, 'correlation_id': correlation_id}
         yield "data: " + json.dumps(payload) + "\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

@@ -15,13 +15,18 @@ logger = logging.getLogger(__name__)
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "")
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 DEFAULT_MODEL = os.getenv("LLM_MODEL_NAME", "")
+LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "20"))
 
 headers = {}
 if LLM_API_KEY:
     headers["Authorization"] = f"Bearer {LLM_API_KEY}"
 
 # Création du client Ollama (Local ou Cloud)
-ollama_client = Client(host=LLM_BASE_URL, headers=headers)
+ollama_client = Client(
+    host=LLM_BASE_URL,
+    headers=headers,
+    timeout=LLM_TIMEOUT_SECONDS,
+)
 
 
 def _institution_context_text(query: str) -> str:

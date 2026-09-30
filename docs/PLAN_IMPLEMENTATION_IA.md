@@ -682,6 +682,12 @@ fine-tuning.
 - `catalog_version` ;
 - `source` (`SYNTHETIC`, `REAL`, `INSTITUTIONAL`).
 
+Ces metadonnees sont portees par la source metier Spring Boot et par les
+documents indexes dans ChromaDB. Elles ne constituent pas une nouvelle
+persistance metier dans `gpr_ai_reporting`. La base reporting conserve
+uniquement les projections necessaires aux tableaux de bord, aux alertes et au
+suivi technique des synchronisations.
+
 ### Score de qualite initial
 
 ```text
@@ -912,40 +918,136 @@ Deploiement si amelioration
 
 ## Priorites d'implementation
 
-### Priorite 1 - Fondations et synchronisation
+### Etat d'avancement de la priorite 1
 
-1. Formaliser le contexte institutionnel.
-2. Structurer les regles, categories, motifs et procedures.
-3. Ajouter la collection `institution_context`.
-4. Separer synchronisation et traitement des requetes.
-5. Implementer la synchronisation incrementale des reclamations.
-6. Versionner les categories et motifs.
-7. Ajouter `/sync/status`.
+La premiere tranche est implementee :
 
-### Priorite 2 - Qualite et feedback
+- le service AI genere ou propage un `correlation_id` dans les reponses
+  synchrones et streaming ;
+- Spring Boot accepte ce correlation ID dans `ClaimRequest` ;
+- la reclamation le conserve dans `gpr_sicma_online` ;
+- l'analyse AI est journalisee dans `gps_log`, avec l'identifiant de la
+  reclamation et le `correlation_id` ;
+- la lecture est disponible par reclamation ou par correlation ID ;
+- aucun audit n'est persiste dans `gpr_ai_reporting`.
 
-8. Creer des exemples synthetiques de base.
-9. Enregistrer les predictions.
-10. Ajouter les validations et corrections agent.
-11. Indexer uniquement les donnees fiables.
-12. Ajouter un score de qualite.
+L'audit des validations et corrections humaines est maintenant disponible via
+`POST /api/v1/claim/{claimId}/ai-feedback`. Les donnees sont persistees dans
+`gpr_sicma_online` et l'evenement detaille est ajoute a `gps_log`.
 
-### Priorite 3 - Evaluation
+Le service AI peut recevoir ces informations dans la reponse d'export Spring
+Boot afin de filtrer les donnees eligibles au RAG, mais `gpr_ai_reporting` ne
+doit pas les persister comme colonnes metier. La source de verite reste
+`gpr_sicma_online` et `gps_log`.
 
-13. Creer le jeu de test.
-14. Mesurer les performances actuelles.
-15. Mesurer la qualite de la synchronisation.
-16. Definir les criteres de reussite.
+L'ordre ci-dessous tient compte de l'etat actuel du service et des responsabilites
+retenues entre le service AI, Spring Boot, `gpr_sicma_online` et
+`gpr_ai_reporting`.
 
-### Priorite 4 - Fine-tuning
+### Priorite 1 - Audit metier et correlation de bout en bout
 
-17. Constituer le dataset valide.
-18. Fine-tuner d'abord la classification.
-19. Comparer avec le modele actuel.
-20. Tester en parallele.
-21. Deployer progressivement.
-22. Planifier les entrainements periodiques.
+1. Implementer dans Spring Boot l'audit metier des analyses AI et des validations/corrections humaines.
+2. Persister cet audit dans `gpr_sicma_online`, sans utiliser `gpr_ai_reporting`.
+3. Propager un meme `correlation_id` entre le service AI, le frontend, Spring Boot et la reclamation persistee.
+4. Conserver les traces techniques du service AI dans les logs ou le systeme d'observabilite, sans table `audit_event` dans la base reporting.
 
+### Priorite 2 - Qualite des donnees RAG et feedback humain
+
+5. Implementer les exemples synthetiques de base et leur statut de validation.
+6. Enregistrer les predictions, validations et corrections des agents dans
+   Spring Boot et `gps_log`. (realise)
+7. Definir les regles d'eligibilite des reclamations pour le RAG. (realise)
+8. Indexer uniquement les donnees fiables et ajoutees au contexte autorise.
+   (realise, avec metadonnees utilisees uniquement pendant l'indexation)
+9. Ajouter un score de qualite et les metadonnees de validation dans la source
+   metier et les documents RAG, sans les transformer en donnees metier de
+   `gpr_ai_reporting`. (realise cote source metier et index RAG)
+
+### Correction architecturale appliquee - Retablir la separation reporting/metier
+
+Le service AI conserve `gpr_ai_reporting` strictement comme base de projection :
+
+1. les colonnes de feedback metier ont ete retirees du modele
+   `reporting_claim` ;
+2. les migrations qui ajoutaient ces colonnes ont ete supprimees et une
+   migration de retrait est fournie pour les bases deja migrees ;
+3. le feedback officiel est conserve uniquement dans Spring Boot,
+   `gpr_sicma_online` et `gps_log` ;
+4. les metadonnees recues depuis l'export sont utilisees uniquement pour filtrer ou
+   indexer ChromaDB, sans les persister dans la base reporting ;
+5. `reporting_claim` conserve uniquement les champs necessaires au
+   reporting et aux indicateurs.
+
+### Prochaine etape prioritaire - Priorite 3
+
+Avant de creer un nouveau jeu de tests AI, reutiliser et qualifier les donnees
+deja presentes :
+
+1. inventorier le `DevelopmentDataSeeder` Spring Boot active avec le profil
+   `seed` ;
+2. exclure `app/data/plaintes_fictives.json` du jeu d'evaluation AI : ces
+   donnees sont un fallback de demonstration et ne constituent pas une source
+   metier validee ;
+3. distinguer les donnees du seeder de developpement, les donnees de test de
+   contrat et les exemples utilisables pour evaluer les predictions AI ;
+4. verifier la couverture des statuts, categories, motifs, urgences, cas
+   ambigus et cas hors perimetre ;
+5. completer uniquement les cas manquants sans dupliquer les seeders existants ;
+6. utiliser les identifiants initiaux `SEED-CLAIM-*` et `SEED-DEN-*` comme
+   references stables des cas de developpement ;
+7. versionner les cas et leurs resultats attendus sans ajouter de statut
+   technique supplementaire aux reclamations.
+
+L'existant verifie a ce stade est le suivant :
+
+- `DevelopmentDataSeeder.java` cree un environnement de developpement avec
+  utilisateurs, catalogue, 39 dossiers principaux et 6 dossiers
+  `TEMP_SAVED`. Il contient des predictions AI de demonstration, mais pas de
+  corrections humaines structurees ni de verites terrain completes. Il sert
+  donc de fixture d'integration et de synchronisation, pas de benchmark
+  definitif ;
+- `app/data/plaintes_fictives.json` est exclu du jeu d'evaluation : il sert
+  uniquement de fallback de demonstration ou d'initialisation locale du RAG et
+  ne doit pas etre considere comme une verite terrain ;
+- les tests Python existants couvrent principalement la transcription, le
+  reporting, les contrats et la synchronisation. Ils ne constituent pas encore
+  un jeu d'evaluation des performances du modele.
+
+Le developpement ne doit pas attendre les retours de production. La suite
+immediate consiste a reutiliser les cas du seeder en les referencant par leurs
+identifiants initiaux (`SEED-CLAIM-*` et `SEED-DEN-*`) et a versionner leurs
+resultats attendus dans le jeu d'evaluation. Aucun champ ou statut
+`DEVELOPMENT_ONLY` ou `PROVISIONAL` ne doit etre ajoute au projet : les
+identifiants du seeder et les statuts metier existants suffisent.
+
+Apres cette qualification, enrichir `/sync/status` avec les volumes, durees,
+erreurs et resultats detailles de chaque synchronisation, puis brancher le jeu
+de tests AI versionne sur des tests d'evaluation reproductibles. Les resultats
+obtenus seront utilises pour detecter les regressions techniques, et non pour
+declarer une performance metier definitive avant validation humaine.
+
+### Priorite 3 - Observabilite et evaluation
+
+10. Completer `/sync/status` avec les volumes, durees et erreurs de chaque synchronisation. (realise pour la synchronisation des reclamations)
+11. Creer un jeu de test AI independant et versionne.
+12. Mesurer les performances de classification, d'urgence et de generation.
+13. Mesurer la qualite et le delai de synchronisation.
+14. Definir les criteres de reussite et les seuils de regression.
+
+L'etat de synchronisation des reclamations conserve maintenant dans
+`reporting_sync_state` les compteurs de dossiers recus, inseres, mis a jour,
+ignores, supprimes et indexes, ainsi que les dates de debut et de fin, la
+duree et la derniere erreur. Ces donnees restent techniques et appartiennent au
+service de reporting ; elles ne constituent pas un audit metier.
+
+### Priorite 4 - Dataset et fine-tuning controle
+
+15. Constituer un dataset a partir des corrections validees et anonymisees.
+16. Versionner le dataset et separer entrainement, validation et test.
+17. Fine-tuner d'abord la classification categorie/motif.
+18. Comparer le modele actuel, le modele avec RAG et le modele fine-tune avec RAG.
+19. Tester en parallele puis deployer progressivement avec retour arriere.
+20. Planifier les entrainements periodiques uniquement si le gain est mesure.
 ## Criteres de reussite
 
 Le systeme doit :

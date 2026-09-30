@@ -118,6 +118,17 @@ def sync_status(db: Session = Depends(get_db)):
                 else None
             ),
             "indexed_count": vector_db.collection.count(),
+            "received_count": state.last_received_count if state else 0,
+            "inserted_count": state.last_inserted_count if state else 0,
+            "updated_count": state.last_updated_count if state else 0,
+            "ignored_count": state.last_ignored_count if state else 0,
+            "deleted_count": state.last_deleted_count if state else 0,
+            "last_indexed_count": state.last_indexed_count if state else 0,
+            "last_started_at": state.last_started_at.isoformat() if state and state.last_started_at else None,
+            "last_completed_at": state.last_completed_at.isoformat() if state and state.last_completed_at else None,
+            "last_duration_ms": state.last_duration_ms if state else None,
+            "error_count": state.last_error_count if state else 0,
+            "last_error": state.last_error if state else None,
             "status": "healthy" if state else "not_initialized",
             "rag_sync_enabled": os.getenv(
                 "REPORTING_ENABLE_RAG_SYNC", "false"
