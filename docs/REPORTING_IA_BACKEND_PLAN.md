@@ -1494,10 +1494,6 @@ Scenario minimal :
 Cette priorite suit la decision de migrer le chatbot vers Text-to-SQL gouverne
 (section 11). L'ordre de livraison est :
 
-Le plan detaille du premier step (perimetre, definitions, donnees sensibles
-et contrats) est dans
-[`REPORTING_TEXT_TO_SQL_STEP_1_PLAN.md`](./REPORTING_TEXT_TO_SQL_STEP_1_PLAN.md).
-
 1. inventorier la projection `gpr_ai_reporting`, les donnees sensibles, les
    regles d'acces et le dialecte SQL reel ;
 2. definir les contrats versionnes d'intention, Schema Catalog, Business

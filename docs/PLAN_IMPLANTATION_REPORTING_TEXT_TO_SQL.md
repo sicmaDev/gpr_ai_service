@@ -59,16 +59,17 @@ flowchart TD
 6. **Validateur AST SQL (Le Bouclier de Sécurité)** :
    * Analyse structurelle de l'arbre syntaxique abstrait (AST) :
      * Vérification de l'instruction : uniquement `SELECT` (ou CTE read-only).
-     * Whitelist stricte des tables : uniquement la table autorisée de la base miroir (`reporting_claim`).
-     * Whitelist stricte des colonnes autorisées.
-     * Rejet absolu de tout mot-clé de mutation (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, etc.) ou de fonction système suspecte (`SLEEP`, `BENCHMARK`, etc.).
+     * Whitelist stricte des tables : uniquement les tables analytiques autorisées de `gpr_ai_reporting` inventoriées au Step 1 (`reporting_claim`, `reporting_suggestion`, `reporting_historique_affectations`, `reporting_solution`, `reporting_product`, `reporting_service_point`, etc.).
+     * Whitelist stricte des colonnes autorisées (exclusion formelle des colonnes sensibles : `client_code`, `content`, `solution`, mots de passe, etc.).
+     * Whitelist stricte des jointures : uniquement `INNER JOIN` et `LEFT JOIN` sur les clés primaires/étrangères déclarées dans le Schema Catalog.
+     * Rejet absolu de tout mot-clé de mutation (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, etc.) ou de fonction suspecte (`SLEEP`, `BENCHMARK`, etc.).
    * **Si Invalide / Hors périmètre** : Rejet immédiat ou demande de clarification. Aucune requête n'est envoyée à la base.
    * **Si Valide** : Passage à l'exécution.
 
 ### 2.3. Exécution & Restitution
 7. **Application des paramètres & Exécution SQL (Read-Only)** :
    * Point de convergence des deux branches (requête approuvée OU requête candidate validée par l'AST).
-   * Exécution sous compte restreint en lecture seule sur la base miroir `gpr_ai_reporting` avec timeout strict et quota `LIMIT 500`.
+   * Exécution sous compte restreint en lecture seule sur la base miroir `gpr_ai_reporting` avec timeout strict de 3s et quota `LIMIT 500`.
 
 8. **Restitution & Gouvernance** :
    * **Vers l'utilisateur** : FastAPI lit les lignes SQL retournées par la base et construit la réponse structurée `ReportingQueryResponse` (chiffres réels + `labels`/`datasets` pour Chart.js), puis la transmet au Front React.
@@ -76,30 +77,37 @@ flowchart TD
 
 ---
 
-## 3. Plan d'Implantation Structuré par Briques
+## 3. Feuille de Route d'Implantation Séquentielle (10 Steps)
 
-Pour respecter rigoureusement cette architecture sans court-circuit, l'implantation se découpe comme suit :
+Conformément à la section 15 de [`REPORTING_IA_BACKEND_PLAN.md`](./REPORTING_IA_BACKEND_PLAN.md), l'implantation suit 10 étapes séquentielles sans aucun court-circuit :
 
-### Brique 1 : Contrats & Validation AST (Socle de Sécurité)
-1. Consolidation des contrats Pydantic d'intention et de candidat SQL ([`text_to_sql_contracts.py`](../app/reporting/text_to_sql_contracts.py)).
-2. Implémentation du **Validateur AST SQL** ([`sql_validator.py`](../app/reporting/sql_validator.py)) :
-   * Contrôle de l'AST (`SELECT` pur, table `reporting_claim` uniquement, colonnes autorisées).
-   * Suite de tests de sécurité et d'injection ([`test_sql_validator.py`](../tests/test_sql_validator.py)).
+```mermaid
+flowchart TD
+    S1["Step 1 : Inventaire gpr_ai_reporting, données sensibles, dialecte\n[TERMINÉ - INVENTAIRE_STEP_1.md]"] --> S2["Step 2 : Contrats versionnés (Intention, Schema, Business, SQL, Approbation)\n[TERMINÉ - PLAN_DETAIL_STEP_2.md & text_to_sql_contracts.py]"]
+    S2 --> S3["Step 3 : Construction Schema Catalog & Business Catalog\n[TERMINÉ - PLAN_DETAIL_STEP_3.md, schema_catalog.py, business_catalog.py]"]
+    S3 --> S4["Step 4 : Résolution d'intention & Query Catalog (Exact/Sémantique)\n[TERMINÉ - PLAN_DETAIL_STEP_4.md, query_catalog.py, intent_resolver.py]"]
+    S4 --> S5["Step 5 : Schema Retriever & Prompt Nemotron minimal\n[EN COURS - PLAN_DETAIL_STEP_5.md]"]
+    S5 --> S6["Step 6 : Validateur AST SQL & Bloqueur de requêtes"]
+    S6 --> S7["Step 7 : Exécution Read-Only, Bind Params & Audit"]
+    S7 --> S8["Step 8 : Approbation humaine & Gestion du Query Catalog"]
+    S8 --> S9["Step 9 : Contrats de réponse & Validation Front React"]
+    S9 --> S10["Step 10 : Comparaison mode observation & Feature flag"]
+```
 
-### Brique 2 : Les Catalogues (Schema, Business & Query)
-1. **Schema Catalog & Business Catalog** : description formelle du sous-schéma `reporting_claim` et des concepts métier (mesures, dimensions, synonymes).
-2. **Query Catalog initial** : registre des requêtes certifiées pour les questions fréquentes (ex: volume global, répartition par agence, répartition par canal).
+---
 
-### Brique 3 : Moteur de Résolution & Dispatcher
-1. Résolution de l'intention canonique via Nemotron.
-2. Vérification de correspondance dans le Query Catalog :
-   * Si match -> binding des paramètres et exécution.
-   * Si absent -> Schema Retriever -> Génération candidate -> Validateur AST.
-3. Exécution sécurisée en lecture seule sur `gpr_ai_reporting`.
-4. Construction de la réponse pour le Front React ([`ReportingQueryResponse`](../app/reporting/schemas.py)).
-5. Traçabilité pour la revue humaine (journalisation du SQL candidat pour promotion ultérieure).
+### Détail des Étapes et Jalons de Réalisation :
 
-### Brique 4 : Intégration sur `POST /reporting/query` & Validation React
-1. Branchement du dispatcher dans `service.py` et `router.py`.
-2. Validation de l'expérience utilisateur dans le chatbot React ([`AiQueryVisualization.jsx`](../../gpr_client_sicma_new_version/src/pages/Rapports/AiQueryVisualization.jsx)).
-3. Tests de non-régression et audit final.
+| Étape | Intitulé & Livrables Clés | Statut |
+| :--- | :--- | :--- |
+| **Step 1** | **Inventaire complet de `gpr_ai_reporting`** :<br>• Cartographie des 12 tables (Dossiers réclamations/dénonciations, suggestions, traitement, référentiels, suivi).<br>• Matrice d'exclusion des données sensibles.<br>• Règles d'accès lecture seule et dialecte MySQL 8.0.<br>📄 *Livrable : [`INVENTAIRE_STEP_1.md`](./INVENTAIRE_STEP_1.md)* | ✅ **Terminé** |
+| **Step 2** | **Contrats versionnés d'intention, catalogues, SQL candidat et approbation** :<br>• Modèles Pydantic pour `CanonicalIntent` (réclamations, dénonciations, suggestions, traitement, filtres, temps).<br>• Modèles Pydantic pour `SchemaCatalog` et `BusinessCatalog`.<br>• Modèles pour `SqlCandidate` (SQL paramétré `:param`) et `SqlValidationResult`.<br>• Modèles d'approbation et statut dans le `QueryCatalog`.<br>• 15 tests unitaires validés (100% succès).<br>📄 *Livrables : [`PLAN_DETAIL_STEP_2.md`](./PLAN_DETAIL_STEP_2.md), [`app/reporting/text_to_sql_contracts.py`](../app/reporting/text_to_sql_contracts.py)* | ✅ **Terminé** |
+| **Step 3** | **Construction du Schema Catalog & Business Catalog** :<br>• Définition statique et persistante des 13 tables analytiques et de gestion + 2 tables d'administration.<br>• Marquage strict `is_sensitive=True` et filtre de sous-schéma sans données confidentielles.<br>• Graphe des 15 jointures officielles autorisées (`LEFT JOIN` / `INNER JOIN`).<br>• Dictionnaire métier : 5 concepts, 10 métriques (dont `plainte_count` unifié), 10 dimensions et résolveur lexical insensible aux accents.<br>• 14 tests unitaires validés (100% succès).<br>📄 *Livrables : [`PLAN_DETAIL_STEP_3.md`](./PLAN_DETAIL_STEP_3.md), [`app/reporting/schema_catalog.py`](../app/reporting/schema_catalog.py), [`app/reporting/business_catalog.py`](../app/reporting/business_catalog.py)* | ✅ **Terminé** |
+| **Step 4** | **Résolution d'intention & Query Catalog (Recherche exacte / sémantique)** :<br>• Résolveur d'intention canonique en langage naturel (contrat `TextToSQLIntent`).<br>• Prompt Nemotron d'extraction d'intention stricte (format JSON pur, zéro SQL généré).<br>• Catalogue initial des 8 requêtes certifiées homologuées (`status=ApprovalStatus.APPROVED`).<br>• Moteur de matching direct sur le catalogue (Fast-Path court-circuit immédiat avec liaison des paramètres).<br>• 19 tests unitaires validés (100% succès).<br>📄 *Livrables : [`PLAN_DETAIL_STEP_4.md`](./PLAN_DETAIL_STEP_4.md), [`app/reporting/query_catalog.py`](../app/reporting/query_catalog.py), [`app/reporting/intent_resolver.py`](../app/reporting/intent_resolver.py)* | ✅ **Terminé** |
+| **Step 5** | **Schema Retriever & Prompt Nemotron de génération SQL** :<br>• Sélection ciblée et automatique du sous-schéma minimal pertinent selon l'intention canonique.<br>• Résolution automatique des tables passerelles (bridge tables) nécessaires aux jointures.<br>• Prompt de génération SQL candidat pour Nemotron restreint au sous-schéma extrait (zéro fuite sensible).<br>• Validation et désérialisation Pydantic conforme au contrat `TextToSQLCandidate`.<br>📄 *Livrables : [`PLAN_DETAIL_STEP_5.md`](./PLAN_DETAIL_STEP_5.md), `app/reporting/schema_retriever.py`, `app/reporting/sql_generator.py`* | 🚀 **En cours** |
+| **Step 6** | **Validateur AST SQL & Sécurité** :<br>• Parseur AST SQL (avec `sqlglot`) : validation structurelle `SELECT` exclusif, whitelists tables/colonnes/joins, blocage absolu de toute injection ou mutation.<br>• Tests unitaires de sécurité exhaustifs. | ⏳ En attente |
+| **Step 7** | **Exécution Read-Only & Audit** :<br>• Exécuteur sécurisé avec paramètres liés (`:param`), quota `LIMIT 500`, timeout 3 secondes.<br>• Journalisation d'audit des requêtes exécutées. | ⏳ En attente |
+| **Step 8** | **Approbation humaine & Cycle de vie des requêtes** :<br>• Endpoint d'approbation administrative des requêtes candidates.<br>• Promotion dans le Query Catalog et désactivation/versionnement sur évolution du schéma. | ⏳ En attente |
+| **Step 9** | **Contrats de réponse & Validation Front React** :<br>• Transformation du résultat SQL vers `ReportingQueryResponse` (chiffres réels, séries Chart.js).<br>• Validation sans régression avec le composant React `AiQueryVisualization.jsx`. | ⏳ En attente |
+| **Step 10** | **Observation comparative & Déploiement progressif** :<br>• Comparaison double-run avec l'ancien moteur en mode observation.<br>• Bascule progressive de production derrière feature flag (`TEXT_TO_SQL_ENABLED`). | ⏳ En attente |
+
