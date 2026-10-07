@@ -1,0 +1,9 @@
+ALTER TABLE reporting_claim
+    DROP COLUMN feedback_status,
+    DROP COLUMN is_agent_validated,
+    DROP COLUMN validation_date,
+    DROP COLUMN quality_score,
+    DROP COLUMN final_category,
+    DROP COLUMN final_motif,
+    DROP COLUMN final_urgency,
+    DROP COLUMN retained_solution;
