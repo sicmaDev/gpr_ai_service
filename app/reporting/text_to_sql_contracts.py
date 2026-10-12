@@ -355,7 +355,77 @@ class QueryCatalogEntry(ContractModel):
     created_by: NonEmptyString
     approved_by: Optional[NonEmptyString] = None
     approved_at: Optional[datetime] = None
+    approval_comment: Optional[str] = None
+    rejection_reason: Optional[str] = None
+    deprecation_reason: Optional[str] = None
     schema_version: NonEmptyString = "1.0.0"
     execution_count: int = 0
     avg_execution_time_ms: Optional[float] = None
     last_executed_at: Optional[datetime] = None
+
+
+class QueryApprovalPayload(ContractModel):
+    query_id: NonEmptyString
+    approver: NonEmptyString
+    comment: Optional[str] = None
+
+
+class QueryRejectionPayload(ContractModel):
+    query_id: NonEmptyString
+    approver: NonEmptyString
+    rejection_reason: NonEmptyString
+
+
+class QueryDeprecationPayload(ContractModel):
+    query_id: NonEmptyString
+    reason: NonEmptyString
+
+
+class UserFeedbackPayload(ContractModel):
+    query_id: NonEmptyString
+    user_id: NonEmptyString
+    is_positive: bool = True
+    feedback_reason: Optional[str] = None
+
+
+
+# ==============================================================================
+# BRIQUE 6 : Contrats d'Exécution SQL & Audit (Step 7)
+# ==============================================================================
+
+
+class ExecutionStatus(str, Enum):
+    SUCCESS = "SUCCESS"
+    TIMEOUT = "TIMEOUT"
+    SQL_ERROR = "SQL_ERROR"
+    VALIDATION_FAILED = "VALIDATION_FAILED"
+
+
+class SqlExecutionResult(ContractModel):
+    status: ExecutionStatus
+    columns: List[NonEmptyString] = Field(default_factory=list)
+    rows: List[Dict[str, Any]] = Field(default_factory=list)
+    row_count: int = 0
+    execution_time_ms: float = 0.0
+    sql_executed: NonEmptyString
+    bound_parameters: Dict[str, Any] = Field(default_factory=dict)
+    error_message: Optional[NonEmptyString] = None
+
+
+class QuerySource(str, Enum):
+    FAST_PATH_CERTIFIED = "FAST_PATH_CERTIFIED"
+    GENERATIVE_SUPERVISED = "GENERATIVE_SUPERVISED"
+
+
+class ExecutionAuditLog(ContractModel):
+    audit_id: NonEmptyString
+    timestamp: datetime
+    query_source: QuerySource
+    query_id: Optional[NonEmptyString] = None
+    natural_language_query: Optional[NonEmptyString] = None
+    sql_executed: NonEmptyString
+    sanitized_parameters: Dict[str, Any] = Field(default_factory=dict)
+    execution_time_ms: float = 0.0
+    row_count: int = 0
+    status: ExecutionStatus
+    error_message: Optional[NonEmptyString] = None

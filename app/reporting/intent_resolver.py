@@ -20,6 +20,7 @@ from app.reporting.text_to_sql_contracts import (
     IntentClarification,
     IntentDimension,
     IntentEntity,
+    IntentFilter,
     IntentMeasure,
     IntentTime,
     TextToSQLIntent,
@@ -293,7 +294,7 @@ def resolve_intent_deterministic(
             target_concept="plainte",
             label="Taux de respect SLA",
         )
-    elif "satisfaction" in norm or "satisfait" in norm:
+    elif ("satisfaction" in norm or "satisfait" in norm) and "insatisfait" not in norm and "non satisfait" not in norm:
         measure = IntentMeasure(
             concept_id="satisfaction_rate",
             operation="rate",
@@ -376,6 +377,17 @@ def resolve_intent_deterministic(
     if "categorie" in norm:
         dimensions.append(IntentDimension(concept_id="category", label="Catégorie"))
 
+    # 7. Identification des filtres explicites
+    filters: List[IntentFilter] = []
+    if "insatisfait" in norm or "mecontent" in norm or "non satisfait" in norm:
+        filters.append(
+            IntentFilter(
+                concept_id="status",
+                operator="equals",
+                value="UNSATISFIED",
+            )
+        )
+
     time_obj = IntentTime(
         field_concept=time_field,
         start_date=start_d,
@@ -389,7 +401,7 @@ def resolve_intent_deterministic(
         entity=entity,
         measure=measure,
         dimensions=dimensions,
-        filters=[],
+        filters=filters,
         time=time_obj,
     )
 

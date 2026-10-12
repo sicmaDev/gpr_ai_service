@@ -7,6 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.reporting.catalog_manager import submit_user_feedback
+from app.reporting.text_to_sql_contracts import UserFeedbackPayload
 from .service import answer_query, build_dashboard
 from .schemas import (
     DashboardResponse,
@@ -17,6 +19,7 @@ from .schemas import (
 from .trace_logging import trace_info
 
 router = APIRouter(prefix="/reporting", tags=["Reporting IA"])
+
 logger = logging.getLogger(__name__)
 
 
@@ -85,7 +88,8 @@ async def query_reporting(
         path="/reporting/query",
     )
     response = answer_query(db, request.question, request.filters, trace_id)
-    if response.summary == "Analyse non supportee":
+    if response.summary in {"Analyse non supportee", "Analyse non supportée"}:
+
         trace_info(
             logger,
             trace_id,
@@ -104,3 +108,38 @@ async def query_reporting(
         comparison=response.comparison is not None,
     )
     return response
+
+
+@router.post(
+    "/feedback",
+    summary="Soumettre un retour utilisateur sur une requête analytique",
+    description=(
+        "Permet à un utilisateur habilité de valider une requête ou de signaler une "
+        "incohérence par son identifiant unique query_id. Un signalement négatif retire "
+        "immédiatement la requête du circuit Fast-Path et crée un anti-pattern d'apprentissage."
+    ),
+    responses={
+        404: {"description": "Requête introuvable dans le catalogue"},
+        422: {"description": "Format de feedback invalide"},
+    },
+)
+async def post_user_feedback(
+    feedback: UserFeedbackPayload,
+):
+    try:
+        updated_entry = submit_user_feedback(feedback)
+        return {
+            "status": "success",
+            "query_id": updated_entry.id,
+            "approval_status": updated_entry.status.value,
+            "message": (
+                "Feedback positif pris en compte."
+                if feedback.is_positive
+                else "Signalement enregistré. La requête a été invalidée du circuit rapide."
+            ),
+        }
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+

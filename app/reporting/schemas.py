@@ -273,7 +273,12 @@ class Visualization(BaseModel):
 class ReportingQueryResponse(BaseModel):
     answer: str
     summary: str = ""
+    query_id: Optional[str] = None
+    sql_query: Optional[str] = None
+    execution_mode: Optional[str] = None
     sources: List[str] = Field(default_factory=list)
     visualization: Optional[Visualization] = None
     data: List[Dict[str, Any]] = Field(default_factory=list)
     comparison: Optional[ReportingComparisonResult] = None
+
+

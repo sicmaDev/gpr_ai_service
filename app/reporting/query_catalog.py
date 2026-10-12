@@ -8,6 +8,7 @@ Ce module matérialise le circuit rapide (Fast-Path Court-Circuit) :
 - L'évitement complet d'appels LLM pour les questions répétitives ou standardisées.
 """
 
+import copy
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -358,9 +359,12 @@ _CERTIFIED_QUERIES: Dict[str, QueryCatalogEntry] = {
     ),
 }
 
+# Copie de sauvegarde pour la restauration lors des tests et réinitialisations
+_INITIAL_CERTIFIED_QUERIES: Dict[str, QueryCatalogEntry] = copy.deepcopy(_CERTIFIED_QUERIES)
+
 
 # -----------------------------------------------------------------------------
-# FONCTIONS D'ACCÈS ET D'APPARIEMENT (MATCHING FAST-PATH)
+# FONCTIONS D'ACCÈS, DE GESTION ET D'APPARIEMENT (MATCHING FAST-PATH)
 # -----------------------------------------------------------------------------
 
 def get_certified_queries() -> Dict[str, QueryCatalogEntry]:
@@ -371,6 +375,25 @@ def get_certified_queries() -> Dict[str, QueryCatalogEntry]:
 def get_query_by_id(query_id: str) -> Optional[QueryCatalogEntry]:
     """Récupère une entrée du catalogue par son identifiant unique."""
     return _CERTIFIED_QUERIES.get(query_id)
+
+
+def register_query_entry(entry: QueryCatalogEntry) -> None:
+    """Enregistre ou met à jour une entrée dans le registre du catalogue de requêtes."""
+    _CERTIFIED_QUERIES[entry.id] = entry
+
+
+def remove_query_entry(query_id: str) -> bool:
+    """Supprime une entrée du catalogue par son identifiant unique."""
+    if query_id in _CERTIFIED_QUERIES:
+        del _CERTIFIED_QUERIES[query_id]
+        return True
+    return False
+
+
+def reset_certified_queries() -> None:
+    """Restaure le catalogue à son état initial homologué (8 requêtes de référence)."""
+    _CERTIFIED_QUERIES.clear()
+    _CERTIFIED_QUERIES.update(copy.deepcopy(_INITIAL_CERTIFIED_QUERIES))
 
 
 def match_intent_in_catalog(
