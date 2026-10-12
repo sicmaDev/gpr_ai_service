@@ -28,3 +28,5 @@ app/data/metadata.json
 fetch*.py
 scratch/
 settings_dump.json
+
+.safe-code-change/
