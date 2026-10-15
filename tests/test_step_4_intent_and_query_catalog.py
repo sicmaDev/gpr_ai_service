@@ -288,6 +288,111 @@ class TestIntentResolver(unittest.TestCase):
         self.assertEqual(intent.status, "ready")
         self.assertEqual(intent.dimensions[0].concept_id, "channel")
 
+    def test_resolve_query_without_date_has_none_time(self):
+        # Sans date explicite, intent.time doit rester None
+        intent_mineur = resolve_intent_deterministic("Plainte mineure", self.ref_date)
+        self.assertEqual(intent_mineur.status, "ready")
+        self.assertIsNone(intent_mineur.time)
+        urg_filters = [f for f in intent_mineur.filters if f.concept_id == "risk_level"]
+        self.assertEqual(len(urg_filters), 1)
+        self.assertEqual(urg_filters[0].value, "MINEUR")
+
+        intent_moyen = resolve_intent_deterministic("Plainte moyenne", self.ref_date)
+        self.assertIsNone(intent_moyen.time)
+        urg_moyen = [f for f in intent_moyen.filters if f.concept_id == "risk_level"]
+        self.assertEqual(len(urg_moyen), 1)
+        self.assertEqual(urg_moyen[0].value, "MOYEN")
+
+    def test_parse_intent_response_with_null_time(self):
+        fake_llm_json = """```json
+{
+    "contract_version": "1.0",
+    "status": "ready",
+    "entity": {
+        "concept_id": "plainte",
+        "types": ["CLAIM"],
+        "include_all_types": false
+    },
+    "measure": {
+        "concept_id": "reclamation_count",
+        "operation": "count",
+        "target_concept": "plainte",
+        "label": "Nombre de réclamations"
+    },
+    "dimensions": [],
+    "filters": [
+        {"concept_id": "risk_level", "operator": "equals", "value": "MINEUR"}
+    ],
+    "time": null
+}
+```"""
+        intent = parse_intent_response(fake_llm_json)
+        self.assertEqual(intent.status, "ready")
+        self.assertIsNone(intent.time)
+        self.assertEqual(len(intent.filters), 1)
+        self.assertEqual(intent.filters[0].value, "MINEUR")
+
+    def test_fast_path_miss_when_query_has_no_date(self):
+        # Structure de réclamations par agence, mais sans période temporelle demandée
+        intent = TextToSQLIntent(
+            status="ready",
+            entity=IntentEntity(concept_id="plainte", types=["CLAIM"]),
+            measure=IntentMeasure(
+                concept_id="reclamation_count",
+                operation="count",
+                target_concept="plainte",
+                label="Nombre de réclamations",
+            ),
+            dimensions=[IntentDimension(concept_id="agency", label="Agence")],
+            time=None,  # Aucune date
+        )
+        match_res = match_intent_in_catalog(intent)
+        self.assertIsNone(match_res, "Une requête sans période ne doit pas matcher une homologuée annuelle")
+
+    def test_build_intent_prompt_is_dynamic_with_catalog_descriptions(self):
+        """Vérifie que build_intent_prompt génère dynamiquement les descriptions et labels du catalogue."""
+        prompt = build_intent_prompt("Nombre de réclamations par agence", self.ref_date)
+        # Vérifie la présence des descriptions riches issues de business_catalog
+        self.assertIn("plainte_count", prompt)
+        self.assertIn("Total unifié des plaintes", prompt)
+        self.assertIn("reclamation_count", prompt)
+        self.assertIn("Total des réclamations", prompt)
+        self.assertIn("sla_adherence_rate", prompt)
+        self.assertIn("Taux de respect des délais SLA", prompt)
+        self.assertIn("MÉTRIQUES INÉDITES", prompt)
+        self.assertIn("agency", prompt)
+        self.assertIn("Agence bancaire", prompt)
+
+    def test_parse_intent_response_supports_custom_metric(self):
+        """Vérifie que le contrat TextToSQLIntent accepte une métrique personnalisée/inédite."""
+        fake_llm_json = """```json
+{
+    "contract_version": "1.0",
+    "status": "ready",
+    "entity": {
+        "concept_id": "plainte",
+        "types": ["CLAIM"],
+        "include_all_types": false
+    },
+    "measure": {
+        "concept_id": "custom_montant_moyen",
+        "operation": "avg",
+        "target_concept": "plainte",
+        "label": "Montant moyen indemnisé"
+    },
+    "dimensions": [
+        {"concept_id": "agency", "label": "Agence"}
+    ],
+    "filters": [],
+    "time": null
+}
+```"""
+        intent = parse_intent_response(fake_llm_json)
+        self.assertEqual(intent.status, "ready")
+        self.assertEqual(intent.measure.concept_id, "custom_montant_moyen")
+        self.assertEqual(intent.measure.operation, "avg")
+        self.assertEqual(intent.measure.label, "Montant moyen indemnisé")
+
 
 if __name__ == "__main__":
     unittest.main()

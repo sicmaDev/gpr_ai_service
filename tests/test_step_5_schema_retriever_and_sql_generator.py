@@ -28,6 +28,7 @@ from app.reporting.sql_generator import (
 from app.reporting.text_to_sql_contracts import (
     IntentDimension,
     IntentEntity,
+    IntentFilter,
     IntentMeasure,
     IntentTime,
     TextToSQLCandidate,
@@ -342,6 +343,40 @@ class TestSQLGenerator(unittest.TestCase):
             self.default_intent, use_llm=True, llm_callable=mock_llm_callable
         )
         self.assertIn("Mock generation success", candidate_llm.assumptions)
+
+    def test_generate_candidate_fallback_without_date_and_with_urgency(self):
+        intent = TextToSQLIntent(
+            status="ready",
+            entity=IntentEntity(concept_id="plainte", types=["CLAIM"]),
+            measure=IntentMeasure(
+                concept_id="reclamation_count",
+                operation="count",
+                target_concept="plainte",
+                label="Nombre de réclamations",
+            ),
+            dimensions=[],
+            filters=[IntentFilter(concept_id="risk_level", operator="equals", value="MINEUR")],
+            time=None,
+        )
+        candidate = generate_candidate_fallback(intent)
+        self.assertNotIn(":start_date", candidate.sql)
+        self.assertNotIn(":end_date", candidate.sql)
+        self.assertIn("c.risk_level = 'MINEUR'", candidate.sql)
+    def test_parse_candidate_with_escaped_newlines(self):
+        raw_json = (
+            '{\n'
+            '  "contract_version": "1.0",\n'
+            '  "sql": "WITH claim_cnt AS (SELECT COUNT(*) AS cnt FROM reporting_claim),\\\\nsug_cnt AS (SELECT COUNT(*) AS cnt FROM reporting_suggestion)\\\\nSELECT (claim_cnt.cnt + sug_cnt.cnt) AS plainte_count\\\\nFROM claim_cnt, sug_cnt;",\n'
+            '  "parameters": {},\n'
+            '  "used_schema": ["reporting_claim", "reporting_suggestion"],\n'
+            '  "result_columns": [{"name": "plainte_count", "concept_id": "plainte_count", "role": "measure", "data_type": "integer"}],\n'
+            '  "assumptions": []\n'
+            '}'
+        )
+        candidate = parse_candidate_response(raw_json)
+        self.assertNotIn("\\n", candidate.sql)
+        self.assertIn("\n", candidate.sql)
+        self.assertIn("WITH claim_cnt", candidate.sql)
 
 
 if __name__ == "__main__":

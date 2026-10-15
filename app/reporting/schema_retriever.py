@@ -59,15 +59,22 @@ def resolve_required_tables(intent: TextToSQLIntent) -> List[str]:
     # 2. Résolution des tables depuis l'entité si non déjà couverte
     if intent.entity.concept_id == "treatment":
         selected_tables.add("reporting_historique_affectations")
-    elif intent.entity.include_all_types:
-        selected_tables.add("reporting_claim")
-        selected_tables.add("reporting_suggestion")
-    else:
-        types_set = set(intent.entity.types)
-        if "CLAIM" in types_set or "DENUNCIATION" in types_set:
+    elif not selected_tables:
+        if intent.entity.include_all_types:
             selected_tables.add("reporting_claim")
-        if "SUGGESTION" in types_set:
             selected_tables.add("reporting_suggestion")
+        else:
+            types_set = set(intent.entity.types)
+            if "CLAIM" in types_set or "DENUNCIATION" in types_set:
+                selected_tables.add("reporting_claim")
+            if "SUGGESTION" in types_set:
+                selected_tables.add("reporting_suggestion")
+    else:
+        # Tables de faits complémentaires si l'entité la cible explicitement et compatible
+        types_set = set(intent.entity.types or [])
+        if "SUGGESTION" in types_set and "reporting_suggestion" not in selected_tables:
+            if metric_id in ["plainte_count", "suggestion_count", "adoption_rate"]:
+                selected_tables.add("reporting_suggestion")
 
     # 3. Résolution des tables de dimensions
     for dim in intent.dimensions:

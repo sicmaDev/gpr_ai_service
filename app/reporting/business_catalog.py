@@ -9,8 +9,10 @@ Ce module matérialise :
 - Le dictionnaire exhaustif de synonymes en langue naturelle et son résolveur insensible aux accents.
 """
 
+import copy
+from datetime import datetime, timezone
 import unicodedata
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from app.reporting.text_to_sql_contracts import (
     BusinessCatalog,
@@ -121,9 +123,9 @@ _METRICS: Dict[str, MetricDefinition] = {
     "severe_plainte_count": MetricDefinition(
         metric_id="severe_plainte_count",
         label="Nombre de plaintes graves",
-        description="Nombre de dossiers qualifiés de gravité urgente ou critique par l'analyse automatique d'urgence.",
+        description="Nombre de dossiers qualifiés de niveau de risque ou gravité grave.",
         required_tables=["reporting_claim"],
-        aggregation_sql_template="COUNT(CASE WHEN ai_urgency = 'GRAVE' THEN 1 END)",
+        aggregation_sql_template="COUNT(CASE WHEN risk_level = 'GRAVE' THEN 1 END)",
     ),
     "adoption_rate": MetricDefinition(
         metric_id="adoption_rate",
@@ -376,3 +378,144 @@ def resolve_synonym(term: str) -> Optional[str]:
                 return canonical_key
 
     return None
+
+
+# -----------------------------------------------------------------------------
+# PERSISTANCE ET SYNCHRONISATION BASE DE DONNÉES (MySQL / SQLite)
+# -----------------------------------------------------------------------------
+
+def metric_to_db_model(
+    metric: MetricDefinition,
+    target_concept: str = "plainte",
+    is_custom: bool = False,
+    created_by: str = "system",
+) -> Any:
+    """Convertit un MetricDefinition en modèle SQLAlchemy ReportingBusinessMetric."""
+    from app.db.models import ReportingBusinessMetric
+
+    return ReportingBusinessMetric(
+        metric_id=metric.metric_id,
+        label=metric.label,
+        description=metric.description,
+        target_concept=target_concept,
+        required_tables=metric.required_tables,
+        aggregation_sql_template=metric.aggregation_sql_template,
+        is_custom=is_custom,
+        created_by=created_by,
+    )
+
+
+def db_model_to_metric(row: Any) -> MetricDefinition:
+    """Convertit une ligne ReportingBusinessMetric en contrat Pydantic MetricDefinition."""
+    return MetricDefinition(
+        metric_id=row.metric_id,
+        label=row.label,
+        description=row.description,
+        required_tables=row.required_tables if isinstance(row.required_tables, list) else list(row.required_tables),
+        aggregation_sql_template=row.aggregation_sql_template,
+    )
+
+
+def sync_metrics_with_db(db: Any) -> None:
+    """
+    Synchronise les métriques métier entre la base de données relationnelle et la mémoire vive.
+    - Si la table reporting_business_metrics est vide, insère automatiquement les 10 métriques certifiées.
+    - Met à jour l'instance globale BUSINESS_CATALOG.metrics avec les métriques en base.
+    """
+    try:
+        from app.db.models import ReportingBusinessMetric
+
+        existing = db.query(ReportingBusinessMetric).all()
+        if not existing:
+            concept_mapping = {
+                "plainte_count": "plainte",
+                "reclamation_count": "reclamation",
+                "denonciation_count": "denonciation",
+                "suggestion_count": "suggestion",
+                "sla_adherence_rate": "reclamation",
+                "avg_processing_time": "reclamation",
+                "satisfaction_rate": "reclamation",
+                "severe_plainte_count": "reclamation",
+                "adoption_rate": "suggestion",
+                "reaffectation_count": "treatment",
+            }
+            for m_id, m_def in _METRICS.items():
+                db_row = metric_to_db_model(
+                    metric=m_def,
+                    target_concept=concept_mapping.get(m_id, "plainte"),
+                    is_custom=False,
+                    created_by="system",
+                )
+                db.add(db_row)
+            db.commit()
+            existing = db.query(ReportingBusinessMetric).all()
+
+        catalog = get_business_catalog()
+        for row in existing:
+            catalog.metrics[row.metric_id] = db_model_to_metric(row)
+    except Exception:
+        try:
+            db.rollback()
+        except Exception:
+            pass
+
+
+def register_custom_metric(
+    metric: MetricDefinition,
+    target_concept: str = "plainte",
+    created_by: str = "system",
+    db: Optional[Any] = None,
+) -> None:
+    """
+    Enregistre une métrique (standard ou personnalisée) dans le catalogue en mémoire et en base de données.
+    """
+    catalog = get_business_catalog()
+    catalog.metrics[metric.metric_id] = metric
+
+    if db is not None:
+        try:
+            from app.db.models import ReportingBusinessMetric
+
+            row = db.query(ReportingBusinessMetric).filter_by(metric_id=metric.metric_id).first()
+            if row:
+                row.label = metric.label
+                row.description = metric.description
+                row.target_concept = target_concept
+                row.required_tables = metric.required_tables
+                row.aggregation_sql_template = metric.aggregation_sql_template
+                row.updated_at = datetime.now(timezone.utc)
+            else:
+                db_row = metric_to_db_model(
+                    metric=metric,
+                    target_concept=target_concept,
+                    is_custom=True,
+                    created_by=created_by,
+                )
+                db.add(db_row)
+            db.commit()
+        except Exception:
+            try:
+                db.rollback()
+            except Exception:
+                pass
+
+
+def reset_business_metrics(db: Optional[Any] = None) -> None:
+    """Restaure les métriques du catalogue à leur état initial certifié."""
+    catalog = get_business_catalog()
+    catalog.metrics.clear()
+    catalog.metrics.update(copy.deepcopy(_METRICS))
+
+    if db is not None:
+        try:
+            from app.db.models import ReportingBusinessMetric
+
+            db.query(ReportingBusinessMetric).delete()
+            db.commit()
+            sync_metrics_with_db(db)
+        except Exception:
+            try:
+                db.rollback()
+            except Exception:
+                pass
+

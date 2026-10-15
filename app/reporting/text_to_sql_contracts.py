@@ -24,7 +24,7 @@ class ContractModel(BaseModel):
 
 # Entité unique centrale 'plainte' (avec 'case', 'treatment', 'metrics' autorisés)
 IntentConceptId = Literal["plainte", "case", "treatment", "metrics"]
-IntentClaimType = Literal["CLAIM", "DENUNCIATION", "DENUNCIACION", "SUGGESTION"]
+IntentClaimType = Literal["CLAIM", "DENUNCIATION", "DENONCIATION", "DENUNCIACION", "SUGGESTION"]
 
 
 class IntentEntity(ContractModel):
@@ -32,12 +32,43 @@ class IntentEntity(ContractModel):
     types: List[IntentClaimType] = Field(default_factory=list)
     include_all_types: bool = False
 
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_types_invariant(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            raw_types = data.get("types") or []
+            # Normalisation canonique : mapping des variantes linguistiques vers l'énumération officielle
+            types = []
+            for t in raw_types:
+                t_str = str(t).upper().strip()
+                if t_str in ("DENONCIATION", "DENUNCIACION"):
+                    types.append("DENUNCIATION")
+                else:
+                    types.append(t_str)
+            data["types"] = types
+
+            include_all = data.get("include_all_types", False)
+            valid_full_sets = [
+                {"CLAIM", "DENUNCIATION", "SUGGESTION"},
+                {"CLAIM", "DENONCIATION", "SUGGESTION"},
+                {"CLAIM", "DENUNCIACION", "SUGGESTION"},
+            ]
+            # Si include_all_types est True mais que types contient un sous-ensemble strict (ex: ['CLAIM']),
+            # l'intention restrictive explicite prime sur le drapeau global.
+            if include_all and len(types) > 0 and set(types) not in valid_full_sets:
+                data["include_all_types"] = False
+            # Si types contient tous les types valides, s'assurer que include_all_types est True
+            elif len(types) > 0 and set(types) in valid_full_sets:
+                data["include_all_types"] = True
+        return data
+
     @model_validator(mode="after")
     def validate_types(self) -> "IntentEntity":
         if self.include_all_types:
             # Quand include_all_types est True, soit types est vide soit il contient l'ensemble des 3 types
             valid_full_sets = [
                 {"CLAIM", "DENUNCIATION", "SUGGESTION"},
+                {"CLAIM", "DENONCIATION", "SUGGESTION"},
                 {"CLAIM", "DENUNCIACION", "SUGGESTION"},
             ]
             if len(self.types) > 0 and set(self.types) not in valid_full_sets:
@@ -48,7 +79,8 @@ class IntentEntity(ContractModel):
         return self
 
 
-MeasureConceptId = Literal[
+# Entités et concepts métiers
+KnownMeasureConceptId = Literal[
     "plainte_count",
     "reclamation_count",
     "denonciation_count",
@@ -61,8 +93,9 @@ MeasureConceptId = Literal[
     "reaffectation_count",
     "adoption_rate",
 ]
+MeasureConceptId = NonEmptyString
 
-MeasureOperation = Literal["count", "avg", "rate", "sum"]
+MeasureOperation = Literal["count", "avg", "rate", "sum", "min", "max"]
 
 
 class IntentMeasure(ContractModel):
@@ -72,7 +105,7 @@ class IntentMeasure(ContractModel):
     label: NonEmptyString
 
 
-DimensionConceptId = Literal[
+KnownDimensionConceptId = Literal[
     "claim_type",
     "type_plainte",
     "status",
@@ -85,7 +118,10 @@ DimensionConceptId = Literal[
     "risk_level",
     "agent",
     "period",
+    "ai_urgency",
+    "urgency",
 ]
+DimensionConceptId = KnownDimensionConceptId
 
 
 class IntentDimension(ContractModel):
@@ -290,7 +326,35 @@ ParameterType = Literal["date", "datetime", "string", "integer", "decimal", "boo
 
 class CandidateParameter(ContractModel):
     type: ParameterType
-    source: NonEmptyString
+    source: str = "custom"
+
+    @field_validator("type", mode="before")
+    @classmethod
+    def normalize_parameter_type(cls, v: Any) -> str:
+        if isinstance(v, str):
+            mapping = {
+                "double": "decimal",
+                "float": "decimal",
+                "real": "decimal",
+                "numeric": "decimal",
+                "number": "decimal",
+                "varchar": "string",
+                "text": "string",
+                "char": "string",
+                "int": "integer",
+                "bigint": "integer",
+                "timestamp": "datetime",
+                "bool": "boolean",
+            }
+            return mapping.get(v.strip().lower(), v.strip().lower())
+        return v
+
+    @field_validator("source", mode="before")
+    @classmethod
+    def default_empty_source(cls, v: Any) -> str:
+        if v is None or not str(v).strip():
+            return "custom"
+        return str(v).strip()
 
 
 ColumnRole = Literal["dimension", "measure"]
@@ -302,6 +366,28 @@ class CandidateResultColumn(ContractModel):
     concept_id: NonEmptyString
     role: ColumnRole
     data_type: ResultDataType
+
+    @field_validator("data_type", mode="before")
+    @classmethod
+    def normalize_result_data_type(cls, v: Any) -> str:
+        if isinstance(v, str):
+            mapping = {
+                "double": "decimal",
+                "float": "decimal",
+                "real": "decimal",
+                "numeric": "decimal",
+                "number": "decimal",
+                "varchar": "string",
+                "text": "string",
+                "char": "string",
+                "int": "integer",
+                "bigint": "integer",
+                "timestamp": "datetime",
+                "bool": "boolean",
+            }
+            return mapping.get(v.strip().lower(), v.strip().lower())
+        return v
+
 
 
 class TextToSQLCandidate(ContractModel):
@@ -346,6 +432,7 @@ class ApprovalStatus(str, Enum):
 
 class QueryCatalogEntry(ContractModel):
     id: NonEmptyString
+    intent_hash: Optional[str] = None
     contract_version: NonEmptyString = "1.0"
     natural_language_query: NonEmptyString
     canonical_intent: TextToSQLIntent

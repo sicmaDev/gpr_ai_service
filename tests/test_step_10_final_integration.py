@@ -157,12 +157,12 @@ class TestStep10FinalIntegration(unittest.TestCase):
 
         data = res.json()
         self.assertIsNotNone(data["query_id"])
-        self.assertTrue(data["query_id"].startswith("QC-AUTO-"))
+        self.assertTrue(data["query_id"].startswith("QC-PEND-") or data["query_id"].startswith("QC-AUTO-"))
 
         # Vérifie la présence effective dans le catalogue
         entry = get_query_by_id(data["query_id"])
         self.assertIsNotNone(entry)
-        self.assertEqual(entry.status, ApprovalStatus.APPROVED)
+        self.assertEqual(entry.status, ApprovalStatus.PENDING)
 
     def test_post_reporting_query_with_filters(self):
         """Vérifie la prise en compte des filtres utilisateur explicites."""

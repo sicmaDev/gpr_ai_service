@@ -13,6 +13,7 @@ par le composant Front React AiReportingCharts :
 from typing import Any, Dict, List, Optional
 
 from app.reporting.schemas import ChartDataset, ReportingQueryResponse, Visualization
+from app.reporting.sql_executor import format_executable_sql
 from app.reporting.text_to_sql_contracts import (
     ExecutionStatus,
     SqlExecutionResult,
@@ -227,7 +228,20 @@ def formulate_natural_answer(
     # Cas 1 : Valeur scalaire unique
     if len(rows) == 1 and len(rows[0]) == 1:
         val = list(rows[0].values())[0]
-        formatted_val = f"{val:,}".replace(",", " ") if isinstance(val, (int, float)) else str(val)
+        # Moteur 5 : Garde-fou de restitution de valeur nulle (None Guard)
+        if val is None or str(val).strip().lower() in ("none", "null"):
+            return "Aucune donnée disponible pour les critères et la période demandés."
+
+        if isinstance(val, (int, float)):
+            if any(kw in meas_label.lower() for kw in ("taux", "pourcentage", "rate", "ratio")):
+                formatted_val = f"{float(val):.2f}%"
+            elif val == int(val):
+                formatted_val = f"{int(val):,}".replace(",", " ")
+            else:
+                formatted_val = f"{round(float(val), 2)}"
+        else:
+            formatted_val = str(val)
+
         return (
             f"Pour la période demandée, le résultat pour {meas_label.lower()} est de {formatted_val}."
         )
@@ -276,6 +290,8 @@ def build_reporting_query_response(
     Garantit l'intégrité des données, la présence du query_id, du SQL exécuté et la sérialisation Pydantic.
     """
     effective_sql = sql_query or execution_result.sql_executed
+    if effective_sql and execution_result.bound_parameters:
+        effective_sql = format_executable_sql(effective_sql, execution_result.bound_parameters)
 
     # Gestion des erreurs d'exécution ou de validation
     if execution_result.status != ExecutionStatus.SUCCESS:

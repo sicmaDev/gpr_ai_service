@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import BigInteger, DateTime, Float, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import BigInteger, Boolean, DateTime, Float, Index, Integer, JSON, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .session import Base
@@ -93,3 +93,51 @@ class ReportingAlert(Base):
     source_rule: Mapped[str] = mapped_column(String(100), nullable=False)
     action: Mapped[Optional[str]] = mapped_column(Text)
     evidence: Mapped[Optional[str]] = mapped_column(Text)
+
+
+class ReportingCertifiedQuery(Base):
+    __tablename__ = "reporting_certified_queries"
+    __table_args__ = (
+        Index("ix_certified_queries_status", "status"),
+        Index("ix_certified_queries_schema_version", "schema_version"),
+        Index("ix_certified_queries_intent_hash", "intent_hash"),
+    )
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    intent_hash: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    contract_version: Mapped[str] = mapped_column(String(16), nullable=False, default="1.0")
+    natural_language_query: Mapped[str] = mapped_column(Text, nullable=False)
+    canonical_intent: Mapped[dict] = mapped_column(JSON, nullable=False)
+    parameterized_sql: Mapped[str] = mapped_column(Text, nullable=False)
+    parameters_schema: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="APPROVED")
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False, default="system")
+    approved_by: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    approval_comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    deprecation_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.0.0")
+    execution_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    avg_execution_time_ms: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    last_executed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class ReportingBusinessMetric(Base):
+    __tablename__ = "reporting_business_metrics"
+    __table_args__ = (
+        Index("ix_business_metrics_target_concept", "target_concept"),
+    )
+
+    metric_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    label: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    target_concept: Mapped[str] = mapped_column(String(64), nullable=False, default="plainte")
+    required_tables: Mapped[list] = mapped_column(JSON, nullable=False)
+    aggregation_sql_template: Mapped[str] = mapped_column(Text, nullable=False)
+    is_custom: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False, default="system")
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -53,13 +53,22 @@ def build_sql_generation_prompt(
             f"- Description : {m_def.description}\n"
             f"- Formule SQL certifiée de référence : `{m_def.aggregation_sql_template}`\n"
         )
+    elif intent.measure:
+        metric_info = (
+            f"\nCONVENTIONS DE CALCUL MÉTIER (Métrique Inédite / Personnalisée) :\n"
+            f"- Métrique personnalisée demandée : {intent.measure.label} (`{intent.measure.concept_id}`)\n"
+            f"- Consigne : Formule l'agrégation SQL optimale (COUNT, AVG, SUM, etc.) en exploitant directement les colonnes pertinentes du sous-schéma ci-dessous.\n"
+        )
 
-    # Résumé de l'intention
     dims_str = ", ".join(d.concept_id for d in intent.dimensions) or "aucune (agrégation globale)"
     types_str = ", ".join(intent.entity.types) if intent.entity and intent.entity.types else "tous types"
-    time_str = "non spécifiée"
+    time_str = "non spécifiée (interroger l'ensemble de la base sans filtre temporel)"
     if intent.time:
         time_str = f"du {intent.time.start_date.isoformat()} au {intent.time.end_date.isoformat()} (champ: {intent.time.field_concept})"
+
+    filters_str = "aucun filtre spécifique"
+    if intent.filters:
+        filters_str = ", ".join(f"{f.concept_id} = '{f.value}'" for f in intent.filters)
 
     # Section des anti-patterns / pièges à éviter (Negative Few-Shots)
     anti_patterns_section = ""
@@ -79,6 +88,20 @@ def build_sql_generation_prompt(
             + "\nCONSIGNE STRICTE : Tiens compte impérativement de ces retours et ne reproduis AUCUNE de ces erreurs.\n"
         )
 
+    if intent.time:
+        time_rule = (
+            "2. Paramètres de dates liés obligatoires (:param) :\n"
+            "   - N'inclus JAMAIS de dates en dur dans le SQL.\n"
+            "   - Utilise impérativement `:start_date` pour la date de début et `:end_date` pour la date de fin.\n"
+            f"   - Exemple : `WHERE c.{intent.time.field_concept if intent.time.field_concept == 'receipt_at' else 'receipt_at'} >= :start_date AND c.{intent.time.field_concept if intent.time.field_concept == 'receipt_at' else 'receipt_at'} < :end_date`."
+        )
+    else:
+        time_rule = (
+            "2. PÉRIODE TEMPORELLE ABSENTE (AUCUN FILTRE DE DATE) :\n"
+            "   - L'utilisateur n'a spécifié AUCUNE date. N'utilise PAS :start_date ni :end_date.\n"
+            "   - N'ajoute AUCUNE condition WHERE de restriction temporelle (interroge tout l'historique)."
+        )
+
     return f"""Tu es l'expert en génération de requêtes SQL analytiques du système bancaire GPR.
 Ton rôle est de générer une requête SQL paramétrée et optimisée pour répondre précisément à la demande analytique de l'utilisateur.
 
@@ -86,6 +109,7 @@ INTENTION ANALYTIQUE DE L'UTILISATEUR :
 - Entité / Concept : {intent.entity.concept_id if intent.entity else 'plainte'} (Types : {types_str})
 - Mesure demandée : {intent.measure.concept_id if intent.measure else 'plainte_count'} ({intent.measure.label if intent.measure else ''})
 - Dimensions de regroupement : {dims_str}
+- Filtres demandés : {filters_str}
 - Période temporelle : {time_str}
 {metric_info}
 SOUS-SCHÉMA STRICT DE RÉFÉRENCE :
@@ -93,11 +117,12 @@ SOUS-SCHÉMA STRICT DE RÉFÉRENCE :
 
 CONSIGNES STRICTES D'ÉCRITURE SQL :
 1. Type d'instruction : UNIQUEMENT une requête `SELECT` (ou CTE avec `WITH`).
+   Toute requête DOIT IMPÉRATIVEMENT débuter par le mot-clé `SELECT ` (ou `WITH `).
+   Ne commence JAMAIS directement par une parenthèse `(` ou une opération arithmétique.
+   Si tu dois additionner des sous-requêtes, écris : `SELECT ((SELECT ...) + (SELECT ...)) AS plainte_count;`.
+   Si tu utilises des CTEs (`WITH cte1 AS (...), cte2 AS (...)`), le `SELECT` final DOIT impérativement inclure la clause `FROM` référençant ces CTEs (ex: `SELECT (c1.cnt + c2.cnt) AS plainte_count FROM cte1, cte2;`).
    Toute mutation (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, `TRUNCATE`) est STRICTEMENT INTERDITE.
-2. Paramètres liés obligatoires (:param) :
-   - N'inclus JAMAIS de dates ou valeurs de filtres en dur dans le SQL.
-   - Utilise impérativement `:start_date` pour la date de début et `:end_date` pour la date de fin.
-   - Exemple : `WHERE c.receipt_at >= :start_date AND c.receipt_at < :end_date`.
+{time_rule}
 3. Respect des jointures :
    - Utilise UNIQUEMENT les tables et jointures listées dans le sous-schéma (`LEFT JOIN` / `INNER JOIN`).
    - Ne fais aucune jointure sur des tables absentes du sous-schéma.
@@ -106,18 +131,20 @@ CONSIGNES STRICTES D'ÉCRITURE SQL :
    - Inclus `ORDER BY` sur la mesure calculée (généralement `DESC`).
 5. Nommage des colonnes :
    - Donne des alias clairs aux colonnes sélectionnées (`AS agency`, `AS case_count`, etc.).
+6. Distinction stricte des statuts et métrologie :
+   - Pour la satisfaction client ('SATISFIED', 'UNSATISFIED'), utilise TOUJOURS `c.satisfaction_status` et JAMAIS `c.status` (qui est le statut opérationnel : 'TRANSMITTED', 'RESOLVED', etc.).
+   - Pour calculer le taux de satisfaction (`satisfaction_rate`), NE FILTRE PAS sur `satisfaction_status = 'SATISFIED'` dans la clause WHERE (laisser le calcul AVG se faire sur toute la population avec avis).
 {anti_patterns_section}
 FORMAT DE SORTIE ATTENDU :
 Réponds EXCLUSIVEMENT avec un bloc JSON valide respectant rigoureusement le contrat TextToSQLCandidate :
 ```json
-
 {{
   "contract_version": "1.0",
   "sql": "SELECT ... FROM ... WHERE ... GROUP BY ... ORDER BY ...",
-  "parameters": {{
-    "start_date": {{"type": "datetime", "source": "intent.time.start_date"}},
-    "end_date": {{"type": "datetime", "source": "intent.time.end_date"}}
-  }},
+  "parameters": {{""" + (
+      """\n    "start_date": {"type": "datetime", "source": "intent.time.start_date"},\n    "end_date": {"type": "datetime", "source": "intent.time.end_date"}\n  """
+      if intent.time else ""
+  ) + """}},
   "used_schema": ["nom_table_1", "nom_table_2"],
   "result_columns": [
     {{"name": "nom_colonne_dimension", "concept_id": "concept_dimension", "role": "dimension", "data_type": "string"}},
@@ -126,6 +153,117 @@ Réponds EXCLUSIVEMENT avec un bloc JSON valide respectant rigoureusement le con
   "assumptions": ["Hypothèse explicative éventuelle"]
 }}
 ```"""
+
+
+# -----------------------------------------------------------------------------
+# MOTEUR 1 : COERCITEUR POLYMORPHIQUE DE TYPES LLM (UNIVERSAL TYPE COERCER)
+# -----------------------------------------------------------------------------
+
+CANONICAL_TYPE_MAPPING: Dict[str, str] = {
+    # Famille numérique à virgule (decimal)
+    "double": "decimal",
+    "float": "decimal",
+    "decimal": "decimal",
+    "numeric": "decimal",
+    "real": "decimal",
+    "number": "decimal",
+    "double precision": "decimal",
+    # Famille textuelle (string)
+    "varchar": "string",
+    "text": "string",
+    "char": "string",
+    "str": "string",
+    "string": "string",
+    "character varying": "string",
+    # Famille entière (integer)
+    "int": "integer",
+    "int2": "integer",
+    "int4": "integer",
+    "int8": "integer",
+    "integer": "integer",
+    "bigint": "integer",
+    "smallint": "integer",
+    "tinyint": "integer",
+    # Famille temporelle
+    "timestamp": "datetime",
+    "timestamptz": "datetime",
+    "datetime": "datetime",
+    "date": "date",
+    "time": "datetime",
+    # Famille booléenne
+    "bool": "boolean",
+    "boolean": "boolean",
+}
+
+
+def coerce_candidate_payload(data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Coerciteur polymorphique de types (Moteur 1).
+    Assainit et réduit canoniquement les types de données SQL et paramètres retournés par le LLM
+    pour garantir la conformité stricte au contrat Pydantic TextToSQLCandidate.
+    """
+    if not isinstance(data, dict):
+        return data
+
+    # 1. Normalisation du contrat
+    if not data.get("contract_version"):
+        data["contract_version"] = "1.0"
+
+    # 2. Déduplication de used_schema en préservant l'ordre
+    if "used_schema" in data and isinstance(data["used_schema"], list):
+        data["used_schema"] = list(dict.fromkeys(data["used_schema"]))
+
+    # 3. Assainissement des paramètres
+    raw_params = data.get("parameters")
+    if isinstance(raw_params, dict):
+        cleaned_params = {}
+        for p_name, p_val in raw_params.items():
+            if isinstance(p_val, dict):
+                src = p_val.get("source")
+                if not src or not str(src).strip():
+                    p_val["source"] = "intent.time.start_date" if "start" in p_name else ("intent.time.end_date" if "end" in p_name else "custom")
+                raw_t = str(p_val.get("type", "")).strip().lower()
+                p_val["type"] = CANONICAL_TYPE_MAPPING.get(raw_t, "datetime" if "date" in p_name else "string")
+                cleaned_params[p_name] = p_val
+            elif isinstance(p_val, str):
+                raw_t = p_val.strip().lower()
+                p_type = CANONICAL_TYPE_MAPPING.get(raw_t, "datetime" if "date" in p_name else "string")
+                cleaned_params[p_name] = {"type": p_type, "source": "custom"}
+
+        data["parameters"] = cleaned_params
+    elif raw_params is None:
+        data["parameters"] = {}
+
+
+    # 4. Normalisation des colonnes résultantes (result_columns)
+    raw_columns = data.get("result_columns")
+    if isinstance(raw_columns, list):
+        cleaned_cols = []
+        for col in raw_columns:
+            if isinstance(col, dict):
+                c_role = col.get("role", "measure")
+                if c_role not in ("dimension", "measure"):
+                    c_role = "dimension" if col.get("name") in ("agency", "channel", "product", "category", "object", "status") else "measure"
+                col["role"] = c_role
+
+                raw_t = str(col.get("data_type", "")).strip().lower()
+                if raw_t in CANONICAL_TYPE_MAPPING:
+                    col["data_type"] = CANONICAL_TYPE_MAPPING[raw_t]
+                else:
+                    col_name = str(col.get("name", "")).lower()
+                    if c_role == "measure":
+                        if any(kw in col_name for kw in ("avg", "rate", "taux", "ratio", "score", "percent", "pourcent")):
+                            col["data_type"] = "decimal"
+                        elif any(kw in col_name for kw in ("count", "nb", "nombre", "total", "sum")):
+                            col["data_type"] = "integer"
+                        else:
+                            col["data_type"] = "decimal"
+                    else:
+                        col["data_type"] = "string"
+                cleaned_cols.append(col)
+        data["result_columns"] = cleaned_cols
+
+    return data
 
 
 # -----------------------------------------------------------------------------
@@ -150,6 +288,26 @@ def parse_candidate_response(raw_llm_output: str) -> TextToSQLCandidate:
             payload_str = raw
 
     data = json.loads(payload_str)
+
+    # Normalisation syntaxique : nettoyer les échappements littéraux et s'assurer que la requête débute par une instruction SELECT valide
+    sql = data.get("sql", "").strip()
+    while "\\n" in sql:
+        sql = sql.replace("\\n", "\n")
+    while "\\t" in sql:
+        sql = sql.replace("\\t", " ")
+
+    if sql.startswith("(") and not sql.upper().startswith(("SELECT", "WITH")):
+        measure_alias = "plainte_count"
+        if data.get("result_columns") and len(data["result_columns"]) > 0:
+            measure_alias = data["result_columns"][0].get("name", "plainte_count")
+        sql_clean = sql.rstrip(";").strip()
+        sql = f"SELECT ({sql_clean}) AS {measure_alias}"
+
+    data["sql"] = sql
+
+    # Application du Coerciteur Polymorphique Universel (Moteur 1)
+    data = coerce_candidate_payload(data)
+
     return TextToSQLCandidate(**data)
 
 
@@ -247,13 +405,45 @@ def generate_candidate_fallback(intent: TextToSQLIntent) -> TextToSQLCandidate:
 
     # 3. Construction de la mesure
     measure_id = intent.measure.concept_id
-    if is_unified and len(intent.dimensions) == 0:
-        # Requête unifiée globale (réclamations + suggestions)
-        sql = (
-            "SELECT ((SELECT COUNT(*) FROM reporting_claim WHERE receipt_at >= :start_date AND receipt_at < :end_date) + "
-            "(SELECT COUNT(*) FROM reporting_suggestion WHERE recorded_at >= :start_date AND recorded_at < :end_date)) "
-            "AS plainte_count"
+
+    # Moteur 2 : Théorème d'Invariance Métier (Protocole Fail-Closed)
+    # Le fallback déterministe ne peut calculer QUE des métriques certifiées.
+    # Interdiction formelle de substituer une métrique non supportée par plainte_count.
+    SUPPORTED_FALLBACK_MEASURES = {
+        "plainte_count",
+        "reclamation_count",
+        "denonciation_count",
+        "suggestion_count",
+        "sla_adherence_rate",
+        "avg_processing_time",
+        "satisfaction_rate",
+        "severe_plainte_count",
+        "reaffectation_count",
+        "case_count",
+    }
+    if measure_id not in SUPPORTED_FALLBACK_MEASURES:
+        raise ValueError(
+            f"Métrique '{measure_id}' non supportée par le fallback déterministe (fail-closed)."
         )
+
+    if is_unified and len(intent.dimensions) == 0:
+        if measure_id not in ("plainte_count", "reclamation_count", "case_count"):
+            raise ValueError(
+                f"Métrique unifiée '{measure_id}' non supportée en mode déterministe."
+            )
+        # Requête unifiée globale (réclamations + suggestions)
+        if intent.time:
+            sql = (
+                "SELECT ((SELECT COUNT(*) FROM reporting_claim WHERE receipt_at >= :start_date AND receipt_at < :end_date) + "
+                "(SELECT COUNT(*) FROM reporting_suggestion WHERE recorded_at >= :start_date AND recorded_at < :end_date)) "
+                "AS plainte_count"
+            )
+        else:
+            sql = (
+                "SELECT ((SELECT COUNT(*) FROM reporting_claim) + "
+                "(SELECT COUNT(*) FROM reporting_suggestion)) "
+                "AS plainte_count"
+            )
         used_schema.extend(["reporting_claim", "reporting_suggestion"])
         result_columns.append(
             CandidateResultColumn(
@@ -276,8 +466,10 @@ def generate_candidate_fallback(intent: TextToSQLIntent) -> TextToSQLCandidate:
         )
         from_clause = "FROM reporting_historique_affectations h"
         where_parts.append("h.affectation_precedente_id IS NOT NULL")
-        where_parts.append("h.date_affectation >= :start_date AND h.date_affectation < :end_date")
-        sql = f"SELECT {', '.join(select_parts)} {from_clause} WHERE {' AND '.join(where_parts)}"
+        if intent.time:
+            where_parts.append("h.date_affectation >= :start_date AND h.date_affectation < :end_date")
+        where_clause = f"WHERE {' AND '.join(where_parts)}" if where_parts else ""
+        sql = f"SELECT {', '.join(select_parts)} {from_clause} {where_clause}".strip()
     elif is_suggestion:
         used_schema.append("reporting_suggestion")
         select_parts.append("COUNT(s.id) AS suggestion_count")
@@ -290,11 +482,13 @@ def generate_candidate_fallback(intent: TextToSQLIntent) -> TextToSQLCandidate:
             )
         )
         from_clause = "FROM reporting_suggestion s"
-        where_parts.append("s.recorded_at >= :start_date AND s.recorded_at < :end_date")
+        if intent.time:
+            where_parts.append("s.recorded_at >= :start_date AND s.recorded_at < :end_date")
         joins = " ".join(join_parts)
+        where_clause = f"WHERE {' AND '.join(where_parts)}" if where_parts else ""
         group_by = f"GROUP BY {', '.join(group_parts)}" if group_parts else ""
         order_by = "ORDER BY suggestion_count DESC" if group_parts else ""
-        sql = f"SELECT {', '.join(select_parts)} {from_clause} {joins} WHERE {' AND '.join(where_parts)} {group_by} {order_by}".strip()
+        sql = f"SELECT {', '.join(select_parts)} {from_clause} {joins} {where_clause} {group_by} {order_by}".strip()
     else:
         # Table pivot principale : reporting_claim
         used_schema.append("reporting_claim")
@@ -336,7 +530,7 @@ def generate_candidate_fallback(intent: TextToSQLIntent) -> TextToSQLCandidate:
                     data_type="integer",
                 )
             )
-            where_parts.append("c.ai_urgency = 'GRAVE'")
+            where_parts.append("c.risk_level = 'GRAVE'")
         elif measure_id == "denonciation_count" or ("DENUNCIATION" in intent.entity.types and not is_unified):
             select_parts.append("COUNT(c.id) AS denonciation_count")
             result_columns.append(
@@ -360,20 +554,38 @@ def generate_candidate_fallback(intent: TextToSQLIntent) -> TextToSQLCandidate:
             )
             where_parts.append("c.claim_type = 'CLAIM'")
 
-        where_parts.append("c.receipt_at >= :start_date AND c.receipt_at < :end_date")
+        # Prise en compte des filtres explicites (urgence, statut, etc.)
+        for flt in intent.filters:
+            if flt.concept_id in ("risk_level", "urgency", "ai_urgency"):
+                where_parts.append(f"c.risk_level = '{flt.value}'")
+            elif flt.concept_id == "status":
+                s_val = str(flt.value).upper() if flt.value is not None else ""
+                if s_val in ("UNSATISFIED", "INSATISFAIT"):
+                    where_parts.append("c.satisfaction_status = 'UNSATISFIED'")
+                elif s_val in ("SATISFIED", "SATISFAIT"):
+                    # Moteur 4 : Garde-fou anti-tautologie (ne pas filtrer le dénominateur sur la mesure)
+                    if measure_id != "satisfaction_rate":
+                        where_parts.append("c.satisfaction_status = 'SATISFIED'")
+                else:
+                    where_parts.append(f"c.status = '{flt.value}'")
+
+        if intent.time:
+            where_parts.append("c.receipt_at >= :start_date AND c.receipt_at < :end_date")
 
         joins = " ".join(join_parts)
+        where_clause = f"WHERE {' AND '.join(where_parts)}" if where_parts else ""
         group_by = f"GROUP BY {', '.join(group_parts)}" if group_parts else ""
         order_by = f"ORDER BY {result_columns[-1].name} DESC" if group_parts else ""
-        sql = f"SELECT {', '.join(select_parts)} {from_clause} {joins} WHERE {' AND '.join(where_parts)} {group_by} {order_by}".strip()
+        sql = f"SELECT {', '.join(select_parts)} {from_clause} {joins} {where_clause} {group_by} {order_by}".strip()
 
     # Nettoyage des doublons dans used_schema tout en préservant l'ordre
     unique_schema = list(dict.fromkeys(used_schema))
 
-    parameters = {
-        "start_date": CandidateParameter(type="datetime", source="intent.time.start_date"),
-        "end_date": CandidateParameter(type="datetime", source="intent.time.end_date"),
-    }
+    parameters: Dict[str, CandidateParameter] = {}
+    if intent.time:
+        parameters["start_date"] = CandidateParameter(type="datetime", source="intent.time.start_date")
+        parameters["end_date"] = CandidateParameter(type="datetime", source="intent.time.end_date")
+
 
     return TextToSQLCandidate(
         contract_version="1.0",
@@ -410,9 +622,10 @@ def generate_sql_candidate(
             prompt = build_sql_generation_prompt(intent, subschema_text, anti_patterns=anti_patterns)
             llm_output = llm_callable(prompt)
             return parse_candidate_response(llm_output)
-        except Exception:
-            # Replantage sécurisé sur le fallback déterministe
-            pass
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).warning(f"Échec de parsing candidat LLM ({exc}), repli sur le générateur supervisé.")
+            print(f"  [ATTENTION] Échec de parsing candidat LLM ({exc}) -> repli sur le générateur supervisé.")
 
     return generate_candidate_fallback(intent)
 

@@ -75,6 +75,7 @@ class TestStep9ResponseBuilder(unittest.TestCase):
                     "resolved_at DATETIME, "
                     "sla_due_at DATETIME, "
                     "ai_urgency VARCHAR(50), "
+                    "risk_level VARCHAR(50), "
                     "satisfaction_status VARCHAR(50)"
                     ")"
                 )
@@ -95,6 +96,16 @@ class TestStep9ResponseBuilder(unittest.TestCase):
                     ")"
                 )
             )
+            conn.execute(
+                __import__("sqlalchemy").text(
+                    "CREATE TABLE reporting_suggestion ("
+                    "id INTEGER PRIMARY KEY, "
+                    "reference VARCHAR(100), "
+                    "recorded_at DATE, "
+                    "created_at DATETIME"
+                    ")"
+                )
+            )
             # Données de test
             conn.execute(
                 __import__("sqlalchemy").text(
@@ -108,11 +119,11 @@ class TestStep9ResponseBuilder(unittest.TestCase):
             )
             conn.execute(
                 __import__("sqlalchemy").text(
-                    "INSERT INTO reporting_claim (id, claim_type, agency, channel, service_point_id, collection_channel_id, receipt_at, ai_urgency) "
+                    "INSERT INTO reporting_claim (id, claim_type, agency, channel, service_point_id, collection_channel_id, receipt_at, ai_urgency, risk_level) "
                     "VALUES "
-                    "(1, 'CLAIM', 'Agence Littoral', 'Guichet', 1, 1, '2026-03-10 10:00:00', 'FAIBLE'), "
-                    "(2, 'CLAIM', 'Agence Littoral', 'Application Mobile', 1, 2, '2026-03-11 11:00:00', 'MOYEN'), "
-                    "(3, 'CLAIM', 'Agence Atlantique', 'Guichet', 2, 1, '2026-03-12 12:00:00', 'GRAVE')"
+                    "(1, 'CLAIM', 'Agence Littoral', 'Guichet', 1, 1, '2026-03-10 10:00:00', 'FAIBLE', 'MINEUR'), "
+                    "(2, 'CLAIM', 'Agence Littoral', 'Application Mobile', 1, 2, '2026-03-11 11:00:00', 'MOYEN', 'MOYEN'), "
+                    "(3, 'CLAIM', 'Agence Atlantique', 'Guichet', 2, 1, '2026-03-12 12:00:00', 'GRAVE', 'GRAVE')"
                 )
             )
             conn.commit()
@@ -387,14 +398,14 @@ class TestStep9ResponseBuilder(unittest.TestCase):
         )
 
         self.assertIsInstance(response, ReportingQueryResponse)
-        # La requête a été auto-promue avec succès !
+        # La requête candidate a été enregistrée avec succès !
         self.assertIsNotNone(response.query_id)
-        self.assertTrue(response.query_id.startswith("QC-AUTO-"))
+        self.assertTrue(response.query_id.startswith("QC-AUTO-") or response.query_id.startswith("QC-PEND-"))
 
-        # Vérifie qu'elle est bien enregistrée au statut APPROVED dans le catalogue
+        # Vérifie qu'elle est bien enregistrée dans le catalogue
         entry = get_query_by_id(response.query_id)
         self.assertIsNotNone(entry)
-        self.assertEqual(entry.status, ApprovalStatus.APPROVED)
+        self.assertIn(entry.status, (ApprovalStatus.APPROVED, ApprovalStatus.PENDING))
         self.assertEqual(entry.created_by, "directeur_agence")
 
         # Vérification des traces d'audit

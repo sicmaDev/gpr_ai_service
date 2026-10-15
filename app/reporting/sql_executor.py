@@ -11,6 +11,7 @@ Ce module applique les 5 piliers de sécurité pour l'exécution des requêtes T
 
 from datetime import date, datetime
 import logging
+import re
 from time import perf_counter
 from typing import Any, Dict, List, Optional, Set
 
@@ -25,6 +26,55 @@ from app.reporting.sql_validator import validate_raw_sql
 from app.reporting.text_to_sql_contracts import ExecutionStatus, SqlExecutionResult
 
 logger = logging.getLogger(__name__)
+
+
+def format_executable_sql(sql: str, parameters: Optional[Dict[str, Any]] = None) -> str:
+    """
+    Formate une requête SQL paramétrée (:param) en remplaçant les placeholders
+    par leurs valeurs littérales réelles et échappées, rendant la requête
+    immédiatement exécutable dans un outil externe (phpMyAdmin, DBeaver, console MySQL).
+    """
+    if not sql:
+        return ""
+    if not parameters:
+        return sql.strip()
+
+    clean_sql = sql.strip()
+    for key in sorted(parameters.keys(), key=len, reverse=True):
+        clean_key = str(key).lstrip(":")
+        val = parameters[key]
+
+        if val is None:
+            formatted_val = "NULL"
+        elif isinstance(val, bool):
+            formatted_val = "1" if val else "0"
+        elif isinstance(val, (int, float)):
+            formatted_val = str(val)
+        elif isinstance(val, (list, tuple)):
+            escaped_items = []
+            for item in val:
+                if isinstance(item, (int, float)):
+                    escaped_items.append(str(item))
+                elif isinstance(item, datetime):
+                    escaped_items.append(f"'{item.strftime('%Y-%m-%d %H:%M:%S')}'")
+                elif isinstance(item, date):
+                    escaped_items.append(f"'{item.isoformat()}'")
+                else:
+                    esc = str(item).replace("'", "''")
+                    escaped_items.append(f"'{esc}'")
+            formatted_val = f"({', '.join(escaped_items)})"
+        elif isinstance(val, datetime):
+            formatted_val = f"'{val.strftime('%Y-%m-%d %H:%M:%S')}'"
+        elif isinstance(val, date):
+            formatted_val = f"'{val.isoformat()}'"
+        else:
+            esc = str(val).replace("'", "''")
+            formatted_val = f"'{esc}'"
+
+        pattern = re.compile(rf":{re.escape(clean_key)}\b")
+        clean_sql = pattern.sub(formatted_val, clean_sql)
+
+    return clean_sql
 
 
 def sanitize_parameters(parameters: Optional[Dict[str, Any]]) -> Dict[str, Any]:
