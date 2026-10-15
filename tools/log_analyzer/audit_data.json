@@ -1,0 +1,141 @@
+{
+  "stats": {
+    "total_runs": 2,
+    "fast_path_hits": 0,
+    "candidate_path_hits": 0,
+    "generative_llm_calls": 2,
+    "silent_fallbacks_total": 0,
+    "step1_pydantic_errors": 0,
+    "step4_pydantic_errors": 0,
+    "sql_divergences_detected": 0,
+    "temporal_mismatches_detected": 0,
+    "orphan_parameters_detected": 0,
+    "semantic_synthesis_corruptions": 0,
+    "pii_leak_detected": 0,
+    "execution_errors": 0
+  },
+  "runs": [
+    {
+      "run_id": 1,
+      "question": "Combien de réclamations ?",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-6C92CF6F",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"Nombre de réclamations\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": null,
+        "raw_llm_json": null,
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-6C92CF6F",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": "SELECT COUNT(c.id) AS case_count FROM reporting_claim c  WHERE c.claim_type = 'CLAIM'",
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "3.04 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "SUPERVISED_FALLBACK",
+        "final_query_id": "QC-PEND-6C92CF6F",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour nombre de réclamations est de 3.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 2,
+      "question": "Quelles sont les dénonciations enregistrées ?",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-74108CDD",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['DENUNCIATION'])",
+        "measure": "denonciation_count (libelle: \"Nombre de dénonciations\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": null,
+        "raw_llm_json": null,
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-74108CDD",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": "SELECT COUNT(c.id) AS denonciation_count FROM reporting_claim c  WHERE c.claim_type = 'DENUNCIATION'",
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "2.71 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "SUPERVISED_FALLBACK",
+        "final_query_id": "QC-PEND-74108CDD",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour nombre de dénonciations est de 1.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    }
+  ]
+}

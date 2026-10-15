@@ -1,0 +1,3710 @@
+{
+  "stats": {
+    "total_runs": 30,
+    "fast_path_hits": 4,
+    "candidate_path_hits": 14,
+    "generative_llm_calls": 12,
+    "silent_fallbacks_total": 3,
+    "step1_pydantic_errors": 1,
+    "step4_pydantic_errors": 2,
+    "sql_divergences_detected": 2,
+    "temporal_mismatches_detected": 4,
+    "orphan_parameters_detected": 9,
+    "semantic_synthesis_corruptions": 1,
+    "pii_leak_detected": 0,
+    "execution_errors": 0
+  },
+  "runs": [
+    {
+      "run_id": 1,
+      "question": "Combien de réclamations ?",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-7F42ED05",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "time": null,
+          "dimensions": [],
+          "filters": [],
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "time": null,
+          "dimensions": [],
+          "filters": [],
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-7F42ED05",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "17.06 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-7F42ED05",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour reclamation_count est de 43.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 2,
+      "question": "Combien de denonciation?",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-9641EE89",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['DENUNCIATION'])",
+        "measure": "denonciation_count (libelle: \"denonciation_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "DENUNCIATION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "denonciation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "DENUNCIATION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "denonciation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-9641EE89",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "4.81 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-9641EE89",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour denonciation_count est de 0.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 3,
+      "question": "Combien de suggestion?",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-2FF7F0BB",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['SUGGESTION'])",
+        "measure": "suggestion_count (libelle: \"suggestion_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "SUGGESTION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "suggestion_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "SUGGESTION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "suggestion_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-2FF7F0BB",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_suggestion']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC;",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": "intent.time.start_date"
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": "intent.time.end_date"
+            }
+          },
+          "used_schema": [
+            "reporting_suggestion"
+          ],
+          "result_columns": [
+            {
+              "name": "suggestion_count",
+              "concept_id": "suggestion_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": [
+            "Aggregation is performed over the entire reporting_suggestion table without any temporal filters, as no date range was specified by the user."
+          ]
+        },
+        "raw_llm_sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC;",
+        "candidate_sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC;",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": "intent.time.start_date"
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": "intent.time.end_date"
+          }
+        },
+        "result_columns": [
+          {
+            "name": "suggestion_count",
+            "concept_id": "suggestion_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [
+          "Aggregation is performed over the entire reporting_suggestion table without any temporal filters, as no date range was specified by the user."
+        ],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "3.07 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-2FF7F0BB",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour suggestion_count est de 0.",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        }
+      ]
+    },
+    {
+      "run_id": 4,
+      "question": "Quelles sont les dénonciations enregistrées ?",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-9641EE89",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['DENUNCIATION'])",
+        "measure": "denonciation_count (libelle: \"denonciation_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "DENUNCIATION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "denonciation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "DENUNCIATION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "denonciation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-9641EE89",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "2.46 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-9641EE89",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour denonciation_count est de 0.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 5,
+      "question": "Quelles sont les sugestionenregistrées ?",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-2FF7F0BB",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['SUGGESTION'])",
+        "measure": "suggestion_count (libelle: \"suggestion_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "SUGGESTION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "suggestion_count"
+          },
+          "time": null,
+          "filters": [],
+          "dimensions": [],
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "SUGGESTION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "suggestion_count"
+          },
+          "time": null,
+          "filters": [],
+          "dimensions": [],
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-2FF7F0BB",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_suggestion']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC;",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": "none"
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": "none"
+            }
+          },
+          "used_schema": [
+            "reporting_suggestion"
+          ],
+          "result_columns": [
+            {
+              "name": "suggestion_count",
+              "concept_id": "suggestion_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": [
+            "Each row in reporting_suggestion corresponds to a single suggestion; we count all rows regardless of status, origin, or any other attribute to obtain the total suggestion count."
+          ]
+        },
+        "raw_llm_sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC;",
+        "candidate_sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC;",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": "none"
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": "none"
+          }
+        },
+        "result_columns": [
+          {
+            "name": "suggestion_count",
+            "concept_id": "suggestion_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [
+          "Each row in reporting_suggestion corresponds to a single suggestion; we count all rows regardless of status, origin, or any other attribute to obtain the total suggestion count."
+        ],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "1.94 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-2FF7F0BB",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour suggestion_count est de 0.",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        }
+      ]
+    },
+    {
+      "run_id": 6,
+      "question": "Quelles sont les reclationenregistrées ?",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-7F42ED05",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-7F42ED05",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "2.89 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-7F42ED05",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour reclamation_count est de 43.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 7,
+      "question": "Nombre d'idées et suggestions d'amélioration",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-F641C06A",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['SUGGESTION'])",
+        "measure": "suggestion_count (libelle: \"suggestion_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "SUGGESTION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "suggestion_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "SUGGESTION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "suggestion_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-F641C06A",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_suggestion']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": null
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": null
+            }
+          },
+          "used_schema": [
+            "reporting_suggestion"
+          ],
+          "result_columns": [
+            {
+              "name": "suggestion_count",
+              "concept_id": "suggestion_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": []
+        },
+        "raw_llm_sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC",
+        "candidate_sql": "SELECT COUNT(reporting_suggestion.id) AS suggestion_count FROM reporting_suggestion ORDER BY suggestion_count DESC",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": null
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": null
+          }
+        },
+        "result_columns": [
+          {
+            "name": "suggestion_count",
+            "concept_id": "suggestion_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "7.24 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-F641C06A",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour suggestion_count est de 0.",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        }
+      ]
+    },
+    {
+      "run_id": 8,
+      "question": "Volume total de dossiers reçus par la banque",
+      "routing": "FAST_PATH_HOMOLOGATED",
+      "final_qid": "QC-AUTO-572FF510",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "plainte_count (libelle: \"plainte_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "FAST_PATH_HOMOLOGATED",
+        "query_id": "QC-AUTO-572FF510",
+        "libelle_metier": "Le nombre de plainte en retard de traitement",
+        "template_sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count",
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "8.66 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "FAST_PATH_HOMOLOGATED",
+        "final_query_id": "QC-AUTO-572FF510",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 9,
+      "question": "Volume de dossiers reçus par la banque",
+      "routing": "FAST_PATH_HOMOLOGATED",
+      "final_qid": "QC-AUTO-572FF510",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "plainte_count (libelle: \"plainte_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "FAST_PATH_HOMOLOGATED",
+        "query_id": "QC-AUTO-572FF510",
+        "libelle_metier": "Le nombre de plainte en retard de traitement",
+        "template_sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count",
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "11.84 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "FAST_PATH_HOMOLOGATED",
+        "final_query_id": "QC-AUTO-572FF510",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 10,
+      "question": "Combien de transferts de dossiers ont eu lieu ?",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-97A0C00A",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "treatment (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "reaffectation_count (libelle: \"reaffectation_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "treatment",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "reaffectation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "treatment",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "reaffectation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-97A0C00A",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "5.89 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-97A0C00A",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour reaffectation_count est de 0.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 11,
+      "question": "Plaintes",
+      "routing": "FAST_PATH_HOMOLOGATED",
+      "final_qid": "QC-AUTO-572FF510",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "plainte_count (libelle: \"plainte_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "FAST_PATH_HOMOLOGATED",
+        "query_id": "QC-AUTO-572FF510",
+        "libelle_metier": "Le nombre de plainte en retard de traitement",
+        "template_sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count",
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "7.60 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "FAST_PATH_HOMOLOGATED",
+        "final_query_id": "QC-AUTO-572FF510",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 12,
+      "question": "Réclamations moyennes",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-F11CD1EA",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "['risk_level=MOYEN']",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-F11CD1EA",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT COUNT(CASE WHEN claim_type = 'CLAIM' THEN 1 END) AS reclamation_count FROM reporting_claim WHERE risk_level = :risk_level",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": null
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": null
+            },
+            "risk_level": {
+              "type": "string",
+              "source": "intent.filters.risk_level"
+            }
+          },
+          "used_schema": [
+            "reporting_claim"
+          ],
+          "result_columns": [
+            {
+              "name": "reclamation_count",
+              "concept_id": "reclamation_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": []
+        },
+        "raw_llm_sql": "SELECT COUNT(CASE WHEN claim_type = 'CLAIM' THEN 1 END) AS reclamation_count FROM reporting_claim WHERE risk_level = :risk_level",
+        "candidate_sql": "SELECT COUNT(CASE WHEN claim_type = 'CLAIM' THEN 1 END) AS reclamation_count FROM reporting_claim WHERE risk_level = 'MOYEN'",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": null
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": null
+          },
+          "risk_level": {
+            "type": "string",
+            "source": "intent.filters.risk_level"
+          }
+        },
+        "result_columns": [
+          {
+            "name": "reclamation_count",
+            "concept_id": "reclamation_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "5.84 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-F11CD1EA",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour reclamation_count est de 17.",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        }
+      ]
+    },
+    {
+      "run_id": 13,
+      "question": "Taux de respect des engagements SLA",
+      "routing": "FAST_PATH_HOMOLOGATED",
+      "final_qid": "QC-AUTO-DCFB5C69",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "sla_adherence_rate (libelle: \"sla_adherence_rate\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "sla_adherence_rate"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "sla_adherence_rate"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "FAST_PATH_HOMOLOGATED",
+        "query_id": "QC-AUTO-DCFB5C69",
+        "libelle_metier": "Taux de respect des délais de traitement",
+        "template_sql": "SELECT AVG(CASE WHEN c.resolved_at <= c.sla_due_at THEN 100.0 ELSE 0.0 END) AS sla_adherence_rate FROM reporting_claim c  WHERE c.resolved_at IS NOT NULL",
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "10.26 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "FAST_PATH_HOMOLOGATED",
+        "final_query_id": "QC-AUTO-DCFB5C69",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour sla_adherence_rate est de None.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 14,
+      "question": "Pourcentage d'usagers satisfaits",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-AF217D8A",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "satisfaction_rate (libelle: \"satisfaction_rate\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "['status=SATISFIED']",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "satisfaction_rate"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "satisfaction_rate"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-AF217D8A",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim', 'reporting_suggestion']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT AVG(CASE WHEN satisfaction_status = 'SATISFIED' THEN 100.0 ELSE 0.0 END) AS satisfaction_rate FROM reporting_claim WHERE status = 'SATISFIED'",
+          "parameters": {},
+          "used_schema": [
+            "reporting_claim"
+          ],
+          "result_columns": [
+            {
+              "name": "satisfaction_rate",
+              "concept_id": "satisfaction_rate",
+              "role": "measure",
+              "data_type": "decimal"
+            }
+          ],
+          "assumptions": [
+            "Only the reporting_claim table contains the satisfaction_status column; reporting_suggestion lacks satisfaction feedback and is therefore excluded from the calculation."
+          ]
+        },
+        "raw_llm_sql": "SELECT AVG(CASE WHEN satisfaction_status = 'SATISFIED' THEN 100.0 ELSE 0.0 END) AS satisfaction_rate FROM reporting_claim WHERE status = 'SATISFIED'",
+        "candidate_sql": "SELECT AVG(CASE WHEN satisfaction_status = 'SATISFIED' THEN 100.0 ELSE 0.0 END) AS satisfaction_rate FROM reporting_claim WHERE status = 'SATISFIED'",
+        "parameters": {},
+        "result_columns": [
+          {
+            "name": "satisfaction_rate",
+            "concept_id": "satisfaction_rate",
+            "role": "measure",
+            "data_type": "decimal"
+          }
+        ],
+        "assumptions": [
+          "Only the reporting_claim table contains the satisfaction_status column; reporting_suggestion lacks satisfaction feedback and is therefore excluded from the calculation."
+        ],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "5.55 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-AF217D8A",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour satisfaction_rate est de 0.00000.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 15,
+      "question": "Score moyen de risque estimé",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-AUTO-572FF510",
+      "lifecycle_status": "APPROVED",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "custom_avg_risk_score (libelle: \"custom_avg_risk_score\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "['risk_level=MOYEN']",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "custom_avg_risk_score"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "custom_avg_risk_score"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-AUTO-572FF510",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim', 'reporting_suggestion']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT AVG(ai_risk_score) AS custom_avg_risk_score FROM reporting_claim WHERE risk_level = :risk_level AND claim_type IN ('CLAIM', 'DENUNCIATION') ORDER BY custom_avg_risk_score DESC;",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": "intent.time.start_date"
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": "intent.time.end_date"
+            }
+          },
+          "result_columns": [
+            {
+              "name": "custom_avg_risk_score",
+              "concept_id": "custom_avg_risk_score",
+              "role": "measure",
+              "data_type": "double"
+            }
+          ],
+          "used_schema": [
+            "reporting_claim"
+          ],
+          "assumptions": [
+            "The reporting_suggestion table does not contain an ai_risk_score column, therefore suggestions areexcluded from the custom average risk score calculation; only CLAIM and DENUNCIATION rows from reporting_claim are considered."
+          ]
+        },
+        "raw_llm_sql": "SELECT AVG(ai_risk_score) AS custom_avg_risk_score FROM reporting_claim WHERE risk_level = :risk_level AND claim_type IN ('CLAIM', 'DENUNCIATION') ORDER BY custom_avg_risk_score DESC;",
+        "candidate_sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": "intent.time.start_date"
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": "intent.time.end_date"
+          }
+        },
+        "result_columns": [
+          {
+            "name": "custom_avg_risk_score",
+            "concept_id": "custom_avg_risk_score",
+            "role": "measure",
+            "data_type": "double"
+          }
+        ],
+        "assumptions": [
+          "The reporting_suggestion table does not contain an ai_risk_score column, therefore suggestions areexcluded from the custom average risk score calculation; only CLAIM and DENUNCIATION rows from reporting_claim are considered."
+        ],
+        "pydantic_error": "1 validation error for TextToSQLCandidate\nresult_columns.0.data_type\n  Input should be 'string', 'integer', 'decimal', 'boolean', 'date' or 'datetime' [type=literal_error, input_value='double', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.12/v/literal_error",
+        "sql_divergence": true,
+        "divergence_details": "Le LLM a proposé une requête spécifique mais le système a exécuté le fallback global 'plainte_count' !",
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "8.54 ms",
+        "lifecycle_status": "APPROVED"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-AUTO-572FF510",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour custom_avg_risk_score est de 52.",
+        "semantic_corrupted": true
+      },
+      "alerts": [
+        {
+          "severity": "CRITICAL",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "SILENT_FALLBACK_CANDIDATE",
+          "message": "Échec de validation Pydantic TextToSQLCandidate (1 validation error for TextToSQLCandidate\nresult_columns.0.data_type\n  Input should be 'string', 'integer', 'decimal', 'boolean', 'date' or 'datetime' [type=literal_error, input_value='double', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.12/v/literal_error). Repli silencieux vers le générateur déterministe."
+        },
+        {
+          "severity": "CRITICAL",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "RAW_VS_CANDIDATE_SQL_DIVERGENCE",
+          "message": "Le LLM a proposé une requête spécifique mais le système a exécuté le fallback global 'plainte_count' ! (Proposé: SELECT AVG(ai_risk_score) AS custom_avg_risk_score FROM repo... | Exécuté: SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COU...)"
+        },
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        },
+        {
+          "severity": "CRITICAL",
+          "step": "Étape 7 (Restitution)",
+          "code": "SEMANTIC_SYNTHESIS_CORRUPTED",
+          "message": "Incohérence sémantique majeure : La synthèse formule 'Pour la période demandée, le résultat pour custom_avg_risk_score est de 52.' sur la base d'un comptage brut (52) issu du fallback déterministe."
+        }
+      ]
+    },
+    {
+      "run_id": 16,
+      "question": "Réclamations par agence",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-CA4F2CB4",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['agency']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-CA4F2CB4",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "4",
+        "duration": "16.06 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-CA4F2CB4",
+        "visualization": "bar",
+        "synthesis": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A...",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 17,
+      "question": "Dossiers par canal de collecte",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-96F3D64F",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "plainte_count (libelle: \"plainte_count\")",
+        "dimensions": "['channel']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "channel"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "channel"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-96F3D64F",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim', 'reporting_suggestion', 'reporting_collection_channel']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT cc.libelle AS channel, COUNT(*) AS plainte_count FROM (SELECT collection_channel_id FROM reporting_claim UNION ALL SELECT collection_channel_id FROM reporting_suggestion) u LEFT JOIN reporting_collection_channel cc ON u.collection_channel_id = cc.id GROUP BY cc.libelle ORDER BY plainte_count DESC;",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": null
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": null
+            }
+          },
+          "used_schema": [
+            "reporting_claim",
+            "reporting_suggestion",
+            "reporting_collection_channel"
+          ],
+          "result_columns": [
+            {
+              "name": "channel",
+              "concept_id": "channel",
+              "role": "dimension",
+              "data_type": "string"
+            },
+            {
+              "name": "plainte_count",
+              "concept_id": "plainte_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": [
+            "Les dossiers sans canal de collecte (collection_channel_id NULL) sont regroupés sous une valeur NULL de la colonne channel."
+          ]
+        },
+        "raw_llm_sql": "SELECT cc.libelle AS channel, COUNT(*) AS plainte_count FROM (SELECT collection_channel_id FROM reporting_claim UNION ALL SELECT collection_channel_id FROM reporting_suggestion) u LEFT JOIN reporting_collection_channel cc ON u.collection_channel_id = cc.id GROUP BY cc.libelle ORDER BY plainte_count DESC;",
+        "candidate_sql": "SELECT cc.libelle AS channel, COUNT(*) AS plainte_count FROM (SELECT collection_channel_id FROM reporting_claim UNION ALL SELECT collection_channel_id FROM reporting_suggestion) u LEFT JOIN reporting_collection_channel cc ON u.collection_channel_id = cc.id GROUP BY cc.libelle ORDER BY plainte_count DESC;",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": null
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": null
+          }
+        },
+        "result_columns": [
+          {
+            "name": "channel",
+            "concept_id": "channel",
+            "role": "dimension",
+            "data_type": "string"
+          },
+          {
+            "name": "plainte_count",
+            "concept_id": "plainte_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [
+          "Les dossiers sans canal de collecte (collection_channel_id NULL) sont regroupés sous une valeur NULL de la colonne channel."
+        ],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "4",
+        "duration": "14.35 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-96F3D64F",
+        "visualization": "pie",
+        "synthesis": "Pour la période demandée, un total de 52 plainte_count a été enregistré, avec la répartition suivante par channel : AGEN...",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        }
+      ]
+    },
+    {
+      "run_id": 18,
+      "question": "Suggestions selon le niveau d'impact",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-6EBA969F",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['SUGGESTION'])",
+        "measure": "suggestion_count (libelle: \"suggestion_count\")",
+        "dimensions": "['impact_level']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "SUGGESTION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "suggestion_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "impact_level"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "SUGGESTION"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "suggestion_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "impact_level"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-6EBA969F",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "0",
+        "duration": "7.92 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-6EBA969F",
+        "visualization": "bar",
+        "synthesis": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 19,
+      "question": "Réclamations par agence et par canal",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-F08016E5",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['agency', 'channel']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            },
+            {
+              "concept_id": "channel"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            },
+            {
+              "concept_id": "channel"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-F08016E5",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "4",
+        "duration": "19.41 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-F08016E5",
+        "visualization": "bar",
+        "synthesis": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A...",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 20,
+      "question": "Total des réclamations",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-7F42ED05",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-7F42ED05",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "7.01 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-7F42ED05",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour reclamation_count est de 43.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 21,
+      "question": "Réclamations graves",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-226DBA67",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "['risk_level=GRAVE']",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [],
+          "filters": [
+            {
+              "concept_id": "risk_level",
+              "operator": "equals",
+              "value": "GRAVE"
+            }
+          ],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [],
+          "filters": [
+            {
+              "concept_id": "risk_level",
+              "operator": "equals",
+              "value": "GRAVE"
+            }
+          ],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-226DBA67",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT COUNT(*) AS reclamation_count FROM reporting_claim WHERE claim_type = 'CLAIM' AND risk_level = 'GRAVE' ORDER BY reclamation_count DESC",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": ""
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": ""
+            }
+          },
+          "used_schema": [
+            "reporting_claim"
+          ],
+          "result_columns": [
+            {
+              "name": "reclamation_count",
+              "concept_id": "reclamation_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": [
+            "Le comptage considère uniquement les enregistrements de type 'CLAIM' avec un risque réglementaire 'GRAVE'. Aucune contrainte temporelle n'est appliquée, donc l'ensemble de l'historique est inclus."
+          ]
+        },
+        "raw_llm_sql": "SELECT COUNT(*) AS reclamation_count FROM reporting_claim WHERE claim_type = 'CLAIM' AND risk_level = 'GRAVE' ORDER BY reclamation_count DESC",
+        "candidate_sql": "SELECT COUNT(*) AS reclamation_count FROM reporting_claim WHERE claim_type = 'CLAIM' AND risk_level = 'GRAVE' ORDERBY reclamation_count DESC",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": ""
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": ""
+          }
+        },
+        "result_columns": [
+          {
+            "name": "reclamation_count",
+            "concept_id": "reclamation_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [
+          "Le comptage considère uniquement les enregistrements de type 'CLAIM' avec un risque réglementaire 'GRAVE'. Aucune contrainte temporelle n'est appliquée, donc l'ensemble de l'historique est inclus."
+        ],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "9.76 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-226DBA67",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour reclamation_count est de 19.",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        }
+      ]
+    },
+    {
+      "run_id": 22,
+      "question": "Plaintes critiques ou lourdes",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-AUTO-572FF510",
+      "lifecycle_status": "APPROVED",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "plainte_count (libelle: \"plainte_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "['risk_level=GRAVE']",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [],
+          "filters": [
+            {
+              "concept_id": "risk_level",
+              "operator": "equals",
+              "value": "GRAVE"
+            }
+          ],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "dimensions": [],
+          "filters": [
+            {
+              "concept_id": "risk_level",
+              "operator": "equals",
+              "value": "GRAVE"
+            }
+          ],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-AUTO-572FF510",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim', 'reporting_suggestion']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim WHERE risk_level = :risk_level) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count;",
+          "parameters": {
+            "risk_level": {
+              "type": "varchar",
+              "source": "intent.filters.risk_level"
+            }
+          },
+          "used_schema": [
+            "reporting_claim",
+            "reporting_suggestion"
+          ],
+          "result_columns": [
+            {
+              "name": "plainte_count",
+              "concept_id": "plainte_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": [
+            "The risk_level filter is applied only to reporting_claim because reporting_suggestion does not have a risk_level column; all suggestions are counted regardless of risk."
+          ]
+        },
+        "raw_llm_sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim WHERE risk_level = :risk_level) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count;",
+        "candidate_sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count",
+        "parameters": {
+          "risk_level": {
+            "type": "varchar",
+            "source": "intent.filters.risk_level"
+          }
+        },
+        "result_columns": [
+          {
+            "name": "plainte_count",
+            "concept_id": "plainte_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [
+          "The risk_level filter is applied only to reporting_claim because reporting_suggestion does not have a risk_level column; all suggestions are counted regardless of risk."
+        ],
+        "pydantic_error": "1 validation error for TextToSQLCandidate\nparameters.risk_level.type\n  Input should be 'date', 'datetime', 'string', 'integer', 'decimal' or 'boolean' [type=literal_error, input_value='varchar', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.12/v/literal_error",
+        "sql_divergence": true,
+        "divergence_details": "Différence structurelle entre le SQL brut du LLM et le SQL candidat exécuté.",
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "17.25 ms",
+        "lifecycle_status": "APPROVED"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-AUTO-572FF510",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "CRITICAL",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "SILENT_FALLBACK_CANDIDATE",
+          "message": "Échec de validation Pydantic TextToSQLCandidate (1 validation error for TextToSQLCandidate\nparameters.risk_level.type\n  Input should be 'date', 'datetime', 'string', 'integer', 'decimal' or 'boolean' [type=literal_error, input_value='varchar', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.12/v/literal_error). Repli silencieux vers le générateur déterministe."
+        },
+        {
+          "severity": "HIGH",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "SQL_STRUCTURAL_DIFF",
+          "message": "Différence structurelle entre le SQL brut du LLM et le SQL candidat exécuté. (Proposé: SELECT ((SELECT COUNT(*) FROM reporting_claim WHERE risk_lev... | Exécuté: SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COU...)"
+        }
+      ]
+    },
+    {
+      "run_id": 23,
+      "question": "Dossiers insatisfaits",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-E3EDFC99",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "FALLBACK_DETERMINISTE_MOTS_CLES",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "plainte_count (libelle: \"Total unifié des plaintes\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "['status=UNSATISFIED']",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "filters": [
+            {
+              "concept_id": "status",
+              "operator": "equals",
+              "value": "UNSATISFIED"
+            }
+          ],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "filters": [
+            {
+              "concept_id": "status",
+              "operator": "equals",
+              "value": "UNSATISFIED"
+            }
+          ],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": "1 validation error for TextToSQLIntent\nentity\n  Value error, types doit etre vide ou contenir l'ensemble des types lorsque include_all_types vaut true [type=value_error, input_value={'concept_id': 'plainte',...rue, 'types': ['CLAIM']}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.12/v/value_error"
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-E3EDFC99",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim', 'reporting_suggestion']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim WHERE satisfaction_status = 'UNSATISFIED') + (SELECT COUNT(*)FROM reporting_suggestion)) AS plainte_count",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": "intent.time.start_date"
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": "intent.time.end_date"
+            }
+          },
+          "used_schema": [
+            "reporting_claim",
+            "reporting_suggestion"
+          ],
+          "result_columns": [
+            {
+              "name": "plainte_count",
+              "concept_id": "plainte_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": [
+            "The filter status = 'UNSATISFIED' is applied to the satisfaction_status column in reporting_claim; reporting_suggestion does not have a satisfaction status field, so all suggestions are counted."
+          ]
+        },
+        "raw_llm_sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim WHERE satisfaction_status = 'UNSATISFIED') + (SELECT COUNT(*)FROM reporting_suggestion)) AS plainte_count",
+        "candidate_sql": "SELECT ((SELECT COUNT(*) FROM reporting_claim WHERE satisfaction_status = 'UNSATISFIED') + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": "intent.time.start_date"
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": "intent.time.end_date"
+          }
+        },
+        "result_columns": [
+          {
+            "name": "plainte_count",
+            "concept_id": "plainte_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [
+          "The filter status = 'UNSATISFIED' is applied to the satisfaction_status column in reporting_claim; reporting_suggestion does not have a satisfaction status field, so all suggestions are counted."
+        ],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "7.48 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-E3EDFC99",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour total unifié des plaintes est de 0.",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "CRITICAL",
+          "step": "Étape 1 (Intention)",
+          "code": "SILENT_FALLBACK_INTENT",
+          "message": "Échec de validation Pydantic de l'intention LLM (1 validation error for TextToSQLIntent\nentity\n  Value error, types doit etre vide ou contenir l'ensemble des types lorsque include_all_types vaut true [type=value_error, input_value={'concept_id': 'plainte',...rue, 'types': ['CLAIM']}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.12/v/value_error). Repli silencieux vers le résolveur déterministe."
+        },
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        }
+      ]
+    },
+    {
+      "run_id": 24,
+      "question": "Dossiers insatisfaits",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-A299EBC2",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM', 'DENUNCIATION', 'SUGGESTION'])",
+        "measure": "plainte_count (libelle: \"plainte_count\")",
+        "dimensions": "['aucune (global)']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "['status=UNSATISFIED']",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "filters": [
+            {
+              "concept_id": "status",
+              "operator": "equals",
+              "value": "UNSATISFIED"
+            }
+          ],
+          "dimensions": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM",
+              "DENUNCIATION",
+              "SUGGESTION"
+            ],
+            "include_all_types": true
+          },
+          "measure": {
+            "concept_id": "plainte_count"
+          },
+          "filters": [
+            {
+              "concept_id": "status",
+              "operator": "equals",
+              "value": "UNSATISFIED"
+            }
+          ],
+          "dimensions": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-A299EBC2",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim', 'reporting_suggestion']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "WITH unioned AS (SELECT 1 FROM reporting_claim WHERE satisfaction_status = 'UNSATISFIED' UNION ALL SELECT 1FROM reporting_suggestion) SELECT COUNT(*) AS plainte_count FROM unioned;",
+          "parameters": {
+            "start_date": {
+              "type": "datetime",
+              "source": "intent.time.start_date"
+            },
+            "end_date": {
+              "type": "datetime",
+              "source": "intent.time.end_date"
+            }
+          },
+          "used_schema": [
+            "reporting_claim",
+            "reporting_suggestion"
+          ],
+          "result_columns": [
+            {
+              "name": "plainte_count",
+              "concept_id": "plainte_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": [
+            "The satisfaction_status filter applies only to reporting_claim; reporting_suggestion rows are counted regardless of their status as they represent complaints/suggestions."
+          ]
+        },
+        "raw_llm_sql": "WITH unioned AS (SELECT 1 FROM reporting_claim WHERE satisfaction_status = 'UNSATISFIED' UNION ALL SELECT 1FROM reporting_suggestion) SELECT COUNT(*) AS plainte_count FROM unioned;",
+        "candidate_sql": "WITH unioned AS (SELECT 1 FROM reporting_claim WHERE satisfaction_status = 'UNSATISFIED' UNION ALL SELECT 1 FROM reporting_suggestion) SELECT COUNT(*) AS plainte_count FROM unioned;",
+        "parameters": {
+          "start_date": {
+            "type": "datetime",
+            "source": "intent.time.start_date"
+          },
+          "end_date": {
+            "type": "datetime",
+            "source": "intent.time.end_date"
+          }
+        },
+        "result_columns": [
+          {
+            "name": "plainte_count",
+            "concept_id": "plainte_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [
+          "The satisfaction_status filter applies only to reporting_claim; reporting_suggestion rows are counted regardless of their status as they represent complaints/suggestions."
+        ],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [
+          "start_date",
+          "end_date"
+        ],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "1",
+        "duration": "7.45 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-A299EBC2",
+        "visualization": "aucune",
+        "synthesis": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "MEDIUM",
+          "step": "Étape 4 (Générateur SQL)",
+          "code": "ORPHAN_PARAMETERS",
+          "message": "Paramètres déclarés dans le contrat mais absents de la clause SQL : ['start_date', 'end_date']"
+        }
+      ]
+    },
+    {
+      "run_id": 25,
+      "question": "Réclamations graves insatisfaites du canal Web",
+      "routing": "GENERATIVE_LLM",
+      "final_qid": "QC-PEND-C3EECB8A",
+      "lifecycle_status": "PENDING",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['channel']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "['risk_level=GRAVE', 'status=UNSATISFIED', 'channel=Web']",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "channel"
+            }
+          ],
+          "filters": [
+            {
+              "concept_id": "risk_level",
+              "operator": "equals",
+              "value": "GRAVE"
+            },
+            {
+              "concept_id": "status",
+              "operator": "equals",
+              "value": "UNSATISFIED"
+            },
+            {
+              "concept_id": "channel",
+              "operator": "equals",
+              "value": "Web"
+            }
+          ],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "channel"
+            }
+          ],
+          "filters": [
+            {
+              "concept_id": "risk_level",
+              "operator": "equals",
+              "value": "GRAVE"
+            },
+            {
+              "concept_id": "status",
+              "operator": "equals",
+              "value": "UNSATISFIED"
+            },
+            {
+              "concept_id": "channel",
+              "operator": "equals",
+              "value": "Web"
+            }
+          ],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "GENERATIVE_LLM",
+        "query_id": "QC-PEND-C3EECB8A",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "['reporting_claim', 'reporting_collection_channel']",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": {
+          "contract_version": "1.0",
+          "sql": "SELECT rcc.libelle AS channel, COUNT(CASE WHEN rc.claim_type = 'CLAIM' THEN 1 END) AS reclamation_count FROM reporting_claim rc LEFT JOIN reporting_collection_channel rcc ON rc.collection_channel_id = rcc.id WHERE rc.risk_level= 'GRAVE' AND rc.status = 'UNSATISFIED' AND rc.claim_type = 'CLAIM' AND rcc.libelle = 'Web' GROUP BY rcc.libelle ORDER BY reclamation_count DESC;",
+          "parameters": {},
+          "used_schema": [
+            "reporting_claim",
+            "reporting_collection_channel"
+          ],
+          "result_columns": [
+            {
+              "name": "channel",
+              "concept_id": "channel",
+              "role": "dimension",
+              "data_type": "string"
+            },
+            {
+              "name": "reclamation_count",
+              "concept_id": "reclamation_count",
+              "role": "measure",
+              "data_type": "integer"
+            }
+          ],
+          "assumptions": [
+            "Filter on claim_type='CLAIM' applied for performance; the measure definition already restricts to CLAIM via CASEWHEN."
+          ]
+        },
+        "raw_llm_sql": "SELECT rcc.libelle AS channel, COUNT(CASE WHEN rc.claim_type = 'CLAIM' THEN 1 END) AS reclamation_count FROM reporting_claim rc LEFT JOIN reporting_collection_channel rcc ON rc.collection_channel_id = rcc.id WHERE rc.risk_level= 'GRAVE' AND rc.status = 'UNSATISFIED' AND rc.claim_type = 'CLAIM' AND rcc.libelle = 'Web' GROUP BY rcc.libelle ORDER BY reclamation_count DESC;",
+        "candidate_sql": "SELECT rcc.libelle AS channel, COUNT(CASE WHEN rc.claim_type = 'CLAIM' THEN 1 END) AS reclamation_count FROM reporting_claim rc LEFT JOIN reporting_collection_channel rcc ON rc.collection_channel_id = rcc.id WHERE rc.risk_level = 'GRAVE' AND rc.status = 'UNSATISFIED' AND rc.claim_type = 'CLAIM' AND rcc.libelle = 'Web' GROUP BY rcc.libelle ORDER BY reclamation_count DESC;",
+        "parameters": {},
+        "result_columns": [
+          {
+            "name": "channel",
+            "concept_id": "channel",
+            "role": "dimension",
+            "data_type": "string"
+          },
+          {
+            "name": "reclamation_count",
+            "concept_id": "reclamation_count",
+            "role": "measure",
+            "data_type": "integer"
+          }
+        ],
+        "assumptions": [
+          "Filter on claim_type='CLAIM' applied for performance; the measure definition already restricts to CLAIM via CASEWHEN."
+        ],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": [
+          "1. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "2. REQUÊTE REJETÉE : `SELECT ((SELECT COUNT(*) FROM reporting_claim) + (SELECT COUNT(*) FROM reporting_suggestion)) AS plainte_count`",
+          "3. REQUÊTE REJETÉE : `SELECT sp.libelle AS agency, COUNT(c.id) AS case_count FROM reporting_claim c LEFT JOIN reporting_service_point sp ON c.service_point_id = sp.id WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date GROUP BY sp.libelle ORDER BY case_count DESC`"
+        ]
+      },
+      "step5_ast_shield": {
+        "ast_valid": "VALIDE",
+        "controls_passed": "SELECT pur, aucune ecriture, aucune fuite sensible, projection stricte"
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "0",
+        "duration": "21.61 ms",
+        "lifecycle_status": "PENDING"
+      },
+      "step7_restitution": {
+        "execution_mode": "GENERATIVE_LLM",
+        "final_query_id": "QC-PEND-C3EECB8A",
+        "visualization": "bar",
+        "synthesis": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 26,
+      "question": "Nombre de réclamations par agence",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-CA4F2CB4",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['agency']",
+        "time": "aucune (global sur toute la base)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "filters": [],
+          "time": null,
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-CA4F2CB4",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": false
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "4",
+        "duration": "13.44 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-CA4F2CB4",
+        "visualization": "bar",
+        "synthesis": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A...",
+        "semantic_corrupted": false
+      },
+      "alerts": []
+    },
+    {
+      "run_id": 27,
+      "question": "Nombre de réclamations par agence en 2026",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-CA4F2CB4",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['agency']",
+        "time": "2026-01-01 -> 2027-01-01 (champ=receipt_date)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "time": {
+            "field_concept": "receipt_date",
+            "start_date": "2026-01-01",
+            "end_date": "2026-12-31",
+            "timezone": "Africa/Porto-Novo"
+          },
+          "filters": [],
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "time": {
+            "field_concept": "receipt_date",
+            "start_date": "2026-01-01",
+            "end_date": "2026-12-31",
+            "timezone": "Africa/Porto-Novo"
+          },
+          "filters": [],
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-CA4F2CB4",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": true
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "4",
+        "duration": "12.45 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-CA4F2CB4",
+        "visualization": "bar",
+        "synthesis": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A...",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "HIGH",
+          "step": "Étape 2 (Candidate-Path)",
+          "code": "TEMPORAL_MISMATCH_CANDIDATE",
+          "message": "Désynchronisation temporelle : L'intention exige une période temporelle (2026-01-01 -> 2027-01-01 (champ=receipt_date)), mais le Candidate-Path a réutilisé la requête en attente (QC-PEND-CA4F2CB4) sans valider la présence de filtre temporel."
+        }
+      ]
+    },
+    {
+      "run_id": 28,
+      "question": "Nombre de réclamations par agence en mars 2026",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-CA4F2CB4",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['agency']",
+        "time": "2026-03-01 -> 2026-03-31 (champ=receipt_date)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "time": {
+            "field_concept": "receipt_date",
+            "start_date": "2026-03-01",
+            "end_date": "2026-03-31",
+            "timezone": "Africa/Porto-Novo"
+          },
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "time": {
+            "field_concept": "receipt_date",
+            "start_date": "2026-03-01",
+            "end_date": "2026-03-31",
+            "timezone": "Africa/Porto-Novo"
+          },
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-CA4F2CB4",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": true
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "4",
+        "duration": "12.16 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-CA4F2CB4",
+        "visualization": "bar",
+        "synthesis": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A...",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "HIGH",
+          "step": "Étape 2 (Candidate-Path)",
+          "code": "TEMPORAL_MISMATCH_CANDIDATE",
+          "message": "Désynchronisation temporelle : L'intention exige une période temporelle (2026-03-01 -> 2026-03-31 (champ=receipt_date)), mais le Candidate-Path a réutilisé la requête en attente (QC-PEND-CA4F2CB4) sans valider la présence de filtre temporel."
+        }
+      ]
+    },
+    {
+      "run_id": 29,
+      "question": "Nombre de réclamations par agence en premier trimestre 2026",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-CA4F2CB4",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['agency']",
+        "time": "2026-01-01 -> 2026-03-31 (champ=receipt_date)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "filters": [],
+          "time": {
+            "field_concept": "receipt_date",
+            "start_date": "2026-01-01",
+            "end_date": "2026-03-31",
+            "timezone": "Africa/Porto-Novo"
+          },
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "filters": [],
+          "time": {
+            "field_concept": "receipt_date",
+            "start_date": "2026-01-01",
+            "end_date": "2026-03-31",
+            "timezone": "Africa/Porto-Novo"
+          },
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-CA4F2CB4",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": true
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "4",
+        "duration": "8.85 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-CA4F2CB4",
+        "visualization": "bar",
+        "synthesis": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A...",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "HIGH",
+          "step": "Étape 2 (Candidate-Path)",
+          "code": "TEMPORAL_MISMATCH_CANDIDATE",
+          "message": "Désynchronisation temporelle : L'intention exige une période temporelle (2026-01-01 -> 2026-03-31 (champ=receipt_date)), mais le Candidate-Path a réutilisé la requête en attente (QC-PEND-CA4F2CB4) sans valider la présence de filtre temporel."
+        }
+      ]
+    },
+    {
+      "run_id": 30,
+      "question": "Nombre de réclamations par agence ce mois ci",
+      "routing": "CANDIDATE_PATH_PENDING",
+      "final_qid": "QC-PEND-CA4F2CB4",
+      "lifecycle_status": "N/A",
+      "step1_intent": {
+        "source": "GENERATIVE_LLM_NEMOTRON",
+        "status": "ready",
+        "entity": "plainte (types=['CLAIM'])",
+        "measure": "reclamation_count (libelle: \"reclamation_count\")",
+        "dimensions": "['agency']",
+        "time": "2026-10-01 -> 2026-10-31 (champ=receipt_date)",
+        "filters": "aucun",
+        "contract_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "filters": [],
+          "time": {
+            "field_concept": "receipt_date",
+            "start_date": "2026-10-01",
+            "end_date": "2026-10-31",
+            "timezone": "Africa/Porto-Novo"
+          },
+          "status": "ready"
+        },
+        "raw_llm_json": {
+          "entity": {
+            "concept_id": "plainte",
+            "types": [
+              "CLAIM"
+            ],
+            "include_all_types": false
+          },
+          "measure": {
+            "concept_id": "reclamation_count"
+          },
+          "dimensions": [
+            {
+              "concept_id": "agency"
+            }
+          ],
+          "filters": [],
+          "time": {
+            "field_concept": "receipt_date",
+            "start_date": "2026-10-01",
+            "end_date": "2026-10-31",
+            "timezone": "Africa/Porto-Novo"
+          },
+          "status": "ready"
+        },
+        "pydantic_error": null
+      },
+      "step2_routing": {
+        "routing": "CANDIDATE_PATH_PENDING",
+        "query_id": "QC-PEND-CA4F2CB4",
+        "libelle_metier": null,
+        "template_sql": null,
+        "temporal_mismatch": true
+      },
+      "step3_subschema": {
+        "allowed_tables": "",
+        "pii_protected": true
+      },
+      "step4_candidate_sql": {
+        "raw_llm_json": null,
+        "raw_llm_sql": null,
+        "candidate_sql": null,
+        "parameters": {},
+        "result_columns": [],
+        "assumptions": [],
+        "pydantic_error": null,
+        "sql_divergence": false,
+        "divergence_details": null,
+        "orphan_parameters": [],
+        "anti_patterns_in_prompt": []
+      },
+      "step5_ast_shield": {
+        "ast_valid": "NON_EVALUE",
+        "controls_passed": ""
+      },
+      "step6_execution": {
+        "execution_status": "SUCCESS",
+        "rows_returned": "4",
+        "duration": "16.75 ms",
+        "lifecycle_status": "N/A"
+      },
+      "step7_restitution": {
+        "execution_mode": "CANDIDATE_PENDING",
+        "final_query_id": "QC-PEND-CA4F2CB4",
+        "visualization": "bar",
+        "synthesis": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A...",
+        "semantic_corrupted": false
+      },
+      "alerts": [
+        {
+          "severity": "HIGH",
+          "step": "Étape 2 (Candidate-Path)",
+          "code": "TEMPORAL_MISMATCH_CANDIDATE",
+          "message": "Désynchronisation temporelle : L'intention exige une période temporelle (2026-10-01 -> 2026-10-31 (champ=receipt_date)), mais le Candidate-Path a réutilisé la requête en attente (QC-PEND-CA4F2CB4) sans valider la présence de filtre temporel."
+        }
+      ]
+    }
+  ]
+}
