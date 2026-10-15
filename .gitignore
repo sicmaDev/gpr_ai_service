@@ -30,3 +30,7 @@ scratch/
 settings_dump.json
 
 .safe-code-change/
+
+# Dumps d'audit et rapports horodates generes
+audit_data_workflow*.json
+RAPPORT_*_2026*.md
