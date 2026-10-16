@@ -66,9 +66,19 @@ def build_sql_generation_prompt(
     if intent.time:
         time_str = f"du {intent.time.start_date.isoformat()} au {intent.time.end_date.isoformat()} (champ: {intent.time.field_concept})"
 
-    filters_str = "aucun filtre spécifique"
-    if intent.filters:
-        filters_str = ", ".join(f"{f.concept_id} = '{f.value}'" for f in intent.filters)
+    filters_parts = []
+    for f in (intent.filters or []):
+        if f.operator == "not_equals":
+            filters_parts.append(f"{f.concept_id} != '{f.value}'")
+        elif f.operator == "not_in":
+            filters_parts.append(f"{f.concept_id} NOT IN ({f.values})")
+        elif f.operator == "in":
+            filters_parts.append(f"{f.concept_id} IN ({f.values})")
+        elif f.operator == "between":
+            filters_parts.append(f"{f.concept_id} BETWEEN {f.values[0]} AND {f.values[1]}")
+        else:
+            filters_parts.append(f"{f.concept_id} = '{f.value}'")
+    filters_str = ", ".join(filters_parts) if filters_parts else "aucun filtre spécifique"
 
     # Section des anti-patterns / pièges à éviter (Negative Few-Shots)
     anti_patterns_section = ""
@@ -102,10 +112,19 @@ def build_sql_generation_prompt(
             "   - N'ajoute AUCUNE condition WHERE de restriction temporelle (interroge tout l'historique)."
         )
 
+    intent_json_str = intent.model_dump_json(indent=2)
+
     return f"""Tu es l'expert en génération de requêtes SQL analytiques du système bancaire GPR.
 Ton rôle est de générer une requête SQL paramétrée et optimisée pour répondre précisément à la demande analytique de l'utilisateur.
 
-INTENTION ANALYTIQUE DE L'UTILISATEUR :
+# CONTRAT D'INTENTION STRUCTURE (INTENTION ANALYTIQUE DE L'UTILISATEUR) :
+```json
+{intent_json_str}
+```
+CONSIGNE IMPERATIVE DE FIDELITE SEMANTIQUE :
+La requête SQL générée DOIT IMPÉRATIVEMENT et INTÉGRALEMENT implémenter chaque contrainte, filtre (opérateurs equals, not_equals, in, not_in, between), dimension et entité spécifiés dans ce contrat d'intention JSON.
+
+SYNTHESE DE L'INTENTION :
 - Entité / Concept : {intent.entity.concept_id if intent.entity else 'plainte'} (Types : {types_str})
 - Mesure demandée : {intent.measure.concept_id if intent.measure else 'plainte_count'} ({intent.measure.label if intent.measure else ''})
 - Dimensions de regroupement : {dims_str}
@@ -131,9 +150,14 @@ CONSIGNES STRICTES D'ÉCRITURE SQL :
    - Inclus `ORDER BY` sur la mesure calculée (généralement `DESC`).
 5. Nommage des colonnes :
    - Donne des alias clairs aux colonnes sélectionnées (`AS agency`, `AS case_count`, etc.).
-6. Distinction stricte des statuts et métrologie :
-   - Pour la satisfaction client ('SATISFIED', 'UNSATISFIED'), utilise TOUJOURS `c.satisfaction_status` et JAMAIS `c.status` (qui est le statut opérationnel : 'TRANSMITTED', 'RESOLVED', etc.).
-   - Pour calculer le taux de satisfaction (`satisfaction_rate`), NE FILTRE PAS sur `satisfaction_status = 'SATISFIED'` dans la clause WHERE (laisser le calcul AVG se faire sur toute la population avec avis).
+6. Règles Métier de Filtrage et de Statuts :
+   - Clôture & Résolution : Un dossier est clôturé et résolu si et seulement si `c.status = 'SATISFIED'`.
+   - Dossiers en cours / non résolus : Tout dossier où `c.status != 'SATISFIED'` est considéré comme en cours de traitement (incluant SAVED, AFFECTED, TREAT, CLASSED et UNSATISFIED).
+   - Dénonciations & Fraudes : Utilise TOUJOURS `c.claim_type IN ('DENUNCIATION', 'DENUNCIACION')` pour interroger les dénonciations en base.
+   - Canaux sans guichet / hors agence physique : Les canaux physiques en base sont 'AGENCE' et 'Physique'. Pour une demande "hors agence physique" ou "sans guichet", utilise : `c.channel NOT IN ('AGENCE', 'Physique')` (qui conserve 'TELEPHONE' et 'WEB').
+   - Satisfaction client : Évaluée sur `c.status = 'SATISFIED'` parmi les dossiers ayant un avis exprimé (`c.status IN ('SATISFIED', 'UNSATISFIED')`).
+   - Taux de respect SLA :
+     `ROUND((COUNT(CASE WHEN (c.resolved_at IS NOT NULL AND c.resolved_at <= c.sla_due_at) OR (c.resolved_at IS NULL AND c.sla_due_at >= NOW()) THEN 1 END) * 100.0) / NULLIF(COUNT(*), 0), 2)`.
 {anti_patterns_section}
 FORMAT DE SORTIE ATTENDU :
 Réponds EXCLUSIVEMENT avec un bloc JSON valide respectant rigoureusement le contrat TextToSQLCandidate :
@@ -560,14 +584,25 @@ def generate_candidate_fallback(intent: TextToSQLIntent) -> TextToSQLCandidate:
                 where_parts.append(f"c.risk_level = '{flt.value}'")
             elif flt.concept_id == "status":
                 s_val = str(flt.value).upper() if flt.value is not None else ""
-                if s_val in ("UNSATISFIED", "INSATISFAIT"):
+                if flt.operator == "not_equals":
+                    where_parts.append(f"c.status != '{flt.value}'")
+                elif s_val in ("UNSATISFIED", "INSATISFAIT"):
                     where_parts.append("c.satisfaction_status = 'UNSATISFIED'")
                 elif s_val in ("SATISFIED", "SATISFAIT"):
                     # Moteur 4 : Garde-fou anti-tautologie (ne pas filtrer le dénominateur sur la mesure)
                     if measure_id != "satisfaction_rate":
-                        where_parts.append("c.satisfaction_status = 'SATISFIED'")
+                        where_parts.append("c.status = 'SATISFIED'")
                 else:
                     where_parts.append(f"c.status = '{flt.value}'")
+            elif flt.concept_id == "channel":
+                if flt.operator == "not_in" and flt.values:
+                    quoted = ", ".join(f"'{v}'" for v in flt.values)
+                    where_parts.append(f"c.channel NOT IN ({quoted})")
+                elif flt.operator == "in" and flt.values:
+                    quoted = ", ".join(f"'{v}'" for v in flt.values)
+                    where_parts.append(f"c.channel IN ({quoted})")
+                elif flt.value:
+                    where_parts.append(f"c.channel = '{flt.value}'")
 
         if intent.time:
             where_parts.append("c.receipt_at >= :start_date AND c.receipt_at < :end_date")

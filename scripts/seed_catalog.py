@@ -176,10 +176,10 @@ INITIAL_CERTIFIED_QUERIES_DATA = [
             "status": "ready",
         },
         "parameterized_sql": (
-            "SELECT AVG(CASE WHEN c.satisfaction_status = 'SATISFIED' THEN 100.0 ELSE 0.0 END) AS satisfaction_rate "
+            "SELECT ROUND((COUNT(CASE WHEN c.status = 'SATISFIED' THEN 1 END) * 100.0) / "
+            "NULLIF(COUNT(CASE WHEN c.status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate "
             "FROM reporting_claim c "
-            "WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date "
-            "AND c.satisfaction_status IS NOT NULL"
+            "WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date"
         ),
         "parameters_schema": {
             "start_date": {"type": "datetime", "source": "intent.time.start_date"},
@@ -204,10 +204,11 @@ INITIAL_CERTIFIED_QUERIES_DATA = [
             "status": "ready",
         },
         "parameterized_sql": (
-            "SELECT AVG(CASE WHEN c.resolved_at <= c.sla_due_at THEN 100.0 ELSE 0.0 END) AS sla_adherence_rate "
+            "SELECT ROUND((COUNT(CASE WHEN (c.resolved_at IS NOT NULL AND c.resolved_at <= c.sla_due_at) "
+            "OR (c.resolved_at IS NULL AND c.sla_due_at >= NOW()) THEN 1 END) * 100.0) / "
+            "NULLIF(COUNT(*), 0), 2) AS sla_adherence_rate "
             "FROM reporting_claim c "
-            "WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date "
-            "AND c.resolved_at IS NOT NULL"
+            "WHERE c.claim_type = 'CLAIM' AND c.receipt_at >= :start_date AND c.receipt_at < :end_date"
         ),
         "parameters_schema": {
             "start_date": {"type": "datetime", "source": "intent.time.start_date"},
@@ -328,10 +329,16 @@ def main():
         logger.info("2. Amorçage des 8 requêtes certifiées de référence...")
         seed_certified_queries(session)
 
+        # 3. Purge des requêtes PENDING obsolètes générées avec d'anciennes formules
+        from sqlalchemy import text
+        purged = session.execute(text("DELETE FROM reporting_certified_queries WHERE status = 'PENDING'")).rowcount
+        session.commit()
+        logger.info(f"3. Purge du catalogue : {purged} requêtes candidates PENDING obsolètes supprimées.")
+
         logger.info("✨ Amorçage du catalogue terminé avec succès.")
     except Exception as e:
         logger.error(f"❌ Échec de l'amorçage : {e}")
-        db.rollback()
+        session.rollback()
         sys.exit(1)
     finally:
         session.close()

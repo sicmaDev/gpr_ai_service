@@ -672,12 +672,27 @@ def _bind_catalog_parameters(
         for ph in sql_placeholders:
             if ph not in bound_params:
                 for flt in intent.filters:
-                    val = flt.value if flt.value is not None else flt.values
                     cid = flt.concept_id
                     syns = filter_synonyms_map.get(cid, [cid])
-                    if ph in syns or any(ph.startswith(f"{syn}_") or ph.endswith(f"_{syn}") for syn in syns):
-                        bound_params[ph] = val
+                    is_match = ph in syns or any(ph.startswith(syn) or ph.endswith(f"_{syn}") for syn in syns)
+                    if is_match:
+                        val = flt.value if flt.value is not None else flt.values
+                        if isinstance(val, (list, tuple)):
+                            num_m = re.search(r"(\d+)$", ph)
+                            if num_m:
+                                idx = int(num_m.group(1)) - 1
+                                if 0 <= idx < len(val):
+                                    bound_params[ph] = val[idx]
+                                else:
+                                    bound_params[ph] = val[0]
+                            else:
+                                bound_params[ph] = val
+                        else:
+                            bound_params[ph] = val
                         break
+
+        # Élagage des paramètres orphelins non présents dans le SQL paramétré
+        bound_params = {k: v for k, v in bound_params.items() if k in sql_placeholders}
 
     return entry, bound_params
 

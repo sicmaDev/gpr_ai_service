@@ -11,6 +11,7 @@ Ce module matérialise :
 
 import json
 import logging
+import os
 import re
 import unicodedata
 from datetime import date, timedelta
@@ -30,8 +31,21 @@ from app.reporting.text_to_sql_contracts import (
 )
 
 # -----------------------------------------------------------------------------
-# UTILITAIRES DE NORMALISATION TEXTUELLE
+# UTILITAIRES DE NORMALISATION TEXTUELLE ET TEMPORELLE
 # -----------------------------------------------------------------------------
+
+def _get_effective_reference_date(reference_date: Optional[date] = None) -> date:
+    """Retourne la date de référence active : paramètre explicite, variable REPORTING_REFERENCE_DATE, ou date courante."""
+    if reference_date is not None:
+        return reference_date
+    env_date = os.getenv("REPORTING_REFERENCE_DATE")
+    if env_date:
+        try:
+            return date.fromisoformat(env_date.strip())
+        except Exception:
+            pass
+    return date.today()
+
 
 def _strip_accents(text: str) -> str:
     """Retire les accents et passe le texte en minuscules."""
@@ -70,7 +84,7 @@ def extract_date_range(
         (None, None, "AMBIGUOUS_TIME_FIELD") si une expression temporelle vague est détectée.
         (None, None, None) si aucune indication temporelle n'est mentionnée.
     """
-    ref = reference_date or date(2026, 10, 7)
+    ref = _get_effective_reference_date(reference_date)
     norm = _strip_accents(text)
 
     # 1. Détection des expressions ambiguës ou imprécises
@@ -387,6 +401,31 @@ def resolve_intent_deterministic(
                 value="UNSATISFIED",
             )
         )
+    elif "en cours" in norm or "non resolu" in norm or "non cloture" in norm or "ouvert" in norm:
+        filters.append(
+            IntentFilter(
+                concept_id="status",
+                operator="not_equals",
+                value="SATISFIED",
+            )
+        )
+    elif "cloture" in norm or "resolu" in norm or "ferme" in norm:
+        filters.append(
+            IntentFilter(
+                concept_id="status",
+                operator="equals",
+                value="SATISFIED",
+            )
+        )
+
+    if "hors agence" in norm or "sans guichet" in norm or "a distance" in norm or "digitaux" in norm:
+        filters.append(
+            IntentFilter(
+                concept_id="channel",
+                operator="not_in",
+                values=["AGENCE", "Physique"],
+            )
+        )
     if "mineur" in norm or "faible" in norm or "basse" in norm:
         filters.append(
             IntentFilter(
@@ -445,7 +484,7 @@ def build_intent_prompt(query: str, reference_date: Optional[date] = None) -> st
     Le prompt interdit formellement à Nemotron de produire du SQL à cette étape.
     La réponse doit être un objet JSON valide conforme au contrat TextToSQLIntent.
     """
-    ref_str = (reference_date or date(2026, 10, 7)).isoformat()
+    ref_str = _get_effective_reference_date(reference_date).isoformat()
     catalog = get_business_catalog()
 
     # 1. Section dynamique des métriques avec labels et descriptions détaillées
@@ -495,10 +534,13 @@ FILTRES EXPLICITES (filters[]) :
   * 'mineur', 'mineure', 'mineurs', 'mineures', 'faible', 'faibles', 'basse', 'basses' -> filters: [{{"concept_id": "risk_level", "operator": "equals", "value": "MINEUR"}}]
   * 'moyen', 'moyenne', 'moyens', 'moyennes', 'normale', 'normales' -> filters: [{{"concept_id": "risk_level", "operator": "equals", "value": "MOYEN"}}]
   * 'grave', 'graves', 'critique', 'critiques', 'eleve', 'elevee' -> filters: [{{"concept_id": "risk_level", "operator": "equals", "value": "GRAVE"}}] (ou measure: severe_plainte_count)
-- Statut / Évaluation :
+- Statut / Évaluation / Clôture opérationnelle :
   * 'insatisfait', 'insatisfaite', 'insatisfaits', 'insatisfaites', 'non satisfait' -> filters: [{{"concept_id": "status", "operator": "equals", "value": "UNSATISFIED"}}]
   * 'satisfait', 'satisfaite', 'satisfaits', 'satisfaites' -> filters: [{{"concept_id": "status", "operator": "equals", "value": "SATISFIED"}}]
-  * statuts opérationnels (ex: 'en cours', 'clôturé', 'traité') -> filters: [{{"concept_id": "status", "operator": "equals", "value": "<VALEUR>"}}]
+  * 'en cours', 'non resolu', 'non cloture', 'ouvert' (dossiers non résolus) -> filters: [{{"concept_id": "status", "operator": "not_equals", "value": "SATISFIED"}}]
+  * 'cloture', 'resolu', 'ferme' -> filters: [{{"concept_id": "status", "operator": "equals", "value": "SATISFIED"}}]
+- Canal de collecte (concept_id='channel') :
+  * 'hors agence', 'sans guichet', 'a distance', 'digitaux' -> filters: [{{"concept_id": "channel", "operator": "not_in", "values": ["AGENCE", "Physique"]}}]
 
 RÈGLE ABSOLUE SUR LA PÉRIODE TEMPORELLE (champ 'time') :
 - Si et seulement si la question contient une indication temporelle explicite (ex: 'en 2026', 'en septembre 2026', 'ce mois-ci', 'du 01/01/2026 au 31/12/2026') :
@@ -571,7 +613,12 @@ def parse_intent_response(llm_output: str) -> TextToSQLIntent:
                 normalized_types.append(t_str)
         data["entity"]["types"] = normalized_types if normalized_types else ["CLAIM"]
 
-    # 2b. Résilience métrique implicite : si l'utilisateur omet la métrique explicite
+    # 2b. Résilience chaîne pour la mesure : si le LLM a renvoyé measure comme une string brute
+    if isinstance(data.get("measure"), str):
+        val_m = data["measure"].strip()
+        data["measure"] = {"concept_id": val_m, "label": val_m}
+
+    # 2c. Résilience métrique implicite : si l'utilisateur omet la métrique explicite
     if data.get("measure") is None and data.get("entity") is not None:
         types_ent = data["entity"].get("types", [])
         if "CLAIM" in types_ent and len(types_ent) == 1:
@@ -613,8 +660,35 @@ def parse_intent_response(llm_output: str) -> TextToSQLIntent:
         for f in data["filters"]:
             if isinstance(f, dict):
                 clean_f = {k: v for k, v in f.items() if k in allowed_filter_fields}
-                if clean_f.get("operator") == "equals" and clean_f.get("value") is not None:
-                    clean_f["values"] = None
+                op = clean_f.get("operator")
+                val = clean_f.get("value")
+                vals = clean_f.get("values")
+                if op in ("in", "not_in", "between"):
+                    if isinstance(val, (list, tuple)) and not vals:
+                        clean_f["values"] = list(val)
+                        clean_f["value"] = None
+                elif op in ("equals", "not_equals", "greater_than", "less_than"):
+                    if val is not None:
+                        clean_f["values"] = None
+
+                # Normalisation sémantique des filtres opérationnels
+                if clean_f.get("concept_id") == "status":
+                    s_val = str(clean_f.get("value") or "").upper().strip()
+                    if s_val in ("EN_COURS", "EN COURS", "OUVERT", "NON_RESOLU", "NON RESOLU"):
+                        clean_f["operator"] = "not_equals"
+                        clean_f["value"] = "SATISFIED"
+                        clean_f["values"] = None
+                    elif s_val in ("CLOTURE", "RESOLU", "FERME"):
+                        clean_f["operator"] = "equals"
+                        clean_f["value"] = "SATISFIED"
+                        clean_f["values"] = None
+                elif clean_f.get("concept_id") == "channel":
+                    c_val = str(clean_f.get("value") or "").upper().strip()
+                    if clean_f.get("operator") in ("not_in", "not_equals") and any(k in c_val for k in ("AGENCE", "GUICHET", "PHYSIQUE")):
+                        clean_f["operator"] = "not_in"
+                        clean_f["values"] = ["AGENCE", "Physique"]
+                        clean_f["value"] = None
+
                 new_filters.append(clean_f)
         data["filters"] = new_filters
     else:

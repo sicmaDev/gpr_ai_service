@@ -10,8 +10,11 @@ Ce module implémente la gouvernance humaine et l'apprentissage continu du moteu
 """
 
 from datetime import datetime, timezone
+import logging
 from typing import Any, Dict, List, Optional
 import uuid
+
+logger = logging.getLogger(__name__)
 
 from app.reporting.query_catalog import (
     compute_canonical_intent_hash,
@@ -368,7 +371,7 @@ def auto_promote_executed_query(
 
     register_query_entry(entry, db=db_session)
 
-    # Persistance de la métrique si personnalisée / inédite
+    # Enregistrement de la métrique si personnalisée / inédite (is_custom=True)
     if canonical_intent.measure and canonical_intent.measure.concept_id not in (
         "plainte_count", "reclamation_count", "denonciation_count", "suggestion_count",
         "sla_adherence_rate", "avg_processing_time", "satisfaction_rate", "severe_plainte_count",
@@ -381,7 +384,7 @@ def auto_promote_executed_query(
             custom_metric_def = MetricDefinition(
                 metric_id=canonical_intent.measure.concept_id,
                 label=canonical_intent.measure.label or canonical_intent.measure.concept_id,
-                description=f"Métrique personnalisée auto-promue : {canonical_intent.measure.label or canonical_intent.measure.concept_id}",
+                description=f"Métrique personnalisée candidate : {canonical_intent.measure.label or canonical_intent.measure.concept_id}",
                 required_tables=["reporting_claim"],
                 aggregation_sql_template=parameterized_sql,
             )
@@ -392,8 +395,11 @@ def auto_promote_executed_query(
                 created_by=user_id,
                 db=db_session,
             )
-        except Exception:
-            pass
+            logger.info(
+                f"Métrique candidate personnalisée enregistrée : '{canonical_intent.measure.concept_id}' (is_custom=True)."
+            )
+        except Exception as e:
+            logger.warning(f"Échec de persistance de la métrique personnalisée : {e}")
 
     return entry
 

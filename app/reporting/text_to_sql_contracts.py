@@ -129,7 +129,7 @@ class IntentDimension(ContractModel):
     label: NonEmptyString
 
 
-FilterOperator = Literal["equals", "in", "greater_than", "less_than", "between"]
+FilterOperator = Literal["equals", "not_equals", "in", "not_in", "greater_than", "less_than", "between"]
 
 
 class IntentFilter(ContractModel):
@@ -138,16 +138,32 @@ class IntentFilter(ContractModel):
     value: Optional[Any] = None
     values: Optional[List[Any]] = None
 
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_filter_fields(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            op = data.get("operator")
+            val = data.get("value")
+            vals = data.get("values")
+            if op in ("in", "not_in", "between"):
+                if isinstance(val, (list, tuple)) and not vals:
+                    data["values"] = list(val)
+                    data["value"] = None
+            elif op in ("equals", "not_equals", "greater_than", "less_than"):
+                if val is not None:
+                    data["values"] = None
+        return data
+
     @model_validator(mode="after")
     def validate_filter_values(self) -> "IntentFilter":
-        if self.operator == "in":
+        if self.operator in ("in", "not_in"):
             if self.value is not None or not self.values or len(self.values) == 0:
-                raise ValueError("L'operateur 'in' exige une liste 'values' non vide et 'value' a None")
+                raise ValueError(f"L'operateur '{self.operator}' exige une liste 'values' non vide et 'value' a None")
         elif self.operator == "between":
             if self.value is not None or not self.values or len(self.values) != 2:
                 raise ValueError("L'operateur 'between' exige 'values' contenant exactement 2 bornes [debut, fin] et 'value' a None")
         else:
-            # equals, greater_than, less_than
+            # equals, not_equals, greater_than, less_than
             if self.value is None or self.values is not None:
                 raise ValueError(f"L'operateur '{self.operator}' exige 'value' defini et 'values' a None")
         return self
@@ -185,6 +201,15 @@ class TextToSQLIntent(ContractModel):
     time: Optional[IntentTime] = None
     clarification: Optional[IntentClarification] = None
     unsupported_reason: Optional[NonEmptyString] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def coerce_measure_string(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            m = data.get("measure")
+            if isinstance(m, str):
+                data["measure"] = {"concept_id": m.strip(), "label": m.strip()}
+        return data
 
     @model_validator(mode="after")
     def validate_status_contract(self) -> "TextToSQLIntent":

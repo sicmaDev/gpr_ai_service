@@ -395,48 +395,62 @@ def execute_text_to_sql_pipeline(
         print(f"  * Réutilisation déterministe immédiate pour cohérence utilisateur.")
         logger.info(f"Pipeline: HIT Candidate-Path PENDING pour query_id='{catalog_entry.id}'")
 
-        exec_result = execute_read_only_query(
-            sql=catalog_entry.parameterized_sql,
-            parameters=bound_params,
-            session=db_session,
-        )
-        _print_workflow_step_6_execution(exec_result)
-
-        catalog_entry.execution_count += 1
-        catalog_entry.last_executed_at = datetime.now(timezone.utc)
-        if db_session is not None:
-            try:
-                from app.reporting.query_catalog import register_query_entry
-                register_query_entry(catalog_entry, db=db_session)
-            except Exception as e:
-                logger.warning(f"Pipeline: Échec de mise à jour des stats : {e}")
-
-        AUDIT_SERVICE.log_execution(
-            query_source=QuerySource.GENERATIVE_SUPERVISED,
-            sql_executed=executable_sql,
-            bound_parameters=bound_params,
-            result=exec_result,
-            query_id=catalog_entry.id,
-            natural_language_query=question,
-        )
-
         sources = ["reporting_claim"]
         if "reporting_service_point" in catalog_entry.parameterized_sql:
             sources.append("reporting_service_point")
         if "reporting_collection_channel" in catalog_entry.parameterized_sql:
             sources.append("reporting_collection_channel")
+        if "reporting_suggestion" in catalog_entry.parameterized_sql:
+            sources.append("reporting_suggestion")
 
-        response = build_reporting_query_response(
-            execution_result=exec_result,
-            intent=intent,
-            natural_language_query=question,
-            sources=sources,
-            query_id=catalog_entry.id,
-            sql_query=executable_sql,
-            execution_mode="CANDIDATE_PENDING",
-        )
-        _print_workflow_step_7_restitution(response)
-        return response
+        _print_workflow_step_4_generation("Candidate-Path PENDING", catalog_entry.parameterized_sql, executable_sql=executable_sql)
+
+        # Contrôle de sécurité AST systématique sur les requêtes PENDING
+        validation_res = validate_raw_sql(catalog_entry.parameterized_sql)
+        _print_workflow_step_5_ast(validation_res.is_valid, validation_res.violations)
+
+        if not validation_res.is_valid:
+            logger.warning(
+                f"Pipeline: Requête PENDING {catalog_entry.id} invalidée par le bouclier AST. "
+                f"Bascule vers la régénération supervisée."
+            )
+        else:
+            exec_result = execute_read_only_query(
+                sql=catalog_entry.parameterized_sql,
+                parameters=bound_params,
+                session=db_session,
+            )
+            _print_workflow_step_6_execution(exec_result)
+
+            catalog_entry.execution_count += 1
+            catalog_entry.last_executed_at = datetime.now(timezone.utc)
+            if db_session is not None:
+                try:
+                    from app.reporting.query_catalog import register_query_entry
+                    register_query_entry(catalog_entry, db=db_session)
+                except Exception as e:
+                    logger.warning(f"Pipeline: Échec de mise à jour des stats : {e}")
+
+            AUDIT_SERVICE.log_execution(
+                query_source=QuerySource.GENERATIVE_SUPERVISED,
+                sql_executed=executable_sql,
+                bound_parameters=bound_params,
+                result=exec_result,
+                query_id=catalog_entry.id,
+                natural_language_query=question,
+            )
+
+            response = build_reporting_query_response(
+                execution_result=exec_result,
+                intent=intent,
+                natural_language_query=question,
+                sources=sources,
+                query_id=catalog_entry.id,
+                sql_query=executable_sql,
+                execution_mode="CANDIDATE_PENDING",
+            )
+            _print_workflow_step_7_restitution(response)
+            return response
 
     # -------------------------------------------------------------------------
     # 3. Étape 3 : Circuit Supervisé Contrôlé (Fast-Path miss)
@@ -573,11 +587,23 @@ def execute_text_to_sql_pipeline(
     for ph in sql_placeholders:
         if ph not in bound_params:
             for flt in intent.filters:
-                val = flt.value if flt.value is not None else flt.values
                 cid = flt.concept_id
                 syns = filter_synonyms_map.get(cid, [cid])
-                if ph in syns or any(ph.startswith(f"{syn}_") or ph.endswith(f"_{syn}") for syn in syns):
-                    bound_params[ph] = val
+                is_match = ph in syns or any(ph.startswith(syn) or ph.endswith(f"_{syn}") for syn in syns)
+                if is_match:
+                    val = flt.value if flt.value is not None else flt.values
+                    if isinstance(val, (list, tuple)):
+                        num_m = re.search(r"(\d+)$", ph)
+                        if num_m:
+                            idx = int(num_m.group(1)) - 1
+                            if 0 <= idx < len(val):
+                                bound_params[ph] = val[idx]
+                            else:
+                                bound_params[ph] = val[0]
+                        else:
+                            bound_params[ph] = val
+                    else:
+                        bound_params[ph] = val
                     break
 
     # 6. Élagage universel des paramètres orphelins :

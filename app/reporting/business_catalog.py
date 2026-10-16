@@ -90,7 +90,7 @@ _METRICS: Dict[str, MetricDefinition] = {
         label="Total des dénonciations",
         description="Nombre total de dénonciations et signalements de fraudes ou d'irrégularités.",
         required_tables=["reporting_claim"],
-        aggregation_sql_template="COUNT(CASE WHEN claim_type = 'DENUNCIATION' THEN 1 END)",
+        aggregation_sql_template="COUNT(CASE WHEN claim_type IN ('DENUNCIATION', 'DENUNCIACION') THEN 1 END)",
     ),
     "suggestion_count": MetricDefinition(
         metric_id="suggestion_count",
@@ -102,9 +102,13 @@ _METRICS: Dict[str, MetricDefinition] = {
     "sla_adherence_rate": MetricDefinition(
         metric_id="sla_adherence_rate",
         label="Taux de respect des délais SLA",
-        description="Pourcentage de réclamations résolues avant ou à la date limite SLA contractuelle.",
+        description="Pourcentage de dossiers résolus dans les délais SLA contractuels.",
         required_tables=["reporting_claim"],
-        aggregation_sql_template="AVG(CASE WHEN resolved_at <= sla_due_at THEN 100.0 ELSE 0.0 END)",
+        aggregation_sql_template=(
+            "ROUND((COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) "
+            "OR (resolved_at IS NULL AND sla_due_at >= NOW()) THEN 1 END) * 100.0) / "
+            "NULLIF(COUNT(*), 0), 2)"
+        ),
     ),
     "avg_processing_time": MetricDefinition(
         metric_id="avg_processing_time",
@@ -116,9 +120,12 @@ _METRICS: Dict[str, MetricDefinition] = {
     "satisfaction_rate": MetricDefinition(
         metric_id="satisfaction_rate",
         label="Taux de satisfaction usagers",
-        description="Pourcentage d'usagers ayant formulé un avis favorable ('SATISFIED') post-résolution.",
+        description="Pourcentage d'usagers ayant formulé un avis favorable ('SATISFIED') parmi les avis exprimés.",
         required_tables=["reporting_claim"],
-        aggregation_sql_template="AVG(CASE WHEN satisfaction_status = 'SATISFIED' THEN 100.0 ELSE 0.0 END)",
+        aggregation_sql_template=(
+            "ROUND((COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0) / "
+            "NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2)"
+        ),
     ),
     "severe_plainte_count": MetricDefinition(
         metric_id="severe_plainte_count",
@@ -250,6 +257,8 @@ _SYNONYMS: Dict[str, List[str]] = {
     "denonciation": [
         "denonciation",
         "denonciations",
+        "denunciacion",
+        "denonciacion",
         "fraude",
         "fraudes",
         "soupcon",
@@ -257,6 +266,18 @@ _SYNONYMS: Dict[str, List[str]] = {
         "signalement",
         "signalements",
         "alerte ethique",
+    ],
+    "unresolved_plainte_count": [
+        "en cours",
+        "dossiers en cours",
+        "non resolu",
+        "non resolus",
+        "non cloture",
+        "non clotures",
+        "ouvert",
+        "ouverts",
+        "dossiers ouverts",
+        "dossiers en attente",
     ],
     "suggestion": [
         "suggestion",
@@ -425,21 +446,27 @@ def sync_metrics_with_db(db: Any) -> None:
     try:
         from app.db.models import ReportingBusinessMetric
 
-        existing = db.query(ReportingBusinessMetric).all()
-        if not existing:
-            concept_mapping = {
-                "plainte_count": "plainte",
-                "reclamation_count": "reclamation",
-                "denonciation_count": "denonciation",
-                "suggestion_count": "suggestion",
-                "sla_adherence_rate": "reclamation",
-                "avg_processing_time": "reclamation",
-                "satisfaction_rate": "reclamation",
-                "severe_plainte_count": "reclamation",
-                "adoption_rate": "suggestion",
-                "reaffectation_count": "treatment",
-            }
-            for m_id, m_def in _METRICS.items():
+        concept_mapping = {
+            "plainte_count": "plainte",
+            "reclamation_count": "reclamation",
+            "denonciation_count": "denonciation",
+            "suggestion_count": "suggestion",
+            "sla_adherence_rate": "reclamation",
+            "avg_processing_time": "reclamation",
+            "satisfaction_rate": "reclamation",
+            "severe_plainte_count": "reclamation",
+            "adoption_rate": "suggestion",
+            "reaffectation_count": "treatment",
+        }
+        for m_id, m_def in _METRICS.items():
+            row = db.query(ReportingBusinessMetric).filter_by(metric_id=m_id).first()
+            if row:
+                row.label = m_def.label
+                row.description = m_def.description
+                row.target_concept = concept_mapping.get(m_id, "plainte")
+                row.required_tables = m_def.required_tables
+                row.aggregation_sql_template = m_def.aggregation_sql_template
+            else:
                 db_row = metric_to_db_model(
                     metric=m_def,
                     target_concept=concept_mapping.get(m_id, "plainte"),
@@ -447,9 +474,9 @@ def sync_metrics_with_db(db: Any) -> None:
                     created_by="system",
                 )
                 db.add(db_row)
-            db.commit()
-            existing = db.query(ReportingBusinessMetric).all()
+        db.commit()
 
+        existing = db.query(ReportingBusinessMetric).all()
         catalog = get_business_catalog()
         for row in existing:
             catalog.metrics[row.metric_id] = db_model_to_metric(row)
