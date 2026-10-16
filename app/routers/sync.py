@@ -112,9 +112,36 @@ def sync_status(db: Session = Depends(get_db)):
             ReportingSyncState.sync_name == "spring_boot_suggestions"
         )
     )
+    aff_state = db.scalar(
+        select(ReportingSyncState).where(
+            ReportingSyncState.sync_name == "spring_boot_affectations"
+        )
+    )
+    ref_state = db.scalar(
+        select(ReportingSyncState).where(
+            ReportingSyncState.sync_name == "spring_boot_referentiels"
+        )
+    )
+    sol_state = db.scalar(
+        select(ReportingSyncState).where(
+            ReportingSyncState.sync_name == "spring_boot_solutions"
+        )
+    )
     categories_metadata = vector_db.categories_collection.metadata or {}
 
     return {
+        "referentiels": {
+            "last_sync_at": ref_state.updated_at.isoformat() if ref_state else None,
+            "received_count": ref_state.last_received_count if ref_state else 0,
+            "inserted_count": ref_state.last_inserted_count if ref_state else 0,
+            "updated_count": ref_state.last_updated_count if ref_state else 0,
+            "last_started_at": ref_state.last_started_at.isoformat() if ref_state and ref_state.last_started_at else None,
+            "last_completed_at": ref_state.last_completed_at.isoformat() if ref_state and ref_state.last_completed_at else None,
+            "last_duration_ms": ref_state.last_duration_ms if ref_state else None,
+            "error_count": ref_state.last_error_count if ref_state else 0,
+            "last_error": ref_state.last_error if ref_state else None,
+            "status": "healthy" if ref_state else "not_initialized",
+        },
         "claims": {
             "last_sync_at": state.updated_at.isoformat() if state else None,
             "last_cursor": (
@@ -158,6 +185,44 @@ def sync_status(db: Session = Depends(get_db)):
             "error_count": sugg_state.last_error_count if sugg_state else 0,
             "last_error": sugg_state.last_error if sugg_state else None,
             "status": "healthy" if sugg_state else "not_initialized",
+        },
+        "affectations": {
+            "last_sync_at": aff_state.updated_at.isoformat() if aff_state else None,
+            "last_cursor": (
+                aff_state.last_successful_sync_at.isoformat()
+                if aff_state and aff_state.last_successful_sync_at
+                else None
+            ),
+            "received_count": aff_state.last_received_count if aff_state else 0,
+            "inserted_count": aff_state.last_inserted_count if aff_state else 0,
+            "updated_count": aff_state.last_updated_count if aff_state else 0,
+            "ignored_count": aff_state.last_ignored_count if aff_state else 0,
+            "deleted_count": aff_state.last_deleted_count if aff_state else 0,
+            "last_started_at": aff_state.last_started_at.isoformat() if aff_state and aff_state.last_started_at else None,
+            "last_completed_at": aff_state.last_completed_at.isoformat() if aff_state and aff_state.last_completed_at else None,
+            "last_duration_ms": aff_state.last_duration_ms if aff_state else None,
+            "error_count": aff_state.last_error_count if aff_state else 0,
+            "last_error": aff_state.last_error if aff_state else None,
+            "status": "healthy" if aff_state else "not_initialized",
+        },
+        "solutions": {
+            "last_sync_at": sol_state.updated_at.isoformat() if sol_state else None,
+            "last_cursor": (
+                sol_state.last_successful_sync_at.isoformat()
+                if sol_state and sol_state.last_successful_sync_at
+                else None
+            ),
+            "received_count": sol_state.last_received_count if sol_state else 0,
+            "inserted_count": sol_state.last_inserted_count if sol_state else 0,
+            "updated_count": sol_state.last_updated_count if sol_state else 0,
+            "ignored_count": sol_state.last_ignored_count if sol_state else 0,
+            "deleted_count": sol_state.last_deleted_count if sol_state else 0,
+            "last_started_at": sol_state.last_started_at.isoformat() if sol_state and sol_state.last_started_at else None,
+            "last_completed_at": sol_state.last_completed_at.isoformat() if sol_state and sol_state.last_completed_at else None,
+            "last_duration_ms": sol_state.last_duration_ms if sol_state else None,
+            "error_count": sol_state.last_error_count if sol_state else 0,
+            "last_error": sol_state.last_error if sol_state else None,
+            "status": "healthy" if sol_state else "not_initialized",
         },
         "categories": {
             "catalog_hash": categories_metadata.get("catalog_hash"),

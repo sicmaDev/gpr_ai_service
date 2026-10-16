@@ -90,6 +90,157 @@ class ReportingSuggestion(Base):
     synced_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
 
+class ReportingHistoriqueAffectation(Base):
+    __tablename__ = "reporting_historique_affectations"
+    __table_args__ = (
+        Index("ix_reporting_hist_aff_date", "date_affectation"),
+        Index("ix_reporting_hist_aff_prev", "affectation_precedente_id"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    reclamation_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    suggestion_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    code_plainte: Mapped[Optional[str]] = mapped_column(String(255))
+    type_plainte: Mapped[Optional[str]] = mapped_column(String(40))
+    nom_agent: Mapped[Optional[str]] = mapped_column(String(255))
+    email_agent: Mapped[Optional[str]] = mapped_column(String(255))
+    affecteur_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    nom_affecteur: Mapped[Optional[str]] = mapped_column(String(255))
+    email_affecteur: Mapped[Optional[str]] = mapped_column(String(255))
+    date_affectation: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    delai_jours: Mapped[Optional[int]] = mapped_column(Integer, default=2)
+    date_fin_affectation: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    affectation_precedente_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    last_notification: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    mail_envoye: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
+    sms_envoye: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
+
+
+class ReportingPoste(Base):
+    __tablename__ = "reporting_poste"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    libelle: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+
+
+class ReportingServicePoint(Base):
+    __tablename__ = "reporting_service_point"
+    __table_args__ = (
+        Index("ix_reporting_sp_libelle", "libelle"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    libelle: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    type: Mapped[Optional[str]] = mapped_column(String(50), default="AGENCE")
+    is_principal_agence: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
+    direction_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+
+
+class ReportingCollectionChannel(Base):
+    __tablename__ = "reporting_collection_channel"
+    __table_args__ = (
+        Index("ix_reporting_cc_libelle", "libelle"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    libelle: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+
+
+class ReportingProduct(Base):
+    __tablename__ = "reporting_product"
+    __table_args__ = (
+        Index("ix_reporting_prod_libelle", "libelle"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    libelle: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    is_deleted: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
+
+
+class ReportingCategorieObjet(Base):
+    __tablename__ = "reporting_categorie_objet"
+    __table_args__ = (
+        Index("ix_reporting_cat_libelle", "libelle"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    libelle: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+
+
+class ReportingObjet(Base):
+    __tablename__ = "reporting_objet"
+    __table_args__ = (
+        Index("ix_reporting_obj_libelle", "libelle"),
+        Index("ix_reporting_obj_categorie", "categorie_id"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    categorie_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    libelle: Mapped[str] = mapped_column(String(255), nullable=False)
+    risque_level: Mapped[Optional[str]] = mapped_column(String(40))
+    processing_time: Mapped[Optional[int]] = mapped_column(Integer, default=2)
+
+
+class ReportingUser(Base):
+    __tablename__ = "reporting_user"
+    __table_args__ = (
+        Index("ix_reporting_user_code", "code"),
+        Index("ix_reporting_user_email", "email"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    code: Mapped[Optional[str]] = mapped_column(String(100), unique=True)
+    firstandlastname: Mapped[Optional[str]] = mapped_column(String(255))
+    email: Mapped[Optional[str]] = mapped_column(String(255), unique=True)
+    additionalrole: Mapped[Optional[str]] = mapped_column(String(255))
+    service_point_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    poste_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+
+
+class ReportingSolution(Base):
+    __tablename__ = "reporting_solution"
+    __table_args__ = (
+        Index("ix_reporting_sol_claim", "claim_id"),
+        Index("ix_reporting_sol_status", "status"),
+        Index("ix_reporting_sol_author", "author_id"),
+        Index("ix_reporting_sol_approver", "approver_id"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    claim_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    author_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    commentaire: Mapped[Optional[str]] = mapped_column(Text)
+    motif_desaprobation: Mapped[Optional[str]] = mapped_column(Text)
+    approver_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    unapproved_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    is_ai_proposed: Mapped[Optional[bool]] = mapped_column(Boolean)
+    ai_selected_solution: Mapped[Optional[str]] = mapped_column(Text)
+
+
+class ReportingSatisfactionMeasure(Base):
+    __tablename__ = "reporting_satisfaction_measure"
+    __table_args__ = (
+        Index("ix_reporting_sat_solution", "solution_id"),
+        Index("ix_reporting_sat_measurer", "measurer_id"),
+        Index("ix_reporting_sat_status", "status"),
+        Index("ix_reporting_sat_date", "measure_date_time"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    solution_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    measurer_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    commentaire: Mapped[Optional[str]] = mapped_column(Text)
+    measure_date_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
 class ReportingSyncState(Base):
     __tablename__ = "reporting_sync_state"
 
