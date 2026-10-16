@@ -1,0 +1,228 @@
+[
+  {
+    "id": 1,
+    "question": "Quels sont les dossiers en cours qui ne sont toujours pas résolus ?",
+    "metric_type": "scalar",
+    "description": "Tous les dossiers avec status != 'SATISFIED' (AFFECTED, SAVED, TREAT, CLASSED, UNSATISFIED)",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE status != 'SATISFIED'",
+    "expected_result": 40.0
+  },
+  {
+    "id": 2,
+    "question": "Réclamations des clients mécontents reçues hors agence physique",
+    "metric_type": "scalar",
+    "description": "Réclamations avec status='UNSATISFIED' hors AGENCE/Physique",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status = 'UNSATISFIED' AND channel NOT IN ('AGENCE', 'Physique')",
+    "expected_result": 2.0
+  },
+  {
+    "id": 3,
+    "question": "Nombre de dossiers critiques ou graves en attente de traitement",
+    "metric_type": "scalar",
+    "description": "Dossiers graves/critiques non clôturés",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE') AND status != 'SATISFIED'",
+    "expected_result": 18.0
+  },
+  {
+    "id": 4,
+    "question": "Taux de respect des délais pour les réclamations de niveau critique en 2026",
+    "metric_type": "rate",
+    "description": "Taux de respect SLA pour réclamations critiques en 2026",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 42.11
+  },
+  {
+    "id": 5,
+    "question": "Signalements de fraudes et irrégularités enregistrés sans passer par le guichet",
+    "metric_type": "scalar",
+    "description": "Dénonciations hors canaux physiques",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type IN ('DENUNCIATION', 'DENUNCIACION') AND channel NOT IN ('AGENCE', 'Physique')",
+    "expected_result": 4.0
+  },
+  {
+    "id": 6,
+    "question": "Délai moyen de résolution des dossiers traités pour les clients insatisfaits",
+    "metric_type": "scalar",
+    "description": "Délai moyen en jours pour les dossiers résolus insatisfaits",
+    "reference_sql": "SELECT ROUND(AVG(DATEDIFF(resolved_at, receipt_at)), 2) AS avg_days FROM reporting_claim WHERE status = 'UNSATISFIED' AND resolved_at IS NOT NULL",
+    "expected_result": 9.0
+  },
+  {
+    "id": 7,
+    "question": "Total des réclamations reçues sur le canal téléphonique au cours de l'été 2026",
+    "metric_type": "scalar",
+    "description": "Réclamations téléphoniques de l'été 2026 (juin à août inclus)",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND channel = 'TELEPHONE' AND receipt_at >= '2026-06-01' AND receipt_at < '2026-09-01'",
+    "expected_result": 7.0
+  },
+  {
+    "id": 8,
+    "question": "Propositions d'amélioration et suggestions enregistrées en 2026",
+    "metric_type": "scalar",
+    "description": "Suggestions enregistrées en 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_suggestion WHERE recorded_at >= '2026-01-01' AND recorded_at < '2027-01-01'",
+    "expected_result": 3.0
+  },
+  {
+    "id": 9,
+    "question": "Taux de satisfaction des usagers pour les dossiers résolus hors délai",
+    "metric_type": "rate",
+    "description": "Satisfaction sur dossiers résolus en retard",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0 / NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate FROM reporting_claim WHERE resolved_at IS NOT NULL AND resolved_at > sla_due_at",
+    "expected_result": 0.0
+  },
+  {
+    "id": 10,
+    "question": "Dossiers de réclamations mineures enregistrés pour l'Agence Bouaké",
+    "metric_type": "scalar",
+    "description": "Réclamations mineures à l'Agence Bouaké",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level IN ('MINEUR', 'FAIBLE') OR ai_urgency = 'MINEUR') AND (agency LIKE '%Bouaké%' OR service_point LIKE '%Bouaké%')",
+    "expected_result": 1.0
+  },
+  {
+    "id": 11,
+    "question": "Pourcentage de respect des SLA pour les signalements graves en 2026",
+    "metric_type": "rate",
+    "description": "Respect SLA sur dénonciations graves",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type IN ('DENUNCIATION', 'DENUNCIACION') AND (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 40.0
+  },
+  {
+    "id": 12,
+    "question": "Nombre de réclamations ouvertes et non clôturées à ce jour en 2026",
+    "metric_type": "scalar",
+    "description": "Réclamations ouvertes (status != 'SATISFIED') en 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status != 'SATISFIED' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 32.0
+  },
+  {
+    "id": 13,
+    "question": "Répartition des dossiers mécontents par motif au troisième trimestre 2026",
+    "metric_type": "breakdown",
+    "description": "Répartition par motif des clients insatisfaits au T3 2026",
+    "reference_sql": "SELECT COALESCE(motif, category, 'Non spécifié') AS motif_name, COUNT(*) AS total FROM reporting_claim WHERE status = 'UNSATISFIED' AND receipt_at >= '2026-07-01' AND receipt_at < '2026-10-01' GROUP BY COALESCE(motif, category, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "motif_name": "Code PIN oublié",
+        "total": 1
+      },
+      {
+        "motif_name": "Fraude à la carte",
+        "total": 1
+      },
+      {
+        "motif_name": "Frais excessifs",
+        "total": 1
+      },
+      {
+        "motif_name": "Carte avalée par le DAB",
+        "total": 1
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "question": "Taux de respect des engagements de délai pour l'Agence Korhogo en 2026",
+    "metric_type": "rate",
+    "description": "Respect SLA à Korhogo en 2026",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE (agency LIKE '%Korhogo%' OR service_point LIKE '%Korhogo%') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 61.54
+  },
+  {
+    "id": 15,
+    "question": "Nombre de dénonciations anonymes ou signalements traités en 2026",
+    "metric_type": "scalar",
+    "description": "Dénonciations traitées (TREAT, SATISFIED, UNSATISFIED) en 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type IN ('DENUNCIATION', 'DENUNCIACION') AND status IN ('TREAT', 'SATISFIED', 'UNSATISFIED') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 6.0
+  },
+  {
+    "id": 16,
+    "question": "Dossiers urgents transmis via le canal web en septembre 2026",
+    "metric_type": "scalar",
+    "description": "Dossiers urgents WEB en septembre 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE channel = 'WEB' AND (ai_urgency = 'GRAVE' OR risk_level IN ('GRAVE', 'ELEVE')) AND receipt_at >= '2026-09-01' AND receipt_at < '2026-10-01'",
+    "expected_result": 2.0
+  },
+  {
+    "id": 17,
+    "question": "Taux de satisfaction des clients ayant déposé une plainte via le téléphone",
+    "metric_type": "rate",
+    "description": "Satisfaction client canal téléphonique",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0 / NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate FROM reporting_claim WHERE channel = 'TELEPHONE'",
+    "expected_result": 66.67
+  },
+  {
+    "id": 18,
+    "question": "Réclamations traitées avec succès avant échéance pour l'Agence Abidjan",
+    "metric_type": "scalar",
+    "description": "Réclamations résolues dans les délais à Abidjan",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (agency LIKE '%Abidjan%' OR service_point LIKE '%Abidjan%') AND status = 'SATISFIED' AND resolved_at <= sla_due_at",
+    "expected_result": 0.0
+  },
+  {
+    "id": 19,
+    "question": "Délai moyen de clôture des dossiers de réclamation en septembre 2026",
+    "metric_type": "scalar",
+    "description": "Délai moyen de clôture en septembre 2026",
+    "reference_sql": "SELECT ROUND(AVG(DATEDIFF(resolved_at, receipt_at)), 2) AS avg_days FROM reporting_claim WHERE claim_type = 'CLAIM' AND status = 'SATISFIED' AND receipt_at >= '2026-09-01' AND receipt_at < '2026-10-01'",
+    "expected_result": 2.0
+  },
+  {
+    "id": 20,
+    "question": "Nombre total de doléances clients enregistrées sur toute l'année 2026",
+    "metric_type": "scalar",
+    "description": "Volume total des réclamations en 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 43.0
+  },
+  {
+    "id": 21,
+    "question": "Taux de respect SLA pour les réclamations reçues par voie digitale en 2026",
+    "metric_type": "rate",
+    "description": "Taux SLA voie digitale (WEB) en 2026",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND channel = 'WEB' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 36.36
+  },
+  {
+    "id": 22,
+    "question": "Dossiers avec niveau de risque moyen clôturés avec satisfaction",
+    "metric_type": "scalar",
+    "description": "Dossiers de risque moyen clôturés satisfaits",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE (risk_level = 'MOYEN' OR ai_urgency = 'MOYEN') AND status = 'SATISFIED'",
+    "expected_result": 5.0
+  },
+  {
+    "id": 23,
+    "question": "Proportion de réclamations respectant le délai imparti par canal en 2026",
+    "metric_type": "breakdown",
+    "description": "Respect SLA par canal pour les réclamations 2026",
+    "reference_sql": "SELECT channel, ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY channel ORDER BY sla_rate DESC",
+    "expected_result": [
+      {
+        "channel": "Physique",
+        "sla_rate": 80.0
+      },
+      {
+        "channel": "TELEPHONE",
+        "sla_rate": 63.64
+      },
+      {
+        "channel": "AGENCE",
+        "sla_rate": 36.36
+      },
+      {
+        "channel": "WEB",
+        "sla_rate": 36.36
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "question": "Volume global de dossiers de réclamation non satisfaits en 2026",
+    "metric_type": "scalar",
+    "description": "Réclamations non satisfaites en 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status = 'UNSATISFIED' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 3.0
+  }
+]

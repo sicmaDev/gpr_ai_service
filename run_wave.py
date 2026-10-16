@@ -131,7 +131,7 @@ def generate_wave_synthesis_report(
         "",
         f"> **Statut Global de la Vague** : {'✅ VALIDÉE (0 anomalie)' if is_wave_perfect else '🚨 ANOMALIES DÉTECTÉES (Corrections requises)'}  ",
         f"> **Date d'exécution** : {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}  ",
-        f"> **Fichier Unique de Questions** : `{question_file.name}`  ",
+        f"> **Fichier Unique de Questions** : [`{question_file.name}`](file:///{question_file.resolve().as_posix()})  ",
         f"> **Nombre de Tests Préalables Exécutés** : {len(runs_results)}  ",
         "",
         "---",
@@ -168,10 +168,13 @@ def generate_wave_synthesis_report(
     ])
 
     for r in runs_results:
-        log_name = Path(r["log_file"]).name if r["log_file"] else "-"
-        audit_name = Path(r["audit_md"]).name if r["audit_md"] else "-"
-        json_name = Path(r["audit_json"]).name if r["audit_json"] else "-"
-        md.append(f"| Test {r['run_idx']} | `{log_name}` | [`{audit_name}`]({audit_name}) | [`{json_name}`]({json_name}) | {r['duration_sec']}s |")
+        log_path = Path(r["log_file"]).resolve() if r.get("log_file") else None
+        audit_path = Path(r["audit_md"]).resolve() if r.get("audit_md") else None
+        json_path = Path(r["audit_json"]).resolve() if r.get("audit_json") else None
+        log_link = f"[`{log_path.name}`](file:///{log_path.as_posix()})" if log_path else "-"
+        audit_link = f"[`{audit_path.name}`](file:///{audit_path.as_posix()})" if audit_path else "-"
+        json_link = f"[`{json_path.name}`](file:///{json_path.as_posix()})" if json_path else "-"
+        md.append(f"| Test {r['run_idx']} | {log_link} | {audit_link} | {json_link} | {r['duration_sec']}s |")
 
     md.extend(["", "---", "", "## 3. Détail des Anomalies Détectées"])
 

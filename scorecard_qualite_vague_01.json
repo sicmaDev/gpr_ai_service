@@ -1,0 +1,325 @@
+{
+  "evaluation_timestamp": "2026-10-16T13:05:50.579336+00:00",
+  "evaluated_questions": 24,
+  "score_global": 53.17,
+  "homologation_status": "NON_HOMOLOGUÉE",
+  "blocking_violations": [
+    "Sécurité AST non respectée à 100% (0.0%)",
+    "Traçabilité incomplète dans l'audit (0.0%)",
+    "Exactitude métier sous le seuil d'admissibilité (70.8% < 75%)"
+  ],
+  "axes": {
+    "axe_1_exactitude_metier_pct": 70.8,
+    "axe_2_qualite_interpretation_pct": 100.0,
+    "axe_3_securite_ast_pct": 0.0,
+    "axe_4_tracabilite_audit_pct": 0.0,
+    "axe_5_reproductibilite_pct": 90.0,
+    "axe_6_latence_p50_sec": 0.0,
+    "axe_6_latence_p95_sec": 0.0,
+    "axe_7_robustesse_pct": 0.0,
+    "axe_8_qualite_restitution_pct": 29.2
+  },
+  "details": [
+    {
+      "id": 1,
+      "question": "Combien de réclamations ?",
+      "expected": 43.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 43.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 2,
+      "question": "Quelles sont les dénonciations enregistrées ?",
+      "expected": 9.0,
+      "actual_text": "Pour la période demandée, le résultat pour denonciation_count est de 0.",
+      "is_exact": false,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 3,
+      "question": "Nombre d'idées et suggestions d'amélioration",
+      "expected": 3.0,
+      "actual_text": "Pour la période demandée, le résultat pour suggestion_count est de 0.",
+      "is_exact": false,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 4,
+      "question": "Volume total de dossiers reçus par la banque",
+      "expected": 52.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 5,
+      "question": "Combien de transferts de dossiers ont eu lieu ?",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour reaffectation_count est de 0.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 6,
+      "question": "Plaintes",
+      "expected": 52.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 7,
+      "question": "Réclamations moyennes",
+      "expected": 17.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 17.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 8,
+      "question": "Taux de respect des engagements SLA",
+      "expected": 53.49,
+      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
+      "is_exact": false,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 9,
+      "question": "Pourcentage d'usagers satisfaits",
+      "expected": 75.0,
+      "actual_text": "Pour la période demandée, le résultat pour satisfaction_rate est de 0.00000.",
+      "is_exact": false,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 10,
+      "question": "Score moyen de risque estimé",
+      "expected": 62.69,
+      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
+      "is_exact": false,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 11,
+      "question": "Réclamations par agence",
+      "expected": [
+        {
+          "agency_name": "Agence Korhogo",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 11
+        },
+        {
+          "agency_name": "Direction Générale",
+          "total": 10
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 12,
+      "question": "Dossiers par canal de collecte",
+      "expected": [
+        {
+          "channel_name": "AGENCE",
+          "total": 13
+        },
+        {
+          "channel_name": "Physique",
+          "total": 13
+        },
+        {
+          "channel_name": "TELEPHONE",
+          "total": 13
+        },
+        {
+          "channel_name": "WEB",
+          "total": 13
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 52 plainte_count a été enregistré, avec la répartition suivante par channel : AGEN",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 13,
+      "question": "Suggestions selon le niveau d'impact",
+      "expected": [
+        {
+          "impact_level": "ELEVE",
+          "total": 1
+        },
+        {
+          "impact_level": "MOYEN",
+          "total": 1
+        },
+        {
+          "impact_level": "FAIBLE",
+          "total": 1
+        }
+      ],
+      "actual_text": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
+      "is_exact": false,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 14,
+      "question": "Réclamations par agence et par canal",
+      "expected": [
+        {
+          "agency_name": "Agence Korhogo",
+          "channel_name": "TELEPHONE",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "channel_name": "WEB",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "channel_name": "AGENCE",
+          "total": 11
+        },
+        {
+          "agency_name": "Direction Générale",
+          "channel_name": "Physique",
+          "total": 10
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 15,
+      "question": "Total des réclamations",
+      "expected": 43.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 43.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 16,
+      "question": "Réclamations graves",
+      "expected": 19.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 19.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 17,
+      "question": "Plaintes critiques ou lourdes",
+      "expected": 24.0,
+      "actual_text": "Pour la période demandée, le résultat pour severe_plainte_count est de 24.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 18,
+      "question": "Dossiers insatisfaits",
+      "expected": 4.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+      "is_exact": false,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 19,
+      "question": "Réclamations graves insatisfaites du canal Web",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 20,
+      "question": "Nombre de réclamations par agence",
+      "expected": [
+        {
+          "agency_name": "Agence Korhogo",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 11
+        },
+        {
+          "agency_name": "Direction Générale",
+          "total": 10
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 21,
+      "question": "En 2026",
+      "expected": 52.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 22,
+      "question": "En mars 2026",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 23,
+      "question": "Premier trimestre 2026",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 24,
+      "question": "Ce mois-ci",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+      "is_exact": true,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    }
+  ]
+}

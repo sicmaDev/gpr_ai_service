@@ -1,0 +1,425 @@
+[
+  {
+    "id": 1,
+    "question": "Taux de respect des délais SLA par agence en 2026",
+    "metric_type": "breakdown",
+    "description": "Taux SLA par agence 2026",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY sla_rate DESC",
+    "expected_result": [
+      {
+        "agency_name": "Direction Générale",
+        "sla_rate": 80.0
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "sla_rate": 63.64
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "sla_rate": 36.36
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "sla_rate": 36.36
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "question": "Top 3 des agences avec le plus grand nombre de réclamations",
+    "metric_type": "breakdown",
+    "description": "Top 3 agences volume réclamations",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC LIMIT 3",
+    "expected_result": [
+      {
+        "agency_name": "Agence Korhogo",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 11
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "question": "Délai moyen de traitement des réclamations par canal en 2026",
+    "metric_type": "breakdown",
+    "description": "Délai moyen traitement par canal 2026",
+    "reference_sql": "SELECT COALESCE(channel, 'Non spécifié') AS channel_name, ROUND(AVG(DATEDIFF(resolved_at, receipt_at)), 2) AS avg_days FROM reporting_claim WHERE claim_type = 'CLAIM' AND resolved_at IS NOT NULL AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(channel, 'Non spécifié') ORDER BY avg_days DESC",
+    "expected_result": [
+      {
+        "channel_name": "WEB",
+        "avg_days": 9.0
+      },
+      {
+        "channel_name": "TELEPHONE",
+        "avg_days": 4.33
+      },
+      {
+        "channel_name": "AGENCE",
+        "avg_days": 4.33
+      },
+      {
+        "channel_name": "Physique",
+        "avg_days": 2.0
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "question": "Taux de satisfaction des usagers par canal de collecte",
+    "metric_type": "breakdown",
+    "description": "Satisfaction par canal de collecte",
+    "reference_sql": "SELECT COALESCE(channel, 'Non spécifié') AS channel_name, ROUND(COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0 / NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate FROM reporting_claim GROUP BY COALESCE(channel, 'Non spécifié') ORDER BY satisfaction_rate DESC",
+    "expected_result": [
+      {
+        "channel_name": "Physique",
+        "satisfaction_rate": 100.0
+      },
+      {
+        "channel_name": "TELEPHONE",
+        "satisfaction_rate": 66.67
+      },
+      {
+        "channel_name": "WEB",
+        "satisfaction_rate": 50.0
+      },
+      {
+        "channel_name": "AGENCE",
+        "satisfaction_rate": 50.0
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "question": "Pourcentage de respect des SLA pour les réclamations de l'Agence Abidjan",
+    "metric_type": "rate",
+    "description": "Respect SLA Agence Abidjan",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND (agency LIKE '%Abidjan%' OR service_point LIKE '%Abidjan%')",
+    "expected_result": 36.36
+  },
+  {
+    "id": 6,
+    "question": "Top 5 des motifs de réclamations les plus fréquents en 2026",
+    "metric_type": "breakdown",
+    "description": "Top 5 motifs réclamations 2026",
+    "reference_sql": "SELECT COALESCE(motif, category, 'Non spécifié') AS motif_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(motif, category, 'Non spécifié') ORDER BY total DESC LIMIT 5",
+    "expected_result": [
+      {
+        "motif_name": "Frais excessifs",
+        "total": 9
+      },
+      {
+        "motif_name": "Carte avalée par le DAB",
+        "total": 9
+      },
+      {
+        "motif_name": "Fraude à la carte",
+        "total": 8
+      },
+      {
+        "motif_name": "Code PIN oublié",
+        "total": 6
+      },
+      {
+        "motif_name": "Prélèvement contesté",
+        "total": 6
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "question": "Délai moyen de résolution des dossiers pour l'Agence Bouaké",
+    "metric_type": "scalar",
+    "description": "Délai moyen de résolution Agence Bouaké",
+    "reference_sql": "SELECT ROUND(AVG(DATEDIFF(resolved_at, receipt_at)), 2) AS avg_days FROM reporting_claim WHERE (agency LIKE '%Bouaké%' OR service_point LIKE '%Bouaké%') AND resolved_at IS NOT NULL",
+    "expected_result": 5.5
+  },
+  {
+    "id": 8,
+    "question": "Taux de respect des délais SLA par niveau de risque",
+    "metric_type": "breakdown",
+    "description": "Taux SLA par risque",
+    "reference_sql": "SELECT COALESCE(risk_level, 'Non spécifié') AS risk_level, ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' GROUP BY COALESCE(risk_level, 'Non spécifié') ORDER BY sla_rate DESC",
+    "expected_result": [
+      {
+        "risk_level": "MOYEN",
+        "sla_rate": 64.71
+      },
+      {
+        "risk_level": "MINEUR",
+        "sla_rate": 57.14
+      },
+      {
+        "risk_level": "GRAVE",
+        "sla_rate": 42.11
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "question": "Classement des agences par délai moyen de traitement en 2026",
+    "metric_type": "breakdown",
+    "description": "Classement agences délai moyen 2026",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, ROUND(AVG(DATEDIFF(resolved_at, receipt_at)), 2) AS avg_days FROM reporting_claim WHERE claim_type = 'CLAIM' AND resolved_at IS NOT NULL AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY avg_days ASC",
+    "expected_result": [
+      {
+        "agency_name": "Direction Générale",
+        "avg_days": 2.0
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "avg_days": 4.33
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "avg_days": 4.33
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "avg_days": 9.0
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "question": "Taux de satisfaction des réclamations pour le canal WEB",
+    "metric_type": "rate",
+    "description": "Satisfaction client canal WEB",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0 / NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate FROM reporting_claim WHERE channel = 'WEB'",
+    "expected_result": 50.0
+  },
+  {
+    "id": 11,
+    "question": "Top 3 des canaux de collecte avec le plus fort volume de réclamations",
+    "metric_type": "breakdown",
+    "description": "Top 3 canaux collecte réclamations",
+    "reference_sql": "SELECT COALESCE(channel, 'Non spécifié') AS channel_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' GROUP BY COALESCE(channel, 'Non spécifié') ORDER BY total DESC LIMIT 3",
+    "expected_result": [
+      {
+        "channel_name": "TELEPHONE",
+        "total": 11
+      },
+      {
+        "channel_name": "WEB",
+        "total": 11
+      },
+      {
+        "channel_name": "AGENCE",
+        "total": 11
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "question": "Nombre moyen de jours de traitement des réclamations reçues en août 2026",
+    "metric_type": "scalar",
+    "description": "Délai moyen réclamations août 2026",
+    "reference_sql": "SELECT ROUND(AVG(DATEDIFF(resolved_at, receipt_at)), 2) AS avg_days FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-08-01' AND receipt_at < '2026-09-01' AND resolved_at IS NOT NULL",
+    "expected_result": 5.5
+  },
+  {
+    "id": 13,
+    "question": "Taux de respect SLA pour les réclamations enregistrées en juillet 2026",
+    "metric_type": "rate",
+    "description": "Taux SLA réclamations juillet 2026",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-07-01' AND receipt_at < '2026-08-01'",
+    "expected_result": null
+  },
+  {
+    "id": 14,
+    "question": "Top 3 des agences ayant le meilleur taux de respect SLA en 2026",
+    "metric_type": "breakdown",
+    "description": "Top 3 agences respect SLA 2026",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY sla_rate DESC LIMIT 3",
+    "expected_result": [
+      {
+        "agency_name": "Direction Générale",
+        "sla_rate": 80.0
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "sla_rate": 63.64
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "sla_rate": 36.36
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "question": "Délai moyen de traitement des plaintes graves en 2026",
+    "metric_type": "scalar",
+    "description": "Délai moyen dossiers graves 2026",
+    "reference_sql": "SELECT ROUND(AVG(DATEDIFF(resolved_at, receipt_at)), 2) AS avg_days FROM reporting_claim WHERE (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' AND resolved_at IS NOT NULL",
+    "expected_result": 3.75
+  },
+  {
+    "id": 16,
+    "question": "Taux de satisfaction global des réclamations en 2026",
+    "metric_type": "rate",
+    "description": "Satisfaction globale réclamations 2026",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0 / NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 78.57
+  },
+  {
+    "id": 17,
+    "question": "Classement des canaux de collecte selon le taux de satisfaction usagers",
+    "metric_type": "breakdown",
+    "description": "Classement canaux par satisfaction",
+    "reference_sql": "SELECT COALESCE(channel, 'Non spécifié') AS channel_name, ROUND(COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0 / NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate FROM reporting_claim GROUP BY COALESCE(channel, 'Non spécifié') ORDER BY satisfaction_rate DESC",
+    "expected_result": [
+      {
+        "channel_name": "Physique",
+        "satisfaction_rate": 100.0
+      },
+      {
+        "channel_name": "TELEPHONE",
+        "satisfaction_rate": 66.67
+      },
+      {
+        "channel_name": "WEB",
+        "satisfaction_rate": 50.0
+      },
+      {
+        "channel_name": "AGENCE",
+        "satisfaction_rate": 50.0
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "question": "Top 5 des dossiers avec le délai de traitement le plus long",
+    "metric_type": "breakdown",
+    "description": "Top 5 dossiers délai résolution le plus long",
+    "reference_sql": "SELECT id, source_code, DATEDIFF(resolved_at, receipt_at) AS days FROM reporting_claim WHERE resolved_at IS NOT NULL ORDER BY days DESC LIMIT 5",
+    "expected_result": [
+      {
+        "id": 25,
+        "source_code": "SEED-CLAIM-016",
+        "days": 9
+      },
+      {
+        "id": 27,
+        "source_code": "SEED-DEN-008",
+        "days": 9
+      },
+      {
+        "id": 39,
+        "source_code": "SEED-CLAIM-024",
+        "days": 9
+      },
+      {
+        "id": 71,
+        "source_code": "SEED-CLAIM-032",
+        "days": 9
+      },
+      {
+        "id": 41,
+        "source_code": "SEED-DEN-022",
+        "days": 2
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "question": "Taux de respect des SLA pour les réclamations reçues via le canal AGENCE",
+    "metric_type": "rate",
+    "description": "Respect SLA canal agence",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND channel IN ('AGENCE', 'Physique', 'GUICHET')",
+    "expected_result": 57.14
+  },
+  {
+    "id": 20,
+    "question": "Délai moyen de traitement des réclamations par agence en 2026",
+    "metric_type": "breakdown",
+    "description": "Délai moyen traitement par agence 2026",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, ROUND(AVG(DATEDIFF(resolved_at, receipt_at)), 2) AS avg_days FROM reporting_claim WHERE claim_type = 'CLAIM' AND resolved_at IS NOT NULL AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY avg_days ASC",
+    "expected_result": [
+      {
+        "agency_name": "Direction Générale",
+        "avg_days": 2.0
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "avg_days": 4.33
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "avg_days": 4.33
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "avg_days": 9.0
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "question": "Taux de satisfaction des usagers pour l'Agence Korhogo en 2026",
+    "metric_type": "rate",
+    "description": "Satisfaction usagers Korhogo 2026",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0 / NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate FROM reporting_claim WHERE (agency LIKE '%Korhogo%' OR service_point LIKE '%Korhogo%') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 66.67
+  },
+  {
+    "id": 22,
+    "question": "Top 3 des motifs de dénonciations enregistrées en 2026",
+    "metric_type": "breakdown",
+    "description": "Top 3 motifs dénonciations 2026",
+    "reference_sql": "SELECT COALESCE(motif, category, 'Non spécifié') AS motif_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type IN ('DENUNCIATION', 'DENUNCIACION') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(motif, category, 'Non spécifié') ORDER BY total DESC LIMIT 3",
+    "expected_result": [
+      {
+        "motif_name": "Corruption ou demande de pot-de-vin",
+        "total": 3
+      },
+      {
+        "motif_name": "Code PIN oublié",
+        "total": 2
+      },
+      {
+        "motif_name": "Fraude à la carte",
+        "total": 1
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "question": "Taux de respect des délais SLA pour les dossiers de niveau de risque moyen",
+    "metric_type": "rate",
+    "description": "Respect SLA risque moyen",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE (risk_level = 'MOYEN' OR ai_urgency = 'MOYEN')",
+    "expected_result": 60.0
+  },
+  {
+    "id": 24,
+    "question": "Classement des agences par volume total de réclamations traitées",
+    "metric_type": "breakdown",
+    "description": "Classement agences volume réclamations traitées",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status IN ('TREAT', 'SATISFIED', 'UNSATISFIED') GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Direction Générale",
+        "total": 8
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "total": 5
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "total": 5
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 5
+      }
+    ]
+  }
+]

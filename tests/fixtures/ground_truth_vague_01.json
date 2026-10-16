@@ -1,0 +1,279 @@
+[
+  {
+    "id": 1,
+    "question": "Combien de réclamations ?",
+    "metric_type": "scalar",
+    "description": "Comptage des réclamations",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM'",
+    "expected_result": 43.0
+  },
+  {
+    "id": 2,
+    "question": "Quelles sont les dénonciations enregistrées ?",
+    "metric_type": "scalar",
+    "description": "Comptage des dénonciations",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type IN ('DENUNCIATION', 'DENUNCIACION')",
+    "expected_result": 9.0
+  },
+  {
+    "id": 3,
+    "question": "Nombre d'idées et suggestions d'amélioration",
+    "metric_type": "scalar",
+    "description": "Comptage des suggestions",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_suggestion",
+    "expected_result": 3.0
+  },
+  {
+    "id": 4,
+    "question": "Volume total de dossiers reçus par la banque",
+    "metric_type": "scalar",
+    "description": "Volume total tous dossiers reçus",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim",
+    "expected_result": 52.0
+  },
+  {
+    "id": 5,
+    "question": "Combien de transferts de dossiers ont eu lieu ?",
+    "metric_type": "scalar",
+    "description": "Transferts / réaffectations",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE status = 'TRANSFER'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 6,
+    "question": "Plaintes",
+    "metric_type": "scalar",
+    "description": "Total unifié plainte_count",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim",
+    "expected_result": 52.0
+  },
+  {
+    "id": 7,
+    "question": "Réclamations moyennes",
+    "metric_type": "scalar",
+    "description": "Réclamations de risque moyen",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level = 'MOYEN' OR ai_urgency = 'MOYEN')",
+    "expected_result": 17.0
+  },
+  {
+    "id": 8,
+    "question": "Taux de respect des engagements SLA",
+    "metric_type": "rate",
+    "description": "Taux SLA global réclamations",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM'",
+    "expected_result": 53.49
+  },
+  {
+    "id": 9,
+    "question": "Pourcentage d'usagers satisfaits",
+    "metric_type": "rate",
+    "description": "Taux de satisfaction global",
+    "reference_sql": "SELECT ROUND(COUNT(CASE WHEN status = 'SATISFIED' THEN 1 END) * 100.0 / NULLIF(COUNT(CASE WHEN status IN ('SATISFIED', 'UNSATISFIED') THEN 1 END), 0), 2) AS satisfaction_rate FROM reporting_claim",
+    "expected_result": 75.0
+  },
+  {
+    "id": 10,
+    "question": "Score moyen de risque estimé",
+    "metric_type": "scalar",
+    "description": "Score moyen de risque IA",
+    "reference_sql": "SELECT ROUND(AVG(ai_risk_score), 2) AS avg_score FROM reporting_claim WHERE ai_risk_score IS NOT NULL",
+    "expected_result": 62.69
+  },
+  {
+    "id": 11,
+    "question": "Réclamations par agence",
+    "metric_type": "breakdown",
+    "description": "Réclamations ventilées par agence",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Agence Korhogo",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 11
+      },
+      {
+        "agency_name": "Direction Générale",
+        "total": 10
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "question": "Dossiers par canal de collecte",
+    "metric_type": "breakdown",
+    "description": "Dossiers ventilés par canal",
+    "reference_sql": "SELECT COALESCE(channel, 'Non spécifié') AS channel_name, COUNT(*) AS total FROM reporting_claim GROUP BY COALESCE(channel, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "channel_name": "AGENCE",
+        "total": 13
+      },
+      {
+        "channel_name": "Physique",
+        "total": 13
+      },
+      {
+        "channel_name": "TELEPHONE",
+        "total": 13
+      },
+      {
+        "channel_name": "WEB",
+        "total": 13
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "question": "Suggestions selon le niveau d'impact",
+    "metric_type": "breakdown",
+    "description": "Suggestions par impact",
+    "reference_sql": "SELECT COALESCE(impact_level, 'Non spécifié') AS impact_level, COUNT(*) AS total FROM reporting_suggestion GROUP BY COALESCE(impact_level, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "impact_level": "ELEVE",
+        "total": 1
+      },
+      {
+        "impact_level": "MOYEN",
+        "total": 1
+      },
+      {
+        "impact_level": "FAIBLE",
+        "total": 1
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "question": "Réclamations par agence et par canal",
+    "metric_type": "breakdown",
+    "description": "Réclamations croisées agence x canal",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COALESCE(channel, 'Non spécifié') AS channel_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' GROUP BY COALESCE(agency, service_point, 'Non spécifié'), COALESCE(channel, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Agence Korhogo",
+        "channel_name": "TELEPHONE",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "channel_name": "WEB",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "channel_name": "AGENCE",
+        "total": 11
+      },
+      {
+        "agency_name": "Direction Générale",
+        "channel_name": "Physique",
+        "total": 10
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "question": "Total des réclamations",
+    "metric_type": "scalar",
+    "description": "Total des réclamations",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM'",
+    "expected_result": 43.0
+  },
+  {
+    "id": 16,
+    "question": "Réclamations graves",
+    "metric_type": "scalar",
+    "description": "Réclamations graves / élevées",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE')",
+    "expected_result": 19.0
+  },
+  {
+    "id": 17,
+    "question": "Plaintes critiques ou lourdes",
+    "metric_type": "scalar",
+    "description": "Plaintes globales graves",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE')",
+    "expected_result": 24.0
+  },
+  {
+    "id": 18,
+    "question": "Dossiers insatisfaits",
+    "metric_type": "scalar",
+    "description": "Dossiers au statut insatisfait",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE status = 'UNSATISFIED'",
+    "expected_result": 4.0
+  },
+  {
+    "id": 19,
+    "question": "Réclamations graves insatisfaites du canal Web",
+    "metric_type": "scalar",
+    "description": "Réclamations graves insatisfaites WEB",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE') AND status = 'UNSATISFIED' AND channel = 'WEB'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 20,
+    "question": "Nombre de réclamations par agence",
+    "metric_type": "breakdown",
+    "description": "Réclamations ventilées par agence",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Agence Korhogo",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 11
+      },
+      {
+        "agency_name": "Direction Générale",
+        "total": 10
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "question": "En 2026",
+    "metric_type": "scalar",
+    "description": "Volume dossiers 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 52.0
+  },
+  {
+    "id": 22,
+    "question": "En mars 2026",
+    "metric_type": "scalar",
+    "description": "Volume dossiers mars 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE receipt_at >= '2026-03-01' AND receipt_at < '2026-04-01'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 23,
+    "question": "Premier trimestre 2026",
+    "metric_type": "scalar",
+    "description": "Volume dossiers T1 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE receipt_at >= '2026-01-01' AND receipt_at < '2026-04-01'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 24,
+    "question": "Ce mois-ci",
+    "metric_type": "scalar",
+    "description": "Volume dossiers octobre 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE receipt_at >= '2026-10-01' AND receipt_at < '2026-11-01'",
+    "expected_result": 0.0
+  }
+]

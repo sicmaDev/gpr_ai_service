@@ -1,0 +1,472 @@
+[
+  {
+    "id": 1,
+    "question": "Nombre de réclamations en cours au premier trimestre 2026",
+    "metric_type": "scalar",
+    "description": "Réclamations non résolues T1 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status != 'SATISFIED' AND receipt_at >= '2026-01-01' AND receipt_at < '2026-04-01'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 2,
+    "question": "Réclamations graves reçues en mars 2026",
+    "metric_type": "scalar",
+    "description": "Réclamations graves mars 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE') AND receipt_at >= '2026-03-01' AND receipt_at < '2026-04-01'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 3,
+    "question": "Dossiers de réclamation par agence pour le canal Guichet",
+    "metric_type": "breakdown",
+    "description": "Réclamations canal physique par agence",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND channel IN ('GUICHET', 'AGENCE', 'Physique') GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 11
+      },
+      {
+        "agency_name": "Direction Générale",
+        "total": 10
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "question": "Répartition des réclamations par catégorie de produit en 2026",
+    "metric_type": "breakdown",
+    "description": "Réclamations par produit 2026",
+    "reference_sql": "SELECT COALESCE(product, category, 'Non spécifié') AS product_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(product, category, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "product_name": "Compte Courant",
+        "total": 27
+      },
+      {
+        "product_name": "Carte VISA Gold",
+        "total": 16
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "question": "Nombre de réclamations traitées et satisfaites par agence",
+    "metric_type": "breakdown",
+    "description": "Réclamations satisfaites par agence",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status = 'SATISFIED' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Direction Générale",
+        "total": 7
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 2
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "question": "Réclamations urgentes ou critiques de l'Agence Littoral",
+    "metric_type": "scalar",
+    "description": "Réclamations urgentes Agence Littoral",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE') AND (agency LIKE '%Littoral%' OR service_point LIKE '%Littoral%')",
+    "expected_result": 0.0
+  },
+  {
+    "id": 7,
+    "question": "Volume de dénonciations par statut en 2026",
+    "metric_type": "breakdown",
+    "description": "Dénonciations par statut en 2026",
+    "reference_sql": "SELECT COALESCE(status, 'Non spécifié') AS status_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type IN ('DENUNCIATION', 'DENUNCIACION') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(status, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "status_name": "TREAT",
+        "total": 4
+      },
+      {
+        "status_name": "SAVED",
+        "total": 2
+      },
+      {
+        "status_name": "CLASSED",
+        "total": 1
+      },
+      {
+        "status_name": "UNSATISFIED",
+        "total": 1
+      },
+      {
+        "status_name": "SATISFIED",
+        "total": 1
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "question": "Suggestions d'amélioration adoptées par catégorie d'impact",
+    "metric_type": "breakdown",
+    "description": "Suggestions adoptées par impact",
+    "reference_sql": "SELECT COALESCE(impact_level, 'Non spécifié') AS impact_level, COUNT(*) AS total FROM reporting_suggestion WHERE status IN ('APPROVED', 'ADOPTED', 'VALIDATED') GROUP BY COALESCE(impact_level, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": []
+  },
+  {
+    "id": 9,
+    "question": "Réclamations reçues entre le 01/01/2026 et le 30/06/2026",
+    "metric_type": "scalar",
+    "description": "Réclamations du premier semestre 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at <= '2026-06-30 23:59:59'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 10,
+    "question": "Nombre de dossiers en souffrance ou en cours par agence",
+    "metric_type": "breakdown",
+    "description": "Dossiers non clôturés par agence",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE status != 'SATISFIED' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Agence Abidjan",
+        "total": 12
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "total": 11
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 11
+      },
+      {
+        "agency_name": "Direction Générale",
+        "total": 6
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "question": "Réclamations par agence avec statut CLOTURE",
+    "metric_type": "breakdown",
+    "description": "Réclamations clôturées par agence",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status IN ('CLOTURE', 'SATISFIED', 'CLOSED') GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Direction Générale",
+        "total": 7
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 2
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "question": "Doléances par canal de collecte pour les réclamations moyennes",
+    "metric_type": "breakdown",
+    "description": "Réclamations moyennes par canal",
+    "reference_sql": "SELECT COALESCE(channel, 'Non spécifié') AS channel_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level = 'MOYEN' OR ai_urgency = 'MOYEN') GROUP BY COALESCE(channel, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "channel_name": "Physique",
+        "total": 5
+      },
+      {
+        "channel_name": "AGENCE",
+        "total": 5
+      },
+      {
+        "channel_name": "WEB",
+        "total": 4
+      },
+      {
+        "channel_name": "TELEPHONE",
+        "total": 3
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "question": "Suggestions selon le statut au premier semestre 2026",
+    "metric_type": "breakdown",
+    "description": "Suggestions par statut S1 2026",
+    "reference_sql": "SELECT COALESCE(status, 'Non spécifié') AS status_name, COUNT(*) AS total FROM reporting_suggestion WHERE recorded_at >= '2026-01-01' AND recorded_at < '2026-07-01' GROUP BY COALESCE(status, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": []
+  },
+  {
+    "id": 14,
+    "question": "Nombre de réclamations graves par canal en 2026",
+    "metric_type": "breakdown",
+    "description": "Réclamations graves par canal 2026",
+    "reference_sql": "SELECT COALESCE(channel, 'Non spécifié') AS channel_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level IN ('GRAVE', 'ELEVE') OR ai_urgency = 'GRAVE') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(channel, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "channel_name": "TELEPHONE",
+        "total": 5
+      },
+      {
+        "channel_name": "AGENCE",
+        "total": 5
+      },
+      {
+        "channel_name": "Physique",
+        "total": 5
+      },
+      {
+        "channel_name": "WEB",
+        "total": 4
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "question": "Dénonciations selon le niveau de risque en 2026",
+    "metric_type": "breakdown",
+    "description": "Dénonciations par risque 2026",
+    "reference_sql": "SELECT COALESCE(risk_level, 'Non spécifié') AS risk_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type IN ('DENUNCIATION', 'DENUNCIACION') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(risk_level, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "risk_name": "GRAVE",
+        "total": 5
+      },
+      {
+        "risk_name": "MOYEN",
+        "total": 3
+      },
+      {
+        "risk_name": "MINEUR",
+        "total": 1
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "question": "Réclamations non satisfaites par agence",
+    "metric_type": "breakdown",
+    "description": "Réclamations insatisfaites par agence",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status = 'UNSATISFIED' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Agence Abidjan",
+        "total": 1
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "total": 1
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "total": 1
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "question": "Volume de dossiers reçus par le canal Mobile en 2026",
+    "metric_type": "scalar",
+    "description": "Dossiers canal Mobile 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE (channel LIKE '%MOBILE%' OR channel LIKE '%APP%') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 18,
+    "question": "Plaintes avec statut AFFECTED au premier trimestre 2026",
+    "metric_type": "scalar",
+    "description": "Plaintes affectées T1 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE status = 'AFFECTED' AND receipt_at >= '2026-01-01' AND receipt_at < '2026-04-01'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 19,
+    "question": "Nombre de litiges par objet et par agence",
+    "metric_type": "breakdown",
+    "description": "Litiges croisés agence x motif",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, COALESCE(motif, category, 'Non spécifié') AS motif_name, COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' GROUP BY COALESCE(agency, service_point, 'Non spécifié'), COALESCE(motif, category, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "agency_name": "Agence Korhogo",
+        "motif_name": "Frais excessifs",
+        "total": 3
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "motif_name": "Fraude à la carte",
+        "total": 3
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "motif_name": "Frais excessifs",
+        "total": 3
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "motif_name": "Carte avalée par le DAB",
+        "total": 3
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "motif_name": "Prélèvement contesté",
+        "total": 3
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "motif_name": "Fraude à la carte",
+        "total": 2
+      },
+      {
+        "agency_name": "Direction Générale",
+        "motif_name": "Mauvais accueil en agence",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "motif_name": "Code PIN oublié",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "motif_name": "Carte avalée par le DAB",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "motif_name": "Carte avalée par le DAB",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "motif_name": "Code PIN oublié",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "motif_name": "Code PIN oublié",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "motif_name": "Prélèvement contesté",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "motif_name": "Fraude à la carte",
+        "total": 2
+      },
+      {
+        "agency_name": "Direction Générale",
+        "motif_name": "Usurpation d'identité",
+        "total": 2
+      },
+      {
+        "agency_name": "Direction Générale",
+        "motif_name": "Frais excessifs",
+        "total": 2
+      },
+      {
+        "agency_name": "Direction Générale",
+        "motif_name": "Carte avalée par le DAB",
+        "total": 2
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "motif_name": "Prélèvement contesté",
+        "total": 1
+      },
+      {
+        "agency_name": "Direction Générale",
+        "motif_name": "Fraude à la carte",
+        "total": 1
+      },
+      {
+        "agency_name": "Direction Générale",
+        "motif_name": "Virement non reçu",
+        "total": 1
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "motif_name": "Frais excessifs",
+        "total": 1
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "question": "Suggestions par canal de collecte",
+    "metric_type": "breakdown",
+    "description": "Suggestions par canal",
+    "reference_sql": "SELECT COALESCE(channel, 'Non spécifié') AS channel_name, COUNT(*) AS total FROM reporting_suggestion GROUP BY COALESCE(channel, 'Non spécifié') ORDER BY total DESC",
+    "expected_result": [
+      {
+        "channel_name": "WEB",
+        "total": 1
+      },
+      {
+        "channel_name": "AGENCE",
+        "total": 1
+      },
+      {
+        "channel_name": "TELEPHONE",
+        "total": 1
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "question": "Réclamations fermées ou résolues en 2026",
+    "metric_type": "scalar",
+    "description": "Réclamations résolues / fermées 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND status IN ('SATISFIED', 'CLOTURE', 'CLOSED') AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01'",
+    "expected_result": 11.0
+  },
+  {
+    "id": 22,
+    "question": "Dénonciations enregistrées par l'Agence Atlantique",
+    "metric_type": "scalar",
+    "description": "Dénonciations Agence Atlantique",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type IN ('DENUNCIATION', 'DENUNCIACION') AND (agency LIKE '%Atlantique%' OR service_point LIKE '%Atlantique%')",
+    "expected_result": 0.0
+  },
+  {
+    "id": 23,
+    "question": "Réclamations mineures reçues en février 2026",
+    "metric_type": "scalar",
+    "description": "Réclamations mineures février 2026",
+    "reference_sql": "SELECT COUNT(*) AS total FROM reporting_claim WHERE claim_type = 'CLAIM' AND (risk_level IN ('MINEUR', 'FAIBLE') OR ai_urgency = 'MINEUR') AND receipt_at >= '2026-02-01' AND receipt_at < '2026-03-01'",
+    "expected_result": 0.0
+  },
+  {
+    "id": 24,
+    "question": "Taux de respect SLA par agence en 2026",
+    "metric_type": "breakdown",
+    "description": "Taux SLA par agence en 2026",
+    "reference_sql": "SELECT COALESCE(agency, service_point, 'Non spécifié') AS agency_name, ROUND(COUNT(CASE WHEN (resolved_at IS NOT NULL AND resolved_at <= sla_due_at) OR (resolved_at IS NULL AND sla_due_at >= '2026-10-15') THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS sla_rate FROM reporting_claim WHERE claim_type = 'CLAIM' AND receipt_at >= '2026-01-01' AND receipt_at < '2027-01-01' GROUP BY COALESCE(agency, service_point, 'Non spécifié') ORDER BY sla_rate DESC",
+    "expected_result": [
+      {
+        "agency_name": "Direction Générale",
+        "sla_rate": 80.0
+      },
+      {
+        "agency_name": "Agence Korhogo",
+        "sla_rate": 63.64
+      },
+      {
+        "agency_name": "Agence Abidjan",
+        "sla_rate": 36.36
+      },
+      {
+        "agency_name": "Agence Bouaké",
+        "sla_rate": 36.36
+      }
+    ]
+  }
+]
