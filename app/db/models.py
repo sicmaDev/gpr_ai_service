@@ -48,6 +48,45 @@ class ReportingClaim(Base):
     resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     sla_due_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     satisfaction_status: Mapped[Optional[str]] = mapped_column(String(40))
+    objet_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    product_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    service_point_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    collection_channel_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    collector_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    synced_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class ReportingSuggestion(Base):
+    __tablename__ = "reporting_suggestion"
+    __table_args__ = (
+        UniqueConstraint("source_suggestion_id", name="uq_reporting_suggestion_source_id"),
+        Index("ix_reporting_suggestion_status", "status"),
+        Index("ix_reporting_suggestion_impact_level", "impact_level"),
+        Index("ix_reporting_suggestion_recorded_at", "recorded_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    source_suggestion_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    reference: Mapped[Optional[str]] = mapped_column(String(255))
+    title: Mapped[Optional[str]] = mapped_column(String(255))
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    client_code: Mapped[Optional[str]] = mapped_column(String(255))
+    client_name: Mapped[Optional[str]] = mapped_column(String(255))
+    phone: Mapped[Optional[str]] = mapped_column(String(255))
+    email: Mapped[Optional[str]] = mapped_column(String(255))
+    channel: Mapped[Optional[str]] = mapped_column(String(255))
+    status: Mapped[Optional[str]] = mapped_column(String(40))
+    impact_level: Mapped[Optional[str]] = mapped_column(String(40))
+    origine: Mapped[Optional[str]] = mapped_column(String(100))
+    objet_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    product_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    service_point_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    collection_channel_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    enregistre_par_id: Mapped[Optional[int]] = mapped_column(BigInteger)
+    evaluator_notes: Mapped[Optional[str]] = mapped_column(Text)
+    recorded_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    created_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     synced_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
 

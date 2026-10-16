@@ -22,7 +22,8 @@ from app.services.sync_service import perform_sync
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if IS_DEPLOYMENT:
+    enable_scheduler = IS_DEPLOYMENT or os.getenv("REPORTING_ENABLE_SCHEDULER", "false").lower() == "true"
+    if enable_scheduler:
         scheduler = BackgroundScheduler()
         scheduler.add_job(perform_sync, 'cron', hour=2, minute=0)
         scheduler.start()
@@ -73,13 +74,14 @@ def read_root():
     return {"status": "online", "service": "GPR Web IA API", "version": "1.0.0"}
 
 @app.get("/sync")
-def trigger_sync(full: bool = False):
+def trigger_sync(full: bool = False, target: str = "all"):
     try:
-        result = perform_sync(full=full)
+        result = perform_sync(full=full, target=target)
         return {
             "status": "success",
             "message": "Synchronisation terminée avec succès.",
             "full": full,
+            "target": target,
             **result,
         }
     except Exception as e:

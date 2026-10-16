@@ -107,6 +107,11 @@ def sync_status(db: Session = Depends(get_db)):
             ReportingSyncState.sync_name == "spring_boot_claims"
         )
     )
+    sugg_state = db.scalar(
+        select(ReportingSyncState).where(
+            ReportingSyncState.sync_name == "spring_boot_suggestions"
+        )
+    )
     categories_metadata = vector_db.categories_collection.metadata or {}
 
     return {
@@ -134,6 +139,25 @@ def sync_status(db: Session = Depends(get_db)):
                 "REPORTING_ENABLE_RAG_SYNC", "false"
             ).lower()
             == "true",
+        },
+        "suggestions": {
+            "last_sync_at": sugg_state.updated_at.isoformat() if sugg_state else None,
+            "last_cursor": (
+                sugg_state.last_successful_sync_at.isoformat()
+                if sugg_state and sugg_state.last_successful_sync_at
+                else None
+            ),
+            "received_count": sugg_state.last_received_count if sugg_state else 0,
+            "inserted_count": sugg_state.last_inserted_count if sugg_state else 0,
+            "updated_count": sugg_state.last_updated_count if sugg_state else 0,
+            "ignored_count": sugg_state.last_ignored_count if sugg_state else 0,
+            "deleted_count": sugg_state.last_deleted_count if sugg_state else 0,
+            "last_started_at": sugg_state.last_started_at.isoformat() if sugg_state and sugg_state.last_started_at else None,
+            "last_completed_at": sugg_state.last_completed_at.isoformat() if sugg_state and sugg_state.last_completed_at else None,
+            "last_duration_ms": sugg_state.last_duration_ms if sugg_state else None,
+            "error_count": sugg_state.last_error_count if sugg_state else 0,
+            "last_error": sugg_state.last_error if sugg_state else None,
+            "status": "healthy" if sugg_state else "not_initialized",
         },
         "categories": {
             "catalog_hash": categories_metadata.get("catalog_hash"),
