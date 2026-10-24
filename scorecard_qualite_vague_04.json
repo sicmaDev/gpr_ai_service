@@ -1,114 +1,112 @@
 {
-  "evaluation_timestamp": "2026-10-16T13:05:26.051816+00:00",
+  "evaluation_timestamp": "2026-10-17T00:28:53.858954+00:00",
   "evaluated_questions": 24,
-  "score_global": 45.46,
+  "score_global": 90.67,
   "homologation_status": "NON_HOMOLOGUÉE",
   "blocking_violations": [
-    "Sécurité AST non respectée à 100% (20.8%)",
-    "Traçabilité incomplète dans l'audit (20.8%)",
-    "Exactitude métier sous le seuil d'admissibilité (12.5% < 75%)"
+    "Exactitude métier sous le seuil d'admissibilité (66.7% < 75%)"
   ],
   "axes": {
-    "axe_1_exactitude_metier_pct": 12.5,
+    "axe_1_exactitude_metier_pct": 66.7,
     "axe_2_qualite_interpretation_pct": 100.0,
-    "axe_3_securite_ast_pct": 20.8,
-    "axe_4_tracabilite_audit_pct": 20.8,
+    "axe_3_securite_ast_pct": 100.0,
+    "axe_4_tracabilite_audit_pct": 100.0,
     "axe_5_reproductibilite_pct": 90.0,
-    "axe_6_latence_p50_sec": 0.0,
-    "axe_6_latence_p95_sec": 0.0,
-    "axe_7_robustesse_pct": 0.0,
-    "axe_8_qualite_restitution_pct": 62.5
+    "axe_6_latence_p50_sec": 0.02,
+    "axe_6_latence_p95_sec": 0.03,
+    "axe_7_robustesse_pct": 100.0,
+    "axe_8_qualite_restitution_pct": 100.0
   },
   "details": [
     {
       "id": 1,
       "question": "Quels sont les dossiers en cours qui ne sont toujours pas résolus ?",
       "expected": 40.0,
-      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 35.",
       "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.01097
     },
     {
       "id": 2,
       "question": "Réclamations des clients mécontents reçues hors agence physique",
       "expected": 2.0,
-      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
-      "is_exact": false,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 2.",
+      "is_exact": true,
       "is_traceable": true,
-      "duration_sec": 0.0
+      "duration_sec": 0.03059
     },
     {
       "id": 3,
       "question": "Nombre de dossiers critiques ou graves en attente de traitement",
       "expected": 18.0,
-      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour severe_plainte_count est de 18.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00211
     },
     {
       "id": 4,
       "question": "Taux de respect des délais pour les réclamations de niveau critique en 2026",
       "expected": 42.11,
-      "actual_text": "Pour la période demandée, le résultat pour sla_adherence_rate est de 0.00000.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour sla_adherence_rate est de 42.11.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.012289999999999999
     },
     {
       "id": 5,
       "question": "Signalements de fraudes et irrégularités enregistrés sans passer par le guichet",
       "expected": 4.0,
-      "actual_text": "Pour la période demandée, un total de 0 denonciation_count a été enregistré, avec la répartition suivante par channel : ",
-      "is_exact": false,
+      "actual_text": "Pour la période demandée, le résultat pour denonciation_count est de 4.",
+      "is_exact": true,
       "is_traceable": true,
-      "duration_sec": 0.0
+      "duration_sec": 0.01091
     },
     {
       "id": 6,
       "question": "Délai moyen de résolution des dossiers traités pour les clients insatisfaits",
       "expected": 9.0,
-      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour avg_processing_time est de 9.0000.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.01841
     },
     {
       "id": 7,
       "question": "Total des réclamations reçues sur le canal téléphonique au cours de l'été 2026",
       "expected": 7.0,
-      "actual_text": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 7.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.02156
     },
     {
       "id": 8,
       "question": "Propositions d'amélioration et suggestions enregistrées en 2026",
       "expected": 3.0,
-      "actual_text": "Pour la période demandée, le résultat pour suggestion_count est de 0.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour suggestion_count est de 3.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.01423
     },
     {
       "id": 9,
       "question": "Taux de satisfaction des usagers pour les dossiers résolus hors délai",
       "expected": 0.0,
-      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour custom_satisfaction_rate_delayed est de 0.00000.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.02586
     },
     {
       "id": 10,
       "question": "Dossiers de réclamations mineures enregistrés pour l'Agence Bouaké",
       "expected": 1.0,
-      "actual_text": "Pour la période demandée, un total de 7 reclamation_count a été enregistré, avec la répartition suivante par agency : Ag",
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
       "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.01579
     },
     {
       "id": 11,
@@ -116,17 +114,17 @@
       "expected": 40.0,
       "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
       "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.045439999999999994
     },
     {
       "id": 12,
       "question": "Nombre de réclamations ouvertes et non clôturées à ce jour en 2026",
       "expected": 32.0,
-      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 32.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.02122
     },
     {
       "id": 13,
@@ -149,28 +147,28 @@
           "total": 1
         }
       ],
-      "actual_text": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, un total de 4 plainte_count a été enregistré, avec la répartition suivante par object : Carte ",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.0294
     },
     {
       "id": 14,
       "question": "Taux de respect des engagements de délai pour l'Agence Korhogo en 2026",
       "expected": 61.54,
-      "actual_text": "Pour la période demandée, un total de 0 sla_adherence_rate a été enregistré, avec la répartition suivante par agency : A",
+      "actual_text": "Pour la période demandée, un total de 216.36 sla_adherence_rate a été enregistré, avec la répartition suivante par agenc",
       "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.01475
     },
     {
       "id": 15,
       "question": "Nombre de dénonciations anonymes ou signalements traités en 2026",
       "expected": 6.0,
-      "actual_text": "Pour la période demandée, le résultat pour denonciation_count est de 0.",
+      "actual_text": "Pour la période demandée, le résultat pour denonciation_count est de 9.",
       "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.01408
     },
     {
       "id": 16,
@@ -179,61 +177,61 @@
       "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 2.",
       "is_exact": true,
       "is_traceable": true,
-      "duration_sec": 0.0
+      "duration_sec": 0.03126
     },
     {
       "id": 17,
       "question": "Taux de satisfaction des clients ayant déposé une plainte via le téléphone",
       "expected": 66.67,
-      "actual_text": "Pour la période demandée, le résultat pour satisfaction_rate est de 0.00000.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour satisfaction_rate est de 66.67.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.02146
     },
     {
       "id": 18,
       "question": "Réclamations traitées avec succès avant échéance pour l'Agence Abidjan",
       "expected": 0.0,
-      "actual_text": "Pour la période demandée, un total de 0 sla_adherence_rate a été enregistré, avec la répartition suivante par agency : A",
-      "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.02504
     },
     {
       "id": 19,
       "question": "Délai moyen de clôture des dossiers de réclamation en septembre 2026",
       "expected": 2.0,
-      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour avg_processing_time est de 2.0000.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.019710000000000002
     },
     {
       "id": 20,
       "question": "Nombre total de doléances clients enregistrées sur toute l'année 2026",
       "expected": 43.0,
-      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 55.",
       "is_exact": false,
       "is_traceable": true,
-      "duration_sec": 0.0
+      "duration_sec": 0.01877
     },
     {
       "id": 21,
       "question": "Taux de respect SLA pour les réclamations reçues par voie digitale en 2026",
       "expected": 36.36,
-      "actual_text": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
+      "actual_text": "Pour la période demandée, un total de 100 sla_adherence_rate a été enregistré, avec la répartition suivante par channel ",
       "is_exact": false,
       "is_traceable": true,
-      "duration_sec": 0.0
+      "duration_sec": 0.03233
     },
     {
       "id": 22,
       "question": "Dossiers avec niveau de risque moyen clôturés avec satisfaction",
       "expected": 5.0,
-      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 5.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.01877
     },
     {
       "id": 23,
@@ -256,19 +254,19 @@
           "sla_rate": 36.36
         }
       ],
-      "actual_text": "Pour la période demandée, un total de 0 sla_adherence_rate a été enregistré, avec la répartition suivante par channel : ",
+      "actual_text": "Pour la période demandée, un total de 216.36 sla_adherence_rate a été enregistré, avec la répartition suivante par chann",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.03024
     },
     {
       "id": 24,
       "question": "Volume global de dossiers de réclamation non satisfaits en 2026",
       "expected": 3.0,
-      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 3.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.02
     }
   ]
 }

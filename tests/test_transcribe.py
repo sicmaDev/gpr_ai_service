@@ -283,6 +283,9 @@ class TranscriptionTests(unittest.TestCase):
         with patch(
             "app.routers.transcribe._transcribe_upload",
             new=AsyncMock(return_value=transcription_result),
+        ), patch(
+            "app.routers.transcribe.correct_transcription",
+            return_value={"text": "Bonjour", "status": "CLEANED", "applied": True},
         ):
             result = asyncio.run(
                 transcribe_audio(

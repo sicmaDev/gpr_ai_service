@@ -1,0 +1,514 @@
+{
+  "evaluation_timestamp": "2026-10-16T23:28:50.427994+00:00",
+  "evaluated_questions": 24,
+  "score_global": 94.42,
+  "homologation_status": "HOMOLOGUÉE",
+  "blocking_violations": [],
+  "axes": {
+    "axe_1_exactitude_metier_pct": 83.3,
+    "axe_2_qualite_interpretation_pct": 100.0,
+    "axe_3_securite_ast_pct": 100.0,
+    "axe_4_tracabilite_audit_pct": 100.0,
+    "axe_5_reproductibilite_pct": 90.0,
+    "axe_6_latence_p50_sec": 0.01,
+    "axe_6_latence_p95_sec": 0.11,
+    "axe_7_robustesse_pct": 95.8,
+    "axe_8_qualite_restitution_pct": 100.0
+  },
+  "details": [
+    {
+      "id": 1,
+      "question": "Nombre de réclamations en cours au premier trimestre 2026",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.0040999999999999995
+    },
+    {
+      "id": 2,
+      "question": "Réclamations graves reçues en mars 2026",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00361
+    },
+    {
+      "id": 3,
+      "question": "Dossiers de réclamation par agence pour le canal Guichet",
+      "expected": [
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 11
+        },
+        {
+          "agency_name": "Direction Générale",
+          "total": 10
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 11 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.00888
+    },
+    {
+      "id": 4,
+      "question": "Répartition des réclamations par catégorie de produit en 2026",
+      "expected": [
+        {
+          "product_name": "Compte Courant",
+          "total": 27
+        },
+        {
+          "product_name": "Carte VISA Gold",
+          "total": 16
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par product : ",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.0154
+    },
+    {
+      "id": 5,
+      "question": "Nombre de réclamations traitées et satisfaites par agence",
+      "expected": [
+        {
+          "agency_name": "Direction Générale",
+          "total": 7
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 2
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 11 reclamation_count a été enregistré, avec la répartition suivante par agency : D",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00882
+    },
+    {
+      "id": 6,
+      "question": "Réclamations urgentes ou critiques de l'Agence Littoral",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00501
+    },
+    {
+      "id": 7,
+      "question": "Volume de dénonciations par statut en 2026",
+      "expected": [
+        {
+          "status_name": "TREAT",
+          "total": 4
+        },
+        {
+          "status_name": "SAVED",
+          "total": 2
+        },
+        {
+          "status_name": "CLASSED",
+          "total": 1
+        },
+        {
+          "status_name": "UNSATISFIED",
+          "total": 1
+        },
+        {
+          "status_name": "SATISFIED",
+          "total": 1
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 9 denonciation_count a été enregistré, avec la répartition suivante par status : T",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.0825
+    },
+    {
+      "id": 8,
+      "question": "Suggestions d'amélioration adoptées par catégorie d'impact",
+      "expected": [],
+      "actual_text": "Une erreur technique est survenue lors de l'exécution : Erreur SQLAlchemy : (sqlalchemy.exc.InvalidRequestError) A value",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00658
+    },
+    {
+      "id": 9,
+      "question": "Réclamations reçues entre le 01/01/2026 et le 30/06/2026",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.10573
+    },
+    {
+      "id": 10,
+      "question": "Nombre de dossiers en souffrance ou en cours par agence",
+      "expected": [
+        {
+          "agency_name": "Agence Abidjan",
+          "total": 12
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 11
+        },
+        {
+          "agency_name": "Direction Générale",
+          "total": 6
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 plainte_count a été enregistré, avec la répartition suivante par agency : Agenc",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.0049900000000000005
+    },
+    {
+      "id": 11,
+      "question": "Réclamations par agence avec statut CLOTURE",
+      "expected": [
+        {
+          "agency_name": "Direction Générale",
+          "total": 7
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 2
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 11 reclamation_count a été enregistré, avec la répartition suivante par agency : D",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00908
+    },
+    {
+      "id": 12,
+      "question": "Doléances par canal de collecte pour les réclamations moyennes",
+      "expected": [
+        {
+          "channel_name": "Physique",
+          "total": 5
+        },
+        {
+          "channel_name": "AGENCE",
+          "total": 5
+        },
+        {
+          "channel_name": "WEB",
+          "total": 4
+        },
+        {
+          "channel_name": "TELEPHONE",
+          "total": 3
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 17 custom_avg_reclamation_count a été enregistré, avec la répartition suivante par",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.02088
+    },
+    {
+      "id": 13,
+      "question": "Suggestions selon le statut au premier semestre 2026",
+      "expected": [],
+      "actual_text": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.01474
+    },
+    {
+      "id": 14,
+      "question": "Nombre de réclamations graves par canal en 2026",
+      "expected": [
+        {
+          "channel_name": "TELEPHONE",
+          "total": 5
+        },
+        {
+          "channel_name": "AGENCE",
+          "total": 5
+        },
+        {
+          "channel_name": "Physique",
+          "total": 5
+        },
+        {
+          "channel_name": "WEB",
+          "total": 4
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 19 severe_plainte_count a été enregistré, avec la répartition suivante par channel",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00455
+    },
+    {
+      "id": 15,
+      "question": "Dénonciations selon le niveau de risque en 2026",
+      "expected": [
+        {
+          "risk_name": "GRAVE",
+          "total": 5
+        },
+        {
+          "risk_name": "MOYEN",
+          "total": 3
+        },
+        {
+          "risk_name": "MINEUR",
+          "total": 1
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 9 denonciation_count a été enregistré, avec la répartition suivante par risk_level",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.01667
+    },
+    {
+      "id": 16,
+      "question": "Réclamations non satisfaites par agence",
+      "expected": [
+        {
+          "agency_name": "Agence Abidjan",
+          "total": 1
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "total": 1
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 1
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 32 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.00543
+    },
+    {
+      "id": 17,
+      "question": "Volume de dossiers reçus par le canal Mobile en 2026",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00797
+    },
+    {
+      "id": 18,
+      "question": "Plaintes avec statut AFFECTED au premier trimestre 2026",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.1945
+    },
+    {
+      "id": 19,
+      "question": "Nombre de litiges par objet et par agence",
+      "expected": [
+        {
+          "agency_name": "Agence Korhogo",
+          "motif_name": "Frais excessifs",
+          "total": 3
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "motif_name": "Fraude à la carte",
+          "total": 3
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "motif_name": "Frais excessifs",
+          "total": 3
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "motif_name": "Carte avalée par le DAB",
+          "total": 3
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "motif_name": "Prélèvement contesté",
+          "total": 3
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "motif_name": "Fraude à la carte",
+          "total": 2
+        },
+        {
+          "agency_name": "Direction Générale",
+          "motif_name": "Mauvais accueil en agence",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "motif_name": "Code PIN oublié",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "motif_name": "Carte avalée par le DAB",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "motif_name": "Carte avalée par le DAB",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "motif_name": "Code PIN oublié",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "motif_name": "Code PIN oublié",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "motif_name": "Prélèvement contesté",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "motif_name": "Fraude à la carte",
+          "total": 2
+        },
+        {
+          "agency_name": "Direction Générale",
+          "motif_name": "Usurpation d'identité",
+          "total": 2
+        },
+        {
+          "agency_name": "Direction Générale",
+          "motif_name": "Frais excessifs",
+          "total": 2
+        },
+        {
+          "agency_name": "Direction Générale",
+          "motif_name": "Carte avalée par le DAB",
+          "total": 2
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "motif_name": "Prélèvement contesté",
+          "total": 1
+        },
+        {
+          "agency_name": "Direction Générale",
+          "motif_name": "Fraude à la carte",
+          "total": 1
+        },
+        {
+          "agency_name": "Direction Générale",
+          "motif_name": "Virement non reçu",
+          "total": 1
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "motif_name": "Frais excessifs",
+          "total": 1
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 55 plainte_count a été enregistré, avec la répartition suivante par object : Frais",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.032560000000000006
+    },
+    {
+      "id": 20,
+      "question": "Suggestions par canal de collecte",
+      "expected": [
+        {
+          "channel_name": "WEB",
+          "total": 1
+        },
+        {
+          "channel_name": "AGENCE",
+          "total": 1
+        },
+        {
+          "channel_name": "TELEPHONE",
+          "total": 1
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 3 suggestion_count a été enregistré, avec la répartition suivante par channel : No",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00757
+    },
+    {
+      "id": 21,
+      "question": "Réclamations fermées ou résolues en 2026",
+      "expected": 11.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 11.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.0059299999999999995
+    },
+    {
+      "id": 22,
+      "question": "Dénonciations enregistrées par l'Agence Atlantique",
+      "expected": 0.0,
+      "actual_text": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00438
+    },
+    {
+      "id": 23,
+      "question": "Réclamations mineures reçues en février 2026",
+      "expected": 0.0,
+      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00454
+    },
+    {
+      "id": 24,
+      "question": "Taux de respect SLA par agence en 2026",
+      "expected": [
+        {
+          "agency_name": "Direction Générale",
+          "sla_rate": 80.0
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "sla_rate": 63.64
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "sla_rate": 36.36
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "sla_rate": 36.36
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 216.36 sla_adherence_rate a été enregistré, avec la répartition suivante par agenc",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.02117
+    }
+  ]
+}

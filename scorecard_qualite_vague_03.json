@@ -1,0 +1,471 @@
+{
+  "evaluation_timestamp": "2026-10-17T00:04:58.615539+00:00",
+  "evaluated_questions": 24,
+  "score_global": 80.67,
+  "homologation_status": "NON_HOMOLOGUÉE",
+  "blocking_violations": [
+    "Sécurité AST non respectée à 100% (95.8%)",
+    "Traçabilité incomplète dans l'audit (95.8%)",
+    "Exactitude métier sous le seuil d'admissibilité (33.3% < 75%)"
+  ],
+  "axes": {
+    "axe_1_exactitude_metier_pct": 33.3,
+    "axe_2_qualite_interpretation_pct": 100.0,
+    "axe_3_securite_ast_pct": 95.8,
+    "axe_4_tracabilite_audit_pct": 95.8,
+    "axe_5_reproductibilite_pct": 90.0,
+    "axe_6_latence_p50_sec": 0.01,
+    "axe_6_latence_p95_sec": 0.09,
+    "axe_7_robustesse_pct": 95.8,
+    "axe_8_qualite_restitution_pct": 95.8
+  },
+  "details": [
+    {
+      "id": 1,
+      "question": "Taux de respect des délais SLA par agence en 2026",
+      "expected": [
+        {
+          "agency_name": "Direction Générale",
+          "sla_rate": 80.0
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "sla_rate": 63.64
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "sla_rate": 36.36
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "sla_rate": 36.36
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 216.36 sla_adherence_rate a été enregistré, avec la répartition suivante par agenc",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.04894
+    },
+    {
+      "id": 2,
+      "question": "Top 3 des agences avec le plus grand nombre de réclamations",
+      "expected": [
+        {
+          "agency_name": "Agence Korhogo",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "total": 11
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 11
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.01323
+    },
+    {
+      "id": 3,
+      "question": "Délai moyen de traitement des réclamations par canal en 2026",
+      "expected": [
+        {
+          "channel_name": "WEB",
+          "avg_days": 9.0
+        },
+        {
+          "channel_name": "TELEPHONE",
+          "avg_days": 4.33
+        },
+        {
+          "channel_name": "AGENCE",
+          "avg_days": 4.33
+        },
+        {
+          "channel_name": "Physique",
+          "avg_days": 2.0
+        }
+      ],
+      "actual_text": "",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.024399999999999998
+    },
+    {
+      "id": 4,
+      "question": "Taux de satisfaction des usagers par canal de collecte",
+      "expected": [
+        {
+          "channel_name": "Physique",
+          "satisfaction_rate": 100.0
+        },
+        {
+          "channel_name": "TELEPHONE",
+          "satisfaction_rate": 66.67
+        },
+        {
+          "channel_name": "WEB",
+          "satisfaction_rate": 50.0
+        },
+        {
+          "channel_name": "AGENCE",
+          "satisfaction_rate": 50.0
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 233.34 satisfaction_rate a été enregistré, avec la répartition suivante par channe",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.12674
+    },
+    {
+      "id": 5,
+      "question": "Pourcentage de respect des SLA pour les réclamations de l'Agence Abidjan",
+      "expected": 36.36,
+      "actual_text": "Pour la période demandée, un total de 216.36 sla_adherence_rate a été enregistré, avec la répartition suivante par agenc",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.0069299999999999995
+    },
+    {
+      "id": 6,
+      "question": "Top 5 des motifs de réclamations les plus fréquents en 2026",
+      "expected": [
+        {
+          "motif_name": "Frais excessifs",
+          "total": 9
+        },
+        {
+          "motif_name": "Carte avalée par le DAB",
+          "total": 9
+        },
+        {
+          "motif_name": "Fraude à la carte",
+          "total": 8
+        },
+        {
+          "motif_name": "Code PIN oublié",
+          "total": 6
+        },
+        {
+          "motif_name": "Prélèvement contesté",
+          "total": 6
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par object : C",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.09015999999999999
+    },
+    {
+      "id": 7,
+      "question": "Délai moyen de résolution des dossiers pour l'Agence Bouaké",
+      "expected": 5.5,
+      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.0047
+    },
+    {
+      "id": 8,
+      "question": "Taux de respect des délais SLA par niveau de risque",
+      "expected": [
+        {
+          "risk_level": "MOYEN",
+          "sla_rate": 64.71
+        },
+        {
+          "risk_level": "MINEUR",
+          "sla_rate": 57.14
+        },
+        {
+          "risk_level": "GRAVE",
+          "sla_rate": 42.11
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 163.96 sla_adherence_rate a été enregistré, avec la répartition suivante par risk_",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00724
+    },
+    {
+      "id": 9,
+      "question": "Classement des agences par délai moyen de traitement en 2026",
+      "expected": [
+        {
+          "agency_name": "Direction Générale",
+          "avg_days": 2.0
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "avg_days": 4.33
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "avg_days": 4.33
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "avg_days": 9.0
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 13 avg_processing_time a été enregistré, avec la répartition suivante par agency :",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.00784
+    },
+    {
+      "id": 10,
+      "question": "Taux de satisfaction des réclamations pour le canal WEB",
+      "expected": 50.0,
+      "actual_text": "Pour la période demandée, un total de 0 satisfaction_rate a été enregistré, avec la répartition suivante par channel : W",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.03102
+    },
+    {
+      "id": 11,
+      "question": "Top 3 des canaux de collecte avec le plus fort volume de réclamations",
+      "expected": [
+        {
+          "channel_name": "TELEPHONE",
+          "total": 11
+        },
+        {
+          "channel_name": "WEB",
+          "total": 11
+        },
+        {
+          "channel_name": "AGENCE",
+          "total": 11
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par channel : ",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.01071
+    },
+    {
+      "id": 12,
+      "question": "Nombre moyen de jours de traitement des réclamations reçues en août 2026",
+      "expected": 5.5,
+      "actual_text": "Pour la période demandée, le résultat pour avg_processing_time est de 2.0000.",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.0091
+    },
+    {
+      "id": 13,
+      "question": "Taux de respect SLA pour les réclamations enregistrées en juillet 2026",
+      "expected": null,
+      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.00888
+    },
+    {
+      "id": 14,
+      "question": "Top 3 des agences ayant le meilleur taux de respect SLA en 2026",
+      "expected": [
+        {
+          "agency_name": "Direction Générale",
+          "sla_rate": 80.0
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "sla_rate": 63.64
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "sla_rate": 36.36
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 216.36 sla_adherence_rate a été enregistré, avec la répartition suivante par agenc",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.00626
+    },
+    {
+      "id": 15,
+      "question": "Délai moyen de traitement des plaintes graves en 2026",
+      "expected": 3.75,
+      "actual_text": "Pour la période demandée, le résultat pour avg_processing_time est de 3.7500.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.0032400000000000003
+    },
+    {
+      "id": 16,
+      "question": "Taux de satisfaction global des réclamations en 2026",
+      "expected": 78.57,
+      "actual_text": "Pour la période demandée, le résultat pour satisfaction_rate est de 78.57.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00797
+    },
+    {
+      "id": 17,
+      "question": "Classement des canaux de collecte selon le taux de satisfaction usagers",
+      "expected": [
+        {
+          "channel_name": "Physique",
+          "satisfaction_rate": 100.0
+        },
+        {
+          "channel_name": "TELEPHONE",
+          "satisfaction_rate": 66.67
+        },
+        {
+          "channel_name": "WEB",
+          "satisfaction_rate": 50.0
+        },
+        {
+          "channel_name": "AGENCE",
+          "satisfaction_rate": 50.0
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 233.34 satisfaction_rate a été enregistré, avec la répartition suivante par channe",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00956
+    },
+    {
+      "id": 18,
+      "question": "Top 5 des dossiers avec le délai de traitement le plus long",
+      "expected": [
+        {
+          "id": 25,
+          "source_code": "SEED-CLAIM-016",
+          "days": 9
+        },
+        {
+          "id": 27,
+          "source_code": "SEED-DEN-008",
+          "days": 9
+        },
+        {
+          "id": 39,
+          "source_code": "SEED-CLAIM-024",
+          "days": 9
+        },
+        {
+          "id": 71,
+          "source_code": "SEED-CLAIM-032",
+          "days": 9
+        },
+        {
+          "id": 41,
+          "source_code": "SEED-DEN-022",
+          "days": 2
+        }
+      ],
+      "actual_text": "La requête demandée ne respecte pas les critères de sécurité et d'intégrité analytique : Table 'reporting_suggestion' ho",
+      "is_exact": false,
+      "is_traceable": false,
+      "duration_sec": 0.0
+    },
+    {
+      "id": 19,
+      "question": "Taux de respect des SLA pour les réclamations reçues via le canal AGENCE",
+      "expected": 57.14,
+      "actual_text": "Pour la période demandée, le résultat pour sla_adherence_rate est de 36.36.",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.005860000000000001
+    },
+    {
+      "id": 20,
+      "question": "Délai moyen de traitement des réclamations par agence en 2026",
+      "expected": [
+        {
+          "agency_name": "Direction Générale",
+          "avg_days": 2.0
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "avg_days": 4.33
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "avg_days": 4.33
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "avg_days": 9.0
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 13 avg_processing_time a été enregistré, avec la répartition suivante par agency :",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.00684
+    },
+    {
+      "id": 21,
+      "question": "Taux de satisfaction des usagers pour l'Agence Korhogo en 2026",
+      "expected": 66.67,
+      "actual_text": "Pour la période demandée, un total de 233.34 satisfaction_rate a été enregistré, avec la répartition suivante par agency",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.008960000000000001
+    },
+    {
+      "id": 22,
+      "question": "Top 3 des motifs de dénonciations enregistrées en 2026",
+      "expected": [
+        {
+          "motif_name": "Corruption ou demande de pot-de-vin",
+          "total": 3
+        },
+        {
+          "motif_name": "Code PIN oublié",
+          "total": 2
+        },
+        {
+          "motif_name": "Fraude à la carte",
+          "total": 1
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 9 denonciation_count a été enregistré, avec la répartition suivante par object : C",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.01184
+    },
+    {
+      "id": 23,
+      "question": "Taux de respect des délais SLA pour les dossiers de niveau de risque moyen",
+      "expected": 60.0,
+      "actual_text": "Pour la période demandée, le résultat pour sla_adherence_rate est de 64.71.",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.006
+    },
+    {
+      "id": 24,
+      "question": "Classement des agences par volume total de réclamations traitées",
+      "expected": [
+        {
+          "agency_name": "Direction Générale",
+          "total": 8
+        },
+        {
+          "agency_name": "Agence Abidjan",
+          "total": 5
+        },
+        {
+          "agency_name": "Agence Korhogo",
+          "total": 5
+        },
+        {
+          "agency_name": "Agence Bouaké",
+          "total": 5
+        }
+      ],
+      "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.0037400000000000003
+    }
+  ]
+}

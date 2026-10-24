@@ -1,23 +1,19 @@
 {
-  "evaluation_timestamp": "2026-10-16T13:05:50.579336+00:00",
+  "evaluation_timestamp": "2026-10-16T23:09:55.952565+00:00",
   "evaluated_questions": 24,
-  "score_global": 53.17,
-  "homologation_status": "NON_HOMOLOGUÉE",
-  "blocking_violations": [
-    "Sécurité AST non respectée à 100% (0.0%)",
-    "Traçabilité incomplète dans l'audit (0.0%)",
-    "Exactitude métier sous le seuil d'admissibilité (70.8% < 75%)"
-  ],
+  "score_global": 93.79,
+  "homologation_status": "HOMOLOGUÉE",
+  "blocking_violations": [],
   "axes": {
-    "axe_1_exactitude_metier_pct": 70.8,
+    "axe_1_exactitude_metier_pct": 79.2,
     "axe_2_qualite_interpretation_pct": 100.0,
-    "axe_3_securite_ast_pct": 0.0,
-    "axe_4_tracabilite_audit_pct": 0.0,
+    "axe_3_securite_ast_pct": 100.0,
+    "axe_4_tracabilite_audit_pct": 100.0,
     "axe_5_reproductibilite_pct": 90.0,
-    "axe_6_latence_p50_sec": 0.0,
-    "axe_6_latence_p95_sec": 0.0,
-    "axe_7_robustesse_pct": 0.0,
-    "axe_8_qualite_restitution_pct": 29.2
+    "axe_6_latence_p50_sec": 0.01,
+    "axe_6_latence_p95_sec": 0.02,
+    "axe_7_robustesse_pct": 100.0,
+    "axe_8_qualite_restitution_pct": 100.0
   },
   "details": [
     {
@@ -26,35 +22,35 @@
       "expected": 43.0,
       "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 43.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.00658
     },
     {
       "id": 2,
       "question": "Quelles sont les dénonciations enregistrées ?",
       "expected": 9.0,
-      "actual_text": "Pour la période demandée, le résultat pour denonciation_count est de 0.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour denonciation_count est de 9.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.0038
     },
     {
       "id": 3,
       "question": "Nombre d'idées et suggestions d'amélioration",
       "expected": 3.0,
-      "actual_text": "Pour la période demandée, le résultat pour suggestion_count est de 0.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour suggestion_count est de 3.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.01509
     },
     {
       "id": 4,
       "question": "Volume total de dossiers reçus par la banque",
       "expected": 52.0,
-      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 55.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.0077800000000000005
     },
     {
       "id": 5,
@@ -62,53 +58,53 @@
       "expected": 0.0,
       "actual_text": "Pour la période demandée, le résultat pour reaffectation_count est de 0.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.0047
     },
     {
       "id": 6,
       "question": "Plaintes",
       "expected": 52.0,
-      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 55.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.00624
     },
     {
       "id": 7,
       "question": "Réclamations moyennes",
       "expected": 17.0,
-      "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 17.",
+      "actual_text": "Pour la période demandée, le résultat pour custom_avg_reclamation_count est de 17.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.00567
     },
     {
       "id": 8,
       "question": "Taux de respect des engagements SLA",
       "expected": 53.49,
-      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour sla_adherence_rate est de 53.49.",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00677
     },
     {
       "id": 9,
       "question": "Pourcentage d'usagers satisfaits",
       "expected": 75.0,
-      "actual_text": "Pour la période demandée, le résultat pour satisfaction_rate est de 0.00000.",
+      "actual_text": "Pour la période demandée, le résultat pour satisfaction_rate est de 11.00%.",
       "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.004
     },
     {
       "id": 10,
       "question": "Score moyen de risque estimé",
       "expected": 62.69,
-      "actual_text": "Aucune donnée disponible pour les critères et la période demandés.",
+      "actual_text": "Pour la période demandée, le résultat pour custom_avg_risk_score est de 17.",
       "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.00266
     },
     {
       "id": 11,
@@ -133,8 +129,8 @@
       ],
       "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.04396
     },
     {
       "id": 12,
@@ -157,10 +153,10 @@
           "total": 13
         }
       ],
-      "actual_text": "Pour la période demandée, un total de 52 plainte_count a été enregistré, avec la répartition suivante par channel : AGEN",
-      "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, un total de 55 plainte_count a été enregistré, avec la répartition suivante par channel : AGEN",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.019940000000000003
     },
     {
       "id": 13,
@@ -179,10 +175,10 @@
           "total": 1
         }
       ],
-      "actual_text": "Aucun enregistrement ne correspond aux critères demandés pour cette période.",
-      "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, un total de 3 suggestion_count a été enregistré, avec la répartition suivante par impact_level",
+      "is_exact": true,
+      "is_traceable": true,
+      "duration_sec": 0.00715
     },
     {
       "id": 14,
@@ -211,8 +207,8 @@
       ],
       "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.02166
     },
     {
       "id": 15,
@@ -220,8 +216,8 @@
       "expected": 43.0,
       "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 43.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.0075899999999999995
     },
     {
       "id": 16,
@@ -229,26 +225,26 @@
       "expected": 19.0,
       "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 19.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.0038900000000000002
     },
     {
       "id": 17,
       "question": "Plaintes critiques ou lourdes",
       "expected": 24.0,
-      "actual_text": "Pour la période demandée, le résultat pour severe_plainte_count est de 24.",
-      "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "actual_text": "Pour la période demandée, le résultat pour severe_plainte_count est de 19.",
+      "is_exact": false,
+      "is_traceable": true,
+      "duration_sec": 0.004019999999999999
     },
     {
       "id": 18,
       "question": "Dossiers insatisfaits",
       "expected": 4.0,
-      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 3.",
       "is_exact": false,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.00859
     },
     {
       "id": 19,
@@ -256,8 +252,8 @@
       "expected": 0.0,
       "actual_text": "Pour la période demandée, le résultat pour reclamation_count est de 0.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.01201
     },
     {
       "id": 20,
@@ -282,17 +278,17 @@
       ],
       "actual_text": "Pour la période demandée, un total de 43 reclamation_count a été enregistré, avec la répartition suivante par agency : A",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.00471
     },
     {
       "id": 21,
       "question": "En 2026",
       "expected": 52.0,
-      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 52.",
+      "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 55.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.01069
     },
     {
       "id": 22,
@@ -300,8 +296,8 @@
       "expected": 0.0,
       "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.01271
     },
     {
       "id": 23,
@@ -309,8 +305,8 @@
       "expected": 0.0,
       "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.00462
     },
     {
       "id": 24,
@@ -318,8 +314,8 @@
       "expected": 0.0,
       "actual_text": "Pour la période demandée, le résultat pour plainte_count est de 0.",
       "is_exact": true,
-      "is_traceable": false,
-      "duration_sec": 0.0
+      "is_traceable": true,
+      "duration_sec": 0.004860000000000001
     }
   ]
 }
