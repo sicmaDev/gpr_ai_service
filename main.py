@@ -14,31 +14,12 @@ if IS_DEPLOYMENT:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import analyze, knowledge, search, sync, transcribe
-from app.reporting import router as reporting_router
-
-from contextlib import asynccontextmanager
-from apscheduler.schedulers.background import BackgroundScheduler
 from app.services.sync_service import perform_sync
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    enable_scheduler = IS_DEPLOYMENT or os.getenv("REPORTING_ENABLE_SCHEDULER", "false").lower() == "true"
-    if enable_scheduler:
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(perform_sync, 'cron', hour=2, minute=0)
-        scheduler.start()
-        print("Planificateur Cron démarré. Synchronisation MySQL prévue tous les jours à 02:00.")
-        try:
-            yield
-        finally:
-            scheduler.shutdown()
-    else:
-        yield
 app = FastAPI(
     title="GPR Web IA Service",
     description="Micro-service d'Intelligence Artificielle pour la Gestion des Plaintes et Réclamations.",
     version="1.0.0",
-    lifespan=lifespan
 )
 
 # Configuration CORS pour autoriser le backend Java (Spring Boot)
@@ -66,7 +47,6 @@ app.include_router(analyze.router)
 app.include_router(search.router)
 app.include_router(sync.router)
 app.include_router(knowledge.router)
-app.include_router(reporting_router)
 app.include_router(transcribe.router)
 
 @app.get("/")
