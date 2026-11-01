@@ -30,7 +30,9 @@ allowed_origins = os.getenv(
         "http://127.0.0.1:3000,"
         "http://localhost:3020,"
         "http://127.0.0.1:3020,"
-        "https://gpr-formation.gprserver.com"
+        "https://gpr-formation.gprserver.com,"
+        "http://92.113.31.9:3005,"
+        "http://92.113.31.9:8000"
     ),
 ).split(",")
 allowed_origins = [origin.strip() for origin in allowed_origins if origin.strip()]

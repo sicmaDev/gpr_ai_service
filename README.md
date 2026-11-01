@@ -61,12 +61,15 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Le service démarre sur `http://localhost:8001`.
+Le service démarre localement sur `http://localhost:8001` et est déployé en ligne sur `https://ai.gprsicma.gprserver.com`.
 
 Pour vérifier que tout fonctionne :
 
 ```bash
+# En local :
 curl http://localhost:8001/
+# En production :
+curl https://ai.gprsicma.gprserver.com/
 ```
 
 Réponse attendue :
